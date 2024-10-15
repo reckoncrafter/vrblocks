@@ -9,11 +9,6 @@ public class VRDebug : MonoBehaviour
   public GameObject UIAnchor;
   public bool UIActive; // can be changed to button press in the future
 
-  void Start()
-  {
-    // ConsoleToText.
-  }
-
   void Update()
   {
     if (UIActive)
