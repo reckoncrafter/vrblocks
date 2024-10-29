@@ -16,7 +16,7 @@ public class SceneTransitionManager : MonoBehaviour
     public static FileInfo[] scenes;
 
     public void Start(){
-        DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Scenes/");
+        DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Scenes/PlayableLevels");
         scenes = dir.GetFiles("*.unity");
     }
 
