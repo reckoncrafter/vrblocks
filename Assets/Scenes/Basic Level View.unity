@@ -2199,6 +2199,7 @@ GameObject:
   - component: {fileID: 740480789}
   - component: {fileID: 740480788}
   - component: {fileID: 740480787}
+  - component: {fileID: 740480791}
   m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2374,6 +2375,21 @@ RectTransform:
   m_AnchoredPosition: {x: -1.24, y: -0.5976}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &740480791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740480786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42354734747d6046baf30f73b16a2c82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 0}
+  toggleButton: 1
+  activationThreshold: 0.1
 --- !u!1 &921243310
 GameObject:
   m_ObjectHideFlags: 0
