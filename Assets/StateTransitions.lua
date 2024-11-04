@@ -16,7 +16,7 @@ StateTransitions = {
   },
 }
 
- function onTransition(stateName)
+function onTransition(stateName)
 print("Transition: " .. stateName)
 UnityFunction(stateName)
 end

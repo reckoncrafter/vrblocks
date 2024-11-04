@@ -32,7 +32,7 @@ public class StateTransitionTable : MonoBehaviour
         }
         luaContent += "}\n";
 
-        luaContent += "\n function onTransition(stateName)\nprint(\"Transition: \" .. stateName)\nUnityFunction(stateName)\nend";
+        luaContent += "\nfunction onTransition(stateName)\nprint(\"Transition: \" .. stateName)\nUnityFunction(stateName)\nend";
 
         string path = Path.Combine(Application.dataPath, "StateTransitions.lua");
         File.WriteAllText(path, luaContent);
