@@ -1064,8 +1064,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac091e3d1f084707adc527b6eb70e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityToSpawn: {fileID: 2844158347067402648, guid: 040b808da240c4b54a6a4135c497a5ec, type: 3}
-  mapBlockValues: {fileID: 11400000, guid: 97e988bc13e5b4efeaebf7e0a926de72, type: 2}
+  mapBlock: {fileID: 2844158347067402648, guid: 040b808da240c4b54a6a4135c497a5ec, type: 3}
+  turtle: {fileID: 5895665564910289227, guid: d0d7639e90aa34d4a861ab49d7013cf3, type: 3}
+  mapValues: {fileID: 11400000, guid: 97e988bc13e5b4efeaebf7e0a926de72, type: 2}
 --- !u!4 &410221467
 Transform:
   m_ObjectHideFlags: 0
@@ -1535,7 +1536,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
