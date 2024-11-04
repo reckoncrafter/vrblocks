@@ -1,17 +1,22 @@
 StateTransitions = {
-  [Pink] = {
+  [Blue] = {
     transitions = {
       'Blue',
     },
   },
   [Blue] = {
     transitions = {
-      'Yellow',
+      'Blue',
     },
   },
-  [Yellow] = {
+  [Blue] = {
     transitions = {
-      'Pink',
+      'Blue',
+    },
+  },
+  [Blue] = {
+    transitions = {
+      'Blue',
     },
   },
 }
