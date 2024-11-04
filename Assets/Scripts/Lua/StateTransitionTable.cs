@@ -15,16 +15,20 @@ public class StateTransitionTable : MonoBehaviour
 
     private void GenerateLuaFile(){
         string luaContent = "StateTransitions = {\n";
-        foreach (Transform child in transform)
-        {
+        foreach (Transform child in transform) {
             State state = child.GetComponent<State>();
-            if (state != null)
-            {
+            if (state != null) {
                 luaContent += $"  [{state.stateName}] = {{\n";
                 luaContent += "    transitions = {\n";
-                foreach (string transition in state.transitions)
-                {
-                    luaContent += $"      '{transition}',\n";
+
+                foreach (State.Transition transition in state.transitions) {
+                    // Get the name of the next object for Lua
+                    string nextObjectName = transition.NextObject != null ? transition.NextObject.name : "nil";
+                    
+                    // Optionally handle actions if you want to store their names or identifiers
+                    string actionName = transition.Action != null ? transition.Action.GetPersistentEventCount() > 0 ? transition.Action.GetPersistentMethodName(0) : "nil" : "nil";
+
+                    luaContent += $"      {{ nextObject = '{nextObjectName}', action = '{actionName}' }},\n";
                 }
                 luaContent += "    },\n";
                 luaContent += "  },\n";
