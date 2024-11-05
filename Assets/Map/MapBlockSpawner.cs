@@ -1,30 +1,48 @@
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MapBlockSpawner : MonoBehaviour
 {
-    public GameObject entityToSpawn;
+    public GameObject mapBlock;
+    public TurtleMovement turtle;
 
-    public MapBlockScriptableObject mapBlockValues;
+    public MapBlockScriptableObject mapValues;
 
     void Start()
     {
         SpawnEntities();
     }
-
-    void SpawnEntities()
+    private void SpawnEntities()
     {
-        // Vector3 startPositionOffset = gameObject.transform.position + mapBlockValues.blockScale / 2;
-        Vector3 startPositionOffset = mapBlockValues.blockScale / 2;
+        Vector3 startPositionOffset = mapValues.blockScale / 2;
 
-        for (int i = 0; i < mapBlockValues.spawnPoints.Length; i++)
+        GameObject currentEntity = null;
+        for (int i = 0; i < mapValues.spawnPoints.Length; i++)
         {
-            Vector3 coords = startPositionOffset + Vector3.Scale(mapBlockValues.spawnPoints[i], mapBlockValues.blockScale);
-            GameObject currentEntity = Instantiate(entityToSpawn, coords, Quaternion.identity);
+            Vector3 coords = startPositionOffset + Vector3.Scale(mapValues.spawnPoints[i], mapValues.blockScale);
+            currentEntity = Instantiate(mapBlock, coords, Quaternion.identity);
 
             currentEntity.transform.SetParent(gameObject.transform, false);
 
-            currentEntity.name = mapBlockValues.prefabName + i;
-            currentEntity.transform.localScale = mapBlockValues.blockScale;
+            currentEntity.name = mapValues.blockPrefabName + i;
+            currentEntity.transform.localScale = mapValues.blockScale;
+        }
+
+        Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
+        TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
+
+        turtleEntity.transform.SetParent(gameObject.transform, false);
+
+        turtleEntity.name = mapValues.turtlePrefabName;
+
+        turtleEntity.movementDuration = mapValues.movementDuration;
+        turtleEntity.animationSpeed = mapValues.animationSpeed;
+
+        if (currentEntity != null)
+        {
+            turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
         }
     }
 }

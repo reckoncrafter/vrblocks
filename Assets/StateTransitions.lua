@@ -1,27 +1,22 @@
 StateTransitions = {
   [Blue] = {
     transitions = {
-      'Blue',
+      { nextObject = 'nil', action = 'nil' },
     },
   },
   [Blue] = {
     transitions = {
-      'Blue',
+      { nextObject = 'nil', action = 'nil' },
     },
   },
   [Blue] = {
     transitions = {
-      'Blue',
-    },
-  },
-  [Blue] = {
-    transitions = {
-      'Blue',
+      { nextObject = 'nil', action = 'nil' },
     },
   },
 }
 
- function onTransition(stateName)
+function onTransition(stateName)
 print("Transition: " .. stateName)
 UnityFunction(stateName)
 end
