@@ -1,5 +1,5 @@
 StateTransitions = {
-  [Pink] = {
+  [Blue] = {
     transitions = {
       { nextObject = 'nil', action = 'nil' },
     },
@@ -9,7 +9,7 @@ StateTransitions = {
       { nextObject = 'nil', action = 'nil' },
     },
   },
-  [Yellow] = {
+  [Blue] = {
     transitions = {
       { nextObject = 'nil', action = 'nil' },
     },
