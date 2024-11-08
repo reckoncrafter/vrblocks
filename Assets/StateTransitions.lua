@@ -14,6 +14,11 @@ StateTransitions = {
       { nextObject = 'nil', action = 'nil' },
     },
   },
+  [Blue] = {
+    transitions = {
+      { nextObject = 'nil', action = 'nil' },
+    },
+  },
 }
 
 function onTransition(stateName)
