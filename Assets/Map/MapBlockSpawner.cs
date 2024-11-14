@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class MapBlockSpawner : MonoBehaviour
 {
     public GameObject mapBlock;
@@ -12,7 +10,11 @@ public class MapBlockSpawner : MonoBehaviour
 
     void Start()
     {
-        SpawnEntities();
+        // delete children to spawn again
+        if (transform.childCount == 0)
+        {
+            SpawnEntities();
+        }
     }
     private void SpawnEntities()
     {
