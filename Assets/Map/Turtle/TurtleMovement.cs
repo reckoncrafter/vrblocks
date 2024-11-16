@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -58,22 +57,22 @@ public class TurtleMovement : MonoBehaviour
     {
         SetIsWalking(true);
 
-        Vector3 targetPosition = transform.position + Vector3.Scale(Vector3.forward, moveDistance);
-        if (targetPosition.x > 0.01)
+        Vector3 targetPosition = transform.position + Vector3.Scale(transform.forward, moveDistance);
+
+        LTDescr tween = null;
+        if (Math.Abs(targetPosition.x - transform.position.x) > 0.01)
         {
-            transform.LeanMoveX(targetPosition.x, movementDuration).setEase(LeanTweenType.easeInOutQuad).setOnComplete(() =>
-            {
-                SetIsWalking(false);
-                StartNextAction();
-            });
+            tween = transform.LeanMoveX(targetPosition.x, movementDuration);
         }
         else
         {
-            transform.LeanMoveZ(targetPosition.z, movementDuration).setEase(LeanTweenType.easeInOutQuad).setOnComplete(() =>
+            tween = transform.LeanMoveZ(targetPosition.z, movementDuration);
+        }
+
+        tween.setEase(LeanTweenType.easeInOutQuad).setOnComplete(() =>
             {
                 SetIsWalking(false);
                 StartNextAction();
             });
-        }
     }
 }
