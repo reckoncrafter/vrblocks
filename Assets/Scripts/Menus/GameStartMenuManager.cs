@@ -18,7 +18,7 @@ public class GameStartMenu : MonoBehaviour
     public List<Button> startMenuReturnButtons;
 
     // Animations
-    private float animationSpeed = .3f;
+    public float animationSpeed = .3f;
 
     void Start(){
         startMenu.SetActive(true);
