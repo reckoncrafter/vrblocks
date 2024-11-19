@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -9,6 +8,11 @@ public class BlockSnapping : MonoBehaviour
 
     private void Awake()
     {
+        // Collision Forwarding active
+        Transform snapTriggerTop = transform.Find("SnapTriggerTop");
+        AttachCollisionForwarding(snapTriggerTop);
+
+        // XR Grab Interactable listeners
         var grabInteractable = GetComponent<XRGrabInteractable>();
         if (grabInteractable != null)
         {
@@ -17,24 +21,47 @@ public class BlockSnapping : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void AttachCollisionForwarding(Transform trigger)
     {
-        Debug.Log(this.gameObject.name + " entered by: " + other.name);
-
-        // Check if SnapTriggerTop was entered by SnapTriggerBottom
-        if (this.gameObject.name == "SnapTriggerTop" && other.gameObject.name == "SnapTriggerBottom" && !hasSnapped)
+        if (trigger != null)
         {
-            Debug.Log("SnapTriggerTop met SnapTriggerBottom. Snapping blocks!");
-            SnapToBlock(this.transform.parent.gameObject, other.transform.parent.gameObject);
-            hasSnapped = true;
-            //Debug.Log("hasSnapped set to true for: " + gameObject.name);
+            CollisionForwarding forwarding = trigger.GetComponent<CollisionForwarding>();
+            if (forwarding == null)
+            {
+                forwarding = trigger.gameObject.AddComponent<CollisionForwarding>();
+            }
+            forwarding.parentBlockSnapping = this;
         }
-
-        if (this.gameObject.name == "SnapTriggerTop" && other.gameObject.name == "SnapTriggerBottom" && hasSnapped)
+        else
         {
-            //Debug.Log("Snap possible but currently disabled.");
+            Debug.LogWarning("SnapTriggerTop is missing on: " + gameObject.name);
         }
     }
+    public void OnChildTriggerEnter(CollisionForwarding sender, Collider other)
+    {
+        // Check if SnapTriggerTop was entered by SnapTriggerBottom
+        if (sender.gameObject.name == "SnapTriggerTop" && other.gameObject.name == "SnapTriggerBottom" && !hasSnapped)
+        {
+            // Get SnappedForwarding from other.SnapTriggerBottom
+            SnappedForwarding snappedForwarding = other.gameObject.GetComponent<SnappedForwarding>();
+
+            // Check if the bottom trigger is already snapped
+            if (snappedForwarding != null && snappedForwarding.CanSnap())
+            {
+                Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
+                SnapToBlock(this.gameObject, other.transform.parent.gameObject);
+                hasSnapped = true;
+
+                // Set other block to snapped
+                snappedForwarding.SetSnapped(true);
+            }
+            else
+            {
+                Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
+            }
+        }
+    }
+
 
     private void SnapToBlock(GameObject block1, GameObject block2)
     {
@@ -51,67 +78,79 @@ public class BlockSnapping : MonoBehaviour
         block1.transform.rotation = Quaternion.Euler(0, block1.transform.rotation.eulerAngles.y, 0);
         block2.transform.rotation = Quaternion.Euler(0, block1.transform.rotation.eulerAngles.y, 0);
 
-        // Sync the Y position of block2 to block1
-        block2.transform.position = new Vector3(block2.transform.position.x, snapPointTop.position.y, block2.transform.position.z);
-
-        // Snap block2's SnapPointBottom to block1's SnapPointTop
+        // Snap bottom block's SnapPointBottom to top block's SnapPointTop
         block2.transform.position = snapPointTop.position - (snapPointBottom.position - block2.transform.position);
 
-        // Add FixedJoint to lock blocks together properly
-        Rigidbody rb2 = block2.GetComponent<Rigidbody>();
-        if (rb2 != null)
+        // Add FixedJoint to lock blocks together
+        Rigidbody bottomRb = block2.GetComponent<Rigidbody>();
+        if (bottomRb != null)
         {
             FixedJoint joint = block1.AddComponent<FixedJoint>();
-            joint.connectedBody = rb2;
+            joint.connectedBody = bottomRb;
             joint.breakForce = Mathf.Infinity;
             joint.breakTorque = Mathf.Infinity;
-            //rb2.isKinematic = false;
         }
 
-        // Re-enable physics on the bottom block
-        Rigidbody rb1 = block1.GetComponent<Rigidbody>();
-        if (rb1 != null)
-        {
-            rb1.isKinematic = false;
-            //Debug.Log("Physics re-enabled on: " + block1.name);
-        }
-
-        Debug.Log(block2.name + " snapped to " + block1.name);
+        Debug.Log($"{block2.name} snapped to {block1.name}.");
     }
 
     private void OnGrab(SelectEnterEventArgs args)
     {
-        Debug.Log("Block grabbed: " + gameObject.name);
+        Debug.Log($"Block grabbed: {gameObject.name}");
 
         // Check for joints connected to objects
         FixedJoint[] joints = GetComponents<FixedJoint>();
-        foreach (var joint in joints)
+        foreach (FixedJoint joint in joints)
         {
+            // Find the other block connected to this block through the FixedJoint
+            Rigidbody otherRb = joint.connectedBody;
+            if (otherRb != null)
+            {
+                // Get the other block
+                GameObject otherBlock = otherRb.gameObject;
+
+                // Reset the snap status on the other block's SnappedForwarding component
+                ResetSnapStatusOnOtherBlock(otherBlock);
+            }
             Destroy(joint); // Destroy the joint to unsnap
-            //Debug.Log(gameObject.name + " unsnapped from " + joint.connectedBody.name);
         }
 
         StartCoroutine(ResetSnapStatusAfterDelay()); // Wait arbitrary amount of time to prevent block resnapping immediately.
     }
 
+    private void ResetSnapStatusOnOtherBlock(GameObject otherBlock)
+    {
+        // Find the SnapTriggerBottom on the other block
+        Transform otherSnapTriggerBottom = otherBlock.transform.Find("SnapTriggerBottom");
+        if (otherSnapTriggerBottom != null)
+        {
+            // Get the SnappedForwarding component of the other block
+            SnappedForwarding otherSnappedForwarding = otherSnapTriggerBottom.GetComponent<SnappedForwarding>();
+            if (otherSnappedForwarding != null)
+            {
+                // Reset the snap status of the other block to false
+                otherSnappedForwarding.SetSnapped(false);
+            }
+            else
+            {
+                Debug.LogWarning($"No SnappedForwarding component found on {otherSnapTriggerBottom.gameObject.name}.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("SnapTriggerBottom not found on the other block.");
+        }
+    }
+
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.5f); // Wait for 0.5 seconds (change as needed)
-
-        Transform snapTriggerTop = transform.Find("SnapTriggerTop");
-        if (snapTriggerTop != null)
-        {
-            BlockSnapping topBlockSnapping = snapTriggerTop.GetComponent<BlockSnapping>();
-            if (topBlockSnapping != null)
-            {
-                topBlockSnapping.hasSnapped = false; // Reset the snap status
-                //Debug.Log("hasSnapped reset to false for: " + snapTriggerTop.name);
-            }
-        }
+        hasSnapped = false; // Allow snapping again after a delay
+        Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
 
     private void OnRelease(SelectExitEventArgs args)
     {
-        //Debug.Log("Block released: " + gameObject.name);
+        Debug.Log($"Block released: {gameObject.name}");
     }
 }

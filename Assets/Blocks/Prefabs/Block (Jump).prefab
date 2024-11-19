@@ -113,7 +113,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7695696624973611861}
   - component: {fileID: 5453061291066825830}
-  - component: {fileID: 5107197205035481198}
+  - component: {fileID: 4413283517250449607}
   m_Layer: 0
   m_Name: SnapTriggerBottom
   m_TagString: Untagged
@@ -157,7 +157,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5107197205035481198
+--- !u!114 &4413283517250449607
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 457222226745981360}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734ba02fec88d0949a0ed1b098564a23, type: 3}
+  m_Script: {fileID: 11500000, guid: cfa0bb0545cb23344a907b689c68e9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2708516735268130501
@@ -322,6 +322,7 @@ GameObject:
   - component: {fileID: 8298196277154468960}
   - component: {fileID: 8863677396530485765}
   - component: {fileID: 7252318290548244527}
+  - component: {fileID: 5405742046879034240}
   m_Layer: 0
   m_Name: Block (Jump)
   m_TagString: Block
@@ -613,7 +614,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateName: Blue
   transitions:
-  - Blue
+  - NextObject: {fileID: 0}
+    Action:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &7252318290548244527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -626,6 +630,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 734ba02fec88d0949a0ed1b098564a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5405742046879034240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6713015538121544575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ef895357dbe3741acd17c2aa3d81be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floorLevel: 0
+  padding: 0.1
 --- !u!1 &8666319159274101146
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,7 +788,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3976268369088059121}
   - component: {fileID: 8836263195832741215}
-  - component: {fileID: 2504569711366480982}
+  - component: {fileID: 6478105249058030286}
   m_Layer: 0
   m_Name: SnapTriggerTop
   m_TagString: Untagged
@@ -814,7 +832,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2504569711366480982
+--- !u!114 &6478105249058030286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -823,6 +841,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8756861190917617692}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734ba02fec88d0949a0ed1b098564a23, type: 3}
+  m_Script: {fileID: 11500000, guid: 65363b0380395e24b9c3462900c6e7c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentBlockSnapping: {fileID: 0}
