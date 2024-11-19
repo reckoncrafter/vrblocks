@@ -1,3 +1,6 @@
+/*
+ Code for Level Selector + animations
+*/
 using System;
 using System.IO;
 using UnityEngine;
@@ -12,7 +15,7 @@ public class LevelSelectorMenu : MonoBehaviour
     public GameObject leftLevelView;
     public GameObject rightLevelView;
 
-    public int selectedLevelIndex = 1;
+    private int selectedLevelIndex = SceneTransitionStates.GetSelectedLevel();
     private Sprite[] levelThumbnails;
 
     // Animations
@@ -33,7 +36,6 @@ public class LevelSelectorMenu : MonoBehaviour
         // Long winded way of grabbing the thumbnails. Wished Resource.LoadAll worked
         DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/Scenes/Thumbnails");
         FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
-        Debug.Log(thumbnailFiles.Length);
         levelThumbnails = new Sprite[thumbnailFiles.Length];
         for(int i = 0; i < thumbnailFiles.Length; i++){
             Texture2D tex = new Texture2D(2, 2);                                // Texture size should not matter (https://discussions.unity.com/t/how-to-load-a-texture2d-from-path-without-resources-load/796449/6)
@@ -73,6 +75,7 @@ public class LevelSelectorMenu : MonoBehaviour
     public void GoToLevel(){
         SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.AssetDirectoryOrder);
         // SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.BuildSettingsOrder);
+        SceneTransitionStates.SetSelectedLevel(selectedLevelIndex);
     }
 
     public void AnimateNavigateLeft(){

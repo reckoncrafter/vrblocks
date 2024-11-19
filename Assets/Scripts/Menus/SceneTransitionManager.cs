@@ -1,3 +1,6 @@
+/*
+ Code to handle loading scenes made available to the player.
+*/
 using System.Collections;
 using System.IO;
 using UnityEngine;

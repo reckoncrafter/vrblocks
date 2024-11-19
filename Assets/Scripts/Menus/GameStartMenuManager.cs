@@ -1,3 +1,6 @@
+/*
+ Code for Start Menu when game begins + animations
+*/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,12 +24,21 @@ public class GameStartMenu : MonoBehaviour
     public float animationSpeed = .3f;
 
     void Start(){
-        startMenu.SetActive(true);
-        options.SetActive(true);
-        options.LeanScale(Vector3.zero, 0f);
-        levelSelector.SetActive(true);
-        levelSelector.LeanScale(Vector3.zero, 0f);
-
+        if(SceneTransitionStates.IsGameStart()){                                    // Show the Game Start Menu on boot up
+            startMenu.SetActive(true);
+            options.SetActive(true);
+            options.LeanScale(Vector3.zero, 0f);
+            levelSelector.SetActive(true);
+            levelSelector.LeanScale(Vector3.zero, 0f);
+            SceneTransitionStates.SetGameStart(false);
+        }
+        else{                                                                       //TODO: For non-level returns to the main menu, create more conditional branches from here
+            startMenu.SetActive(true);
+            startMenu.LeanScale(Vector3.zero, 0f);
+            options.SetActive(true);
+            options.LeanScale(Vector3.zero, 0f);
+            levelSelector.SetActive(true);
+        }
         playGameButton.onClick.AddListener(EnableLevelSelectorMenu);
         optionsButton.onClick.AddListener(EnableOptionsMenu);
         quitButton.onClick.AddListener(QuitGame);
