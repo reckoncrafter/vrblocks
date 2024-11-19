@@ -303,6 +303,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87c860f8d8405f4cbac10fefbd67e831, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseMenuAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Pause Menu Input
+      m_Type: 0
+      m_ExpectedControlType: bool
+      m_Id: 33b68fe8-9653-4f87-8a19-06de8cd2317e
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: c121bcff-803e-4bf6-ae71-7caf01b1d6ca
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Pause Menu Input
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 7981444297469423662, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   UIContainer: {fileID: 61780478}
   pauseMenu: {fileID: 1456434545}
   confirmationWindow: {fileID: 598137804}

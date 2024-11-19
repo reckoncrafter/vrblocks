@@ -1,11 +1,17 @@
+/*
+ Code for handling level to level Player UI + animations
+*/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
 public class PlayerUIManager : MonoBehaviour
 {
-    
+    public InputActionProperty pauseMenuAction = new InputActionProperty(new InputAction("Pause Menu Input", expectedControlType: "bool"));
+    //TODO: Could be a better way to do this: https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Actions.html
+
+
     [Header("UI Pages")]
     public GameObject UIContainer;
     public GameObject pauseMenu;
@@ -27,7 +33,7 @@ public class PlayerUIManager : MonoBehaviour
     void Start()
     {
         pauseMenu.SetActive(true);
-        // pauseMenu.LeanScale(Vector3.zero, 0f);
+        pauseMenu.LeanScale(Vector3.zero, 0f);
         confirmationWindow.SetActive(true);
         confirmationWindow.LeanScale(Vector3.zero, 0f);
         options.SetActive(true);
@@ -35,6 +41,7 @@ public class PlayerUIManager : MonoBehaviour
         // endScreen.SetActive(true);
         // endScreen.LeanScale(Vector3.zero, 0f); 
 
+        pauseMenuAction.action.started += context => { EnablePauseMenu(); };
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
         optionsButton.onClick.AddListener(EnableOptionsMenu);
         returnToMenuButton.onClick.AddListener(OpenConfirmationWindow);
@@ -48,13 +55,21 @@ public class PlayerUIManager : MonoBehaviour
         StartCoroutine(ClearUIShaderChannels());
     }
 
+    void OnEnable(){
+        pauseMenuAction.action.Enable();
+    }
+
+    void OnDisable(){
+        pauseMenuAction.action.Disable();
+    }
+
     IEnumerator ClearUIShaderChannels(){
         while(true){
-            UIContainer.GetComponent<Canvas>().additionalShaderChannels = AdditionalCanvasShaderChannels.None;      // For some reason cannot be set in stone before runtime. This helps fix text disappearing
+            // UIContainer.GetComponent<Canvas>().additionalShaderChannels = AdditionalCanvasShaderChannels.None;
             yield return new WaitForSeconds(0.5f);
         }
     }
-
+    
     public void EnablePauseMenu(){
         pauseMenu.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
         options.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
