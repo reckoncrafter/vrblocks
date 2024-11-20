@@ -19,5 +19,8 @@ public class MovementMenu : Editor
         if (GUILayout.Button("Turn Right")){
             turtleMovement.RotateRight();
         }
+        if (GUILayout.Button("Start Queue")){
+            turtleMovement.StartQueue();
+        }
     }
 }
