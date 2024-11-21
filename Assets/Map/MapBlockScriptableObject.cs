@@ -13,5 +13,8 @@ public class MapBlockScriptableObject : ScriptableObject
     public Vector3 turtleSpawnPoint;
     public float turtleRotation;
 
+    public Vector3 goalSpawnPoint;
+    public Vector3 goalScale;
+
     public Vector3[] spawnPoints;
 }

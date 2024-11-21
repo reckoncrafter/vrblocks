@@ -4,6 +4,7 @@ using UnityEngine;
 public class MapBlockSpawner : MonoBehaviour
 {
     public GameObject mapBlock;
+    public GameObject goalSphere;
     public TurtleMovement turtle;
 
     public MapBlockScriptableObject mapValues;
@@ -32,6 +33,13 @@ public class MapBlockSpawner : MonoBehaviour
             currentEntity.transform.localScale = mapValues.blockScale;
         }
 
+        // Triggerable Goal
+        Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
+        GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
+        generatedGoalSphere.transform.SetParent(gameObject.transform, false);
+        generatedGoalSphere.transform.localScale = mapValues.goalScale;
+        //
+
         Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
 
@@ -41,6 +49,7 @@ public class MapBlockSpawner : MonoBehaviour
 
         turtleEntity.movementDuration = mapValues.movementDuration;
         turtleEntity.animationSpeed = mapValues.animationSpeed;
+
 
         if (currentEntity != null)
         {
