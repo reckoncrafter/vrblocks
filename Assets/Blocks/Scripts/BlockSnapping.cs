@@ -51,6 +51,7 @@ public class BlockSnapping : MonoBehaviour
                 Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
                 SnapToBlock(this.gameObject, other.transform.parent.gameObject);
                 hasSnapped = true;
+                snappedForwarding.ConnectedBlock = this.gameObject;
 
                 // Set other block to snapped
                 snappedForwarding.SetSnapped(true);
@@ -130,6 +131,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 // Reset the snap status of the other block to false
                 otherSnappedForwarding.SetSnapped(false);
+                otherSnappedForwarding.ConnectedBlock = null;
             }
             else
             {
