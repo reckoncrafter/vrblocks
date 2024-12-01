@@ -6,7 +6,6 @@ public class MapBlockSpawner : MonoBehaviour
     public GameObject mapBlock;
     public GameObject goalSphere;
     public TurtleMovement turtle;
-
     public MapBlockScriptableObject mapValues;
 
     void Start()
@@ -38,6 +37,7 @@ public class MapBlockSpawner : MonoBehaviour
         GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
         generatedGoalSphere.transform.SetParent(gameObject.transform, false);
         generatedGoalSphere.transform.localScale = mapValues.goalScale;
+        generatedGoalSphere.name = mapValues.goalPrefabName;
         //
 
         Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
