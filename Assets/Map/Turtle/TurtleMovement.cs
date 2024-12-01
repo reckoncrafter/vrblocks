@@ -20,6 +20,8 @@ public class TurtleMovement : MonoBehaviour
     private bool shouldJump = false;
     private bool canBeGrounded = true;
 
+    public UnityEvent EndOfMovementEvent;
+
     private void SetIsWalking(bool value)
     {
         animator.SetBool("isWalking", value);
@@ -120,6 +122,8 @@ public class TurtleMovement : MonoBehaviour
     {
         SetIsWalking(false);
         StartNextAction();
+
+        EndOfMovementEvent.Invoke();
     }
 
     private void PerformWalkForward()

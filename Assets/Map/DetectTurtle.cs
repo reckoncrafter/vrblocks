@@ -14,8 +14,11 @@ public class DetectTurtle : MonoBehaviour
     void Start(){
         Turtle = GameObject.Find("/MapSpawner/Turtle");
         GoalSphere = GameObject.Find("/MapSpawner/GoalSphere");
+
+        Turtle.GetComponent<TurtleMovement>().EndOfMovementEvent.AddListener(CheckDistance);
     }
-    void Update()
+
+    void CheckDistance()
     {
         distance = Vector3.Distance (GoalSphere.transform.position, Turtle.transform.position);
 
