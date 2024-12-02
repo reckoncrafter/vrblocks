@@ -3736,12 +3736,12 @@ MonoBehaviour:
   m_margin: {x: -0.03583335, y: -28.862024, z: -9.593889, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 740480789}
-  m_maskType: 0
   _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
+  m_hasFontAssetChanged: 0
+  m_renderer: {fileID: 740480789}
+  m_maskType: 0
 --- !u!23 &740480789
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5909,7 +5909,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &1108144157
 MonoBehaviour:
@@ -5926,6 +5926,9 @@ MonoBehaviour:
   movementDuration: 1
   animationSpeed: 4
   moveDistance: {x: 0.5, y: 0.5, z: 0.5}
+  EndOfMovementEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1108144158
 BoxCollider:
   m_ObjectHideFlags: 0
