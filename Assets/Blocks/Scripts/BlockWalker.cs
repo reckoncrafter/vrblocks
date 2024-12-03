@@ -6,26 +6,28 @@ using UnityEngine.Events;
 
 public class BlockWalker : MonoBehaviour
 {
-    BlockSnapping blockSnapping;
+    SnappedForwarding snappedForwarding; 
 
     public List<UnityEvent> ActionList;
 
     void Start(){
-        if(blockSnapping == null){
-            blockSnapping = this.gameObject.GetComponent<BlockSnapping>();
+        if(snappedForwarding == null){
+            GameObject SnapTriggerBottom = this.transform.Find("SnapTriggerBottom").gameObject;
+            snappedForwarding = SnapTriggerBottom.GetComponent<SnappedForwarding>();
+            Debug.Log(snappedForwarding);
         }
     }
 
     public void onActivation(){
         ActionList.Clear();
 
-        GameObject nextBlock = blockSnapping.NextBlockToExecute;
+        GameObject nextBlock = snappedForwarding.ConnectedBlock;
         TurtleCommand turtleCommand = nextBlock.GetComponent<TurtleCommand>();
         UnityEvent onMoveMethod = turtleCommand.onMove;
         ActionList.Add(onMoveMethod);
 
         while(nextBlock != null){
-            nextBlock = nextBlock.GetComponent<BlockSnapping>().NextBlockToExecute;
+            nextBlock = nextBlock.transform.Find("SnapTriggerBottom").gameObject.GetComponent<SnappedForwarding>().ConnectedBlock;
             if(nextBlock != null){
                 turtleCommand = nextBlock.GetComponent<TurtleCommand>();
                 onMoveMethod = turtleCommand.onMove;
