@@ -790,6 +790,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "debug_EndScreenTrigger",
+                    "type": "Button",
+                    "id": "78804843-7d12-4ea2-b1b4-44b33c02bd1a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -966,6 +975,17 @@
                     "processors": "",
                     "groups": ";Generic XR Controller",
                     "action": "Pause Menu Input",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d247d7c0-37e5-4a16-aa80-223c8346795d",
+                    "path": "<XRController>{LeftHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Generic XR Controller",
+                    "action": "debug_EndScreenTrigger",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
