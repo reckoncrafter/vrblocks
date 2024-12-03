@@ -5,6 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class BlockSnapping : MonoBehaviour
 {
     private bool hasSnapped = false; // Flag to prevent repeated snapping
+    public GameObject NextBlockToExecute;
 
     private void Awake()
     {
@@ -50,6 +51,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
                 SnapToBlock(this.gameObject, other.transform.parent.gameObject);
+
                 hasSnapped = true;
                 snappedForwarding.ConnectedBlock = this.gameObject;
 
@@ -93,6 +95,14 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
+
+        // update reference to next block in order
+        if(this.gameObject == block1){
+            block2.GetComponent<BlockSnapping>().NextBlockToExecute = block1;
+        }
+        else{
+            NextBlockToExecute = block2;
+        }
     }
 
     private void OnGrab(SelectEnterEventArgs args)
