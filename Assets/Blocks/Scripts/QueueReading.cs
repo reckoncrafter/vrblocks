@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Events;
 
 public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
     private Queue<string> blockQueue = new Queue<string>();
 
-    [ContextMenu("Read Queue")] // Adds a Unity button in the menu
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
@@ -61,5 +62,19 @@ public class QueueReading : MonoBehaviour
     public Queue<string> GetBlockQueue()
     {
         return new Queue<string>(blockQueue);
+    }
+}
+
+[CustomEditor(typeof(QueueReading))]
+public class QueueReadingMenu : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        QueueReading queueReading = (QueueReading)target;
+        if (GUILayout.Button("Read Queue"))
+        {
+            queueReading.ReadQueue();
+        }
     }
 }
