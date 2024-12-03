@@ -3,6 +3,8 @@
 */
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -31,6 +33,8 @@ public class PlayerUIManager : MonoBehaviour
     public Button returnToMenuYButton;
     public Button returnToMenuNButton;
     public Button nextLevelButton;
+    public Button endScreenReturnToMenu;
+    public Button endScreenReturnToMenuAlt;
 
     //Animations
     public float animationSpeed = .3f;
@@ -151,6 +155,18 @@ public class PlayerUIManager : MonoBehaviour
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         mainMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         blockMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+
+        // Show "Next Level" Button only if the current level is not the last playable level
+        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/Scenes/Thumbnails");
+        FileInfo[] fin = thumbnailDir.GetFiles("*.png");
+        if(SceneTransitionStates.GetSelectedLevel() + 1 >= fin.Length){
+            nextLevelButton.GameObject().LeanScale(Vector3.zero, 0f);
+            endScreenReturnToMenu.GameObject().LeanScale(Vector3.zero, 0f);
+        }
+        else
+        {
+            endScreenReturnToMenuAlt.GameObject().LeanScale(Vector3.zero, 0f);
+        }
 
         //TODO: If we want the option to allow players to play around in the level after completing, these need to go
         pauseMenuAction.action.Disable();
