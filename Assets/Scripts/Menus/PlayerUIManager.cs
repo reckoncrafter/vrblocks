@@ -149,7 +149,6 @@ public class PlayerUIManager : MonoBehaviour
 
     public void EnableEndScreen()
     {
-        //TODO: When at the last level, obviously you dont want to show the "Next Level" button
         endScreen.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
         pauseMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
