@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class StartButton : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public void SetGlowEffect(bool isGlow){
+        Renderer renderer = GetComponent<Renderer>();
+        if(renderer != null){
+            Material material = renderer.material;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+            if(isGlow){
+                material.SetColor("_EmissionColor", Color.green);
+                material.EnableKeyword("_EMISSION");
+            }
+            else{
+                material.SetColor("_EmissionColor", Color.black);
+                material.DisableKeyword("_EMISSION");
+            }
+        }
+        else{
+            Debug.LogWarning("Renderer not found on GameObject");
+        }
     }
 }
