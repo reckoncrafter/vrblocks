@@ -116,6 +116,10 @@ public class TurtleMovement : MonoBehaviour
         {
             queue.Dequeue().Invoke();
         }
+        else
+        {
+            Debug.Log("No Actions in Queue!");
+        }
     }
 
     private void EndMovement()
