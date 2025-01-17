@@ -7354,10 +7354,10 @@ MonoBehaviour:
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1166485205}
-        m_TargetAssemblyTypeName: StartButton, Assembly-CSharp
-        m_MethodName: SetGlowEffect
-        m_Mode: 6
+      - m_Target: {fileID: 1108144157}
+        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
+        m_MethodName: StartQueue
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -7366,9 +7366,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1108144157}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: StartQueue
+      - m_Target: {fileID: 1166485205}
+        m_TargetAssemblyTypeName: StartButton, Assembly-CSharp
+        m_MethodName: CaptureQueueAndExecute
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7539,6 +7539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839e8ec8ed89e713a9c7cbec41e8e73e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turtleMovement: {fileID: 1108144157}
+  blockWalker: {fileID: 1866267873}
 --- !u!1 &1176638032
 GameObject:
   m_ObjectHideFlags: 0
@@ -12996,6 +12998,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1866267873 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6581950676430863490, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
+  m_PrefabInstance: {fileID: 1821506446}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78968824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3b89251a5d1a4bf955746d8c1d1bac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1872294335 stripped

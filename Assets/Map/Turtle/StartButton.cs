@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class StartButton : MonoBehaviour
 {
+    public TurtleMovement turtleMovement;
+    public BlockWalker blockWalker;
+
+
     public void SetGlowEffect(bool isGlow){
         Renderer renderer = GetComponent<Renderer>();
         if(renderer != null){
@@ -21,5 +25,13 @@ public class StartButton : MonoBehaviour
         else{
             Debug.LogWarning("Renderer not found on GameObject");
         }
+    }
+
+    public void CaptureQueueAndExecute(){
+        blockWalker.onActivation();
+        foreach(var unityEvent in blockWalker.ActionList) {
+            unityEvent.Invoke();
+        }
+        turtleMovement.StartQueue();
     }
 }

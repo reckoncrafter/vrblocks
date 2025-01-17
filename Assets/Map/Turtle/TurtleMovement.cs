@@ -10,10 +10,10 @@ public class TurtleMovement : MonoBehaviour
     public float movementDuration = 2.0f;
     public float animationSpeed = 1.0f;
     public Vector3 moveDistance = Vector3.zero;
+    public Queue<Action> queue;
 
     private Animator animator;
     private Rigidbody rb;
-    private Queue<Action> queue;
 
     // jumping things
     private bool isGrounded = false;
