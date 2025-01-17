@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Compression;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,11 +10,14 @@ public class TurtleMovement : MonoBehaviour
 {
     public float movementDuration = 2.0f;
     public float animationSpeed = 1.0f;
+    public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
-    public Queue<Action> queue;
 
+    private LTDescr tween;
     private Animator animator;
     private Rigidbody rb;
+    private BoxCollider turtleCollider;
+    private Queue<Action> queue;
 
     // jumping things
     private bool isGrounded = false;
@@ -36,6 +40,7 @@ public class TurtleMovement : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        turtleCollider = GetComponent<BoxCollider>();
         queue = new Queue<Action>();
 
         SetAnimSpeed(animationSpeed);
@@ -82,6 +87,18 @@ public class TurtleMovement : MonoBehaviour
         {
             isGrounded = true;
             canBeGrounded = false;
+        }
+    }
+
+    private void OnTriggerEnter()
+    {
+        if (isGrounded)
+        {
+            FailOnHitNose();
+        }
+        else
+        {
+            FailOnHitBack();
         }
     }
 
@@ -136,7 +153,7 @@ public class TurtleMovement : MonoBehaviour
 
         Vector3 targetPosition = transform.position + Vector3.Scale(transform.forward, moveDistance);
 
-        LTDescr tween = null;
+        tween = null;
         if (Math.Abs(targetPosition.x - transform.position.x) > 0.01)
         {
             tween = transform.LeanMoveX(targetPosition.x, movementDuration);
@@ -153,7 +170,7 @@ public class TurtleMovement : MonoBehaviour
     {
         SetIsWalking(true);
 
-        LTDescr tween = transform.LeanRotateY(transform.rotation.eulerAngles.y + angle, movementDuration);
+        tween = transform.LeanRotateY(transform.rotation.eulerAngles.y + angle, movementDuration);
         tween.setEase(LeanTweenType.easeInOutQuad).setOnComplete(EndMovement);
     }
 
@@ -172,9 +189,36 @@ public class TurtleMovement : MonoBehaviour
     private void PerformJump()
     {
         // animator.SetTrigger("jump");
-        float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * -Physics.gravity.y); // h = (µsin(θ))^2 / 2g with 50% more height
-        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * Mathf.Abs(Physics.gravity.y)); // h = (µsin(θ))^2 / 2g with 50% more height
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
         StartNextAction();
+    }
+
+    private void FailOnHitBack()
+    {
+        Fail(() =>
+        {
+            rb.AddTorque(new Vector3(UnityEngine.Random.Range(-10f, 10f), 0, UnityEngine.Random.Range(-10f, 10f)), ForceMode.Impulse);
+        });
+    }
+
+    private void FailOnHitNose()
+    {
+        Fail(() =>
+        {
+            rb.AddForce((-transform.forward + transform.up) * Mathf.Sqrt(moveDistance.y * 0.3f * 2 * Mathf.Abs(Physics.gravity.y)), ForceMode.Impulse);
+            rb.AddTorque(-transform.right * 5, ForceMode.Impulse);
+        });
+    }
+
+    private void Fail(Action failMovement = null)
+    {
+        rb.constraints = RigidbodyConstraints.None;
+        turtleCollider.material.bounciness = failBounciness;
+        queue.Clear();
+        tween.reset();
+
+        failMovement.Invoke();
     }
 }
