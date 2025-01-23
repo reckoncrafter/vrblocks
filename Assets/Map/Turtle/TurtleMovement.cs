@@ -13,6 +13,8 @@ public class TurtleMovement : MonoBehaviour
     public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
 
+    public bool testCondition = false;
+
     private LTDescr tween;
     private Animator animator;
     private Rigidbody rb;
@@ -105,6 +107,64 @@ public class TurtleMovement : MonoBehaviour
     public void StartQueue()
     {
         StartNextAction();
+    }
+
+    public void EnqueueConditional(string functionName){
+        if(functionName == "IfStatementBegin"){
+            queue.Enqueue(IfStatementBegin);
+        }
+        else if(functionName == "IfStatementEnd"){
+            queue.Enqueue(IfStatementEnd);
+        }
+        else if(functionName == "WhileStatementBegin"){
+            queue.Enqueue(WhileStatementBegin);
+        }
+        else if(functionName == "WhileStatementEnd"){
+            queue.Enqueue(WhileStatementEnd);
+        }
+    }
+
+    private void IfStatementBegin(){
+        Action[] queueArray = queue.ToArray();
+
+        int EndIndex = 0;
+        for(int i = 0; i < queueArray.Length; i++){
+            if(queueArray[i] == IfStatementEnd){
+                EndIndex = i;
+                Debug.Log("IfStatement found its end. " + EndIndex);
+            }
+        }
+
+        if(!testCondition){
+            for(int i = 0; i < EndIndex; i++){
+                queue.Dequeue();
+            }
+            Debug.Log("Condition not satisfied. Skipping.");
+        }
+        else{
+            Debug.Log("Condition satisfied.");
+        }
+        StartNextAction();
+    }
+
+    private void IfStatementEnd(){
+
+    }
+
+    private void WhileStatementBegin(){
+        Action[] queueArray = queue.ToArray();
+
+        int EndIndex = 0;
+        for(int i = 0; i < queueArray.Length; i++){
+            if(queueArray[i] == WhileStatementEnd){
+                EndIndex = i;
+                Debug.Log("WhileStatement found its end. " + EndIndex);
+            }
+        }
+    }
+
+    private void WhileStatementEnd(){
+
     }
 
     public void WalkForward()
