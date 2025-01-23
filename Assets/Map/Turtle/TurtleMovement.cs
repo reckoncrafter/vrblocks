@@ -64,8 +64,13 @@ public class TurtleMovement : MonoBehaviour
     }
 
 
-    void Update()
+    void FixedUpdate()
     {
+        if (!Physics.Raycast(transform.position, -transform.up, moveDistance.y * 2))
+        {
+            Fail();
+        }
+
         if (shouldJump && isGrounded)
         {
             PerformJump();
@@ -90,15 +95,18 @@ public class TurtleMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter()
+    private void OnTriggerEnter(Collider other)
     {
-        if (isGrounded)
+        if (!other.isTrigger)
         {
-            FailOnHitNose();
-        }
-        else
-        {
-            FailOnHitBack();
+            if (isGrounded)
+            {
+                FailOnHitNose();
+            }
+            else
+            {
+                FailOnHitBack();
+            }
         }
     }
 
@@ -219,6 +227,6 @@ public class TurtleMovement : MonoBehaviour
         queue.Clear();
         tween.reset();
 
-        failMovement.Invoke();
+        failMovement?.Invoke();
     }
 }
