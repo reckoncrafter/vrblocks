@@ -2704,7 +2704,7 @@ MonoBehaviour:
   onMove:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1089609111}
         m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
         m_MethodName: RotateLeft
         m_Mode: 1
@@ -4736,12 +4736,12 @@ MonoBehaviour:
   m_margin: {x: -0.03583335, y: -28.862024, z: -9.593889, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  _SortingLayer: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 740480789}
   m_maskType: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
 --- !u!23 &740480789
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5583,7 +5583,7 @@ MonoBehaviour:
   onMove:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1089609111}
         m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
         m_MethodName: WalkForward
         m_Mode: 1
@@ -7743,10 +7743,10 @@ MonoBehaviour:
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: StartQueue
-        m_Mode: 1
+      - m_Target: {fileID: 1166485205}
+        m_TargetAssemblyTypeName: StartButton, Assembly-CSharp
+        m_MethodName: SetGlowEffect
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -7929,7 +7929,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turtleMovement: {fileID: 0}
-  blockWalker: {fileID: 1866267873}
+  queueReading: {fileID: 0}
 --- !u!1 &1176638032
 GameObject:
   m_ObjectHideFlags: 0
@@ -12801,7 +12801,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6581950676430863490, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -13172,17 +13173,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1866267873 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6581950676430863490, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
-  m_PrefabInstance: {fileID: 1821506446}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 78968824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f3b89251a5d1a4bf955746d8c1d1bac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1872294335 stripped
@@ -14669,7 +14659,7 @@ MonoBehaviour:
   onMove:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1089609111}
         m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
         m_MethodName: RotateRight
         m_Mode: 1
@@ -14845,7 +14835,7 @@ MonoBehaviour:
   onMove:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1089609111}
         m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
         m_MethodName: Jump
         m_Mode: 1
