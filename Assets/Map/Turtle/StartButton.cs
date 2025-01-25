@@ -1,11 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class StartButton : MonoBehaviour
 {
     public TurtleMovement turtleMovement;
-    public BlockWalker blockWalker;
+    public QueueReading queueReading;
+
+    public void Start(){
+        turtleMovement = FindObjectOfType<TurtleMovement>();
+        queueReading = FindObjectOfType<QueueReading>();
+    }
 
 
     public void SetGlowEffect(bool isGlow){
@@ -28,8 +34,10 @@ public class StartButton : MonoBehaviour
     }
 
     public void CaptureQueueAndExecute(){
-        blockWalker.onActivation();
-        foreach(var unityEvent in blockWalker.ActionList) {
+        queueReading.ReadQueue();
+        Queue<UnityEvent> eventQueue = queueReading.GetBlockQueueOfUnityEvents();
+        foreach(var unityEvent in eventQueue) {
+            Debug.Log(unityEvent);
             unityEvent.Invoke();
         }
         turtleMovement.StartQueue();

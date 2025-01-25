@@ -7,13 +7,14 @@ public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
     private Queue<string> blockQueue = new Queue<string>();
-
+    private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
 
         // Clear previous readings
         blockQueue.Clear();
+        eventQueue.Clear();
 
         // Start reading from the Queue Block
         ReadBlocks(gameObject);
@@ -53,6 +54,7 @@ public class QueueReading : MonoBehaviour
 
         // Add the block type to the queue
         blockQueue.Enqueue(blockType);
+        eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
 
         // Recursively read the next block in the queue
         ReadBlocks(connectedBlock);
@@ -62,6 +64,10 @@ public class QueueReading : MonoBehaviour
     public Queue<string> GetBlockQueue()
     {
         return new Queue<string>(blockQueue);
+    }
+
+    public Queue<UnityEvent> GetBlockQueueOfUnityEvents(){
+        return new Queue<UnityEvent>(eventQueue);
     }
 }
 
