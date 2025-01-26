@@ -1,5 +1,5 @@
 /*
- Code to handle loading scenes made available to the player.
+ Handle loading/transitioning scenes that are made available to the player.
 */
 using System.Collections;
 using System.IO;

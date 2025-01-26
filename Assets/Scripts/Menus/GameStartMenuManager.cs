@@ -1,5 +1,5 @@
 /*
- Code for Start Menu when game begins + animations
+ Start Menu when game begins + animations
 */
 using System.Collections;
 using System.Collections.Generic;
