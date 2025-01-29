@@ -124,7 +124,7 @@ public class TurtleMovement : MonoBehaviour
         }
     }
 
-    private void IfStatementBegin(){
+    public void IfStatementBegin(){
         Action[] queueArray = queue.ToArray();
 
         int EndIndex = 0;
@@ -147,7 +147,7 @@ public class TurtleMovement : MonoBehaviour
         StartNextAction();
     }
 
-    private void IfStatementEnd(){
+    public void IfStatementEnd(){
 
     }
 
