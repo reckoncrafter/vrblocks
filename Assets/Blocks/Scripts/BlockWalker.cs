@@ -6,8 +6,7 @@ using UnityEngine.Events;
 
 public class BlockWalker : MonoBehaviour
 {
-    SnappedForwarding snappedForwarding; 
-
+    private SnappedForwarding snappedForwarding;
     public List<UnityEvent> ActionList;
 
     void Start(){

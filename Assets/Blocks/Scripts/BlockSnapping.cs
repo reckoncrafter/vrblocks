@@ -5,9 +5,17 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class BlockSnapping : MonoBehaviour
 {
     private bool hasSnapped = false; // Flag to prevent repeated snapping
+    private QueueReading queueReading;
 
     private void Awake()
     {
+        // Automatic detection of QueueReading component
+        queueReading = FindObjectOfType<QueueReading>();
+        if (queueReading == null)
+        {
+            Debug.LogWarning("QueueReading component not found in the scene. Ensure there is one active in the hierarchy.");
+        }
+
         // Collision Forwarding active
         Transform snapTriggerTop = transform.Find("SnapTriggerTop");
         AttachCollisionForwarding(snapTriggerTop);
@@ -94,6 +102,8 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
+
+        queueReading?.ReadQueue(); // Update Block Queue on snap.
     }
 
     private void OnGrab(SelectEnterEventArgs args)
@@ -148,6 +158,7 @@ public class BlockSnapping : MonoBehaviour
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.5f); // Wait for 0.5 seconds (change as needed)
+        queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
