@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.021, y: 0.094}
+  m_AnchoredPosition: {x: -0.021, y: 0.085}
   m_SizeDelta: {x: 0.9, y: 0.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3843319125445191185
@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 5405742046879034240}
   - component: {fileID: -1380404877363445918}
   m_Layer: 0
-  m_Name: Block (IfBegin)
+  m_Name: Block (TRUE)
   m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -379,7 +379,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 83f60d51dd3571d57a849686d5e8da5b, type: 2}
+  - {fileID: 2100000, guid: 7a1a16a0c9eec5a1489fe83ac76ed4ce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -662,7 +662,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8949930570369046022, guid: 400fef76ef71943d48f3221445efd519, type: 3}
         m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: IfStatementBegin
+        m_MethodName: setConditionRegisterTrue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -737,7 +737,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: if
+  m_text: TRUE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

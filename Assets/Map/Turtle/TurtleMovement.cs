@@ -13,13 +13,12 @@ public class TurtleMovement : MonoBehaviour
     public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
 
-    public bool testCondition = false;
-
     private LTDescr tween;
     private Animator animator;
     private Rigidbody rb;
     private BoxCollider turtleCollider;
     private Queue<Action> queue;
+    private bool conditionRegister = false;
 
     // jumping things
     private bool isGrounded = false;
@@ -132,6 +131,16 @@ public class TurtleMovement : MonoBehaviour
         }
     }
 
+    // I will not atone for my sins
+    public void setConditionRegisterTrue(){
+        conditionRegister = true;
+        StartNextAction();
+    }
+    public void setConditionRegisterFalse(){
+        conditionRegister = false;
+        StartNextAction();
+    }
+
     public void IfStatementBegin(){
         Action[] queueArray = queue.ToArray();
 
@@ -143,7 +152,7 @@ public class TurtleMovement : MonoBehaviour
             }
         }
 
-        if(!testCondition){
+        if(!conditionRegister){
             for(int i = 0; i < EndIndex; i++){
                 queue.Dequeue();
             }
