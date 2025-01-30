@@ -1,5 +1,5 @@
 /*
- Code for handling level to level Player UI + animations
+ Handle level-to-level Player UI + animations
 */
 using System.Collections;
 using System.Collections.Generic;

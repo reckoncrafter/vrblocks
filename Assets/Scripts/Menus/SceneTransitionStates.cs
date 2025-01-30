@@ -1,5 +1,5 @@
 /*
- Variables for loading scenes e.g., loading directly to the level selector
+ Static Vars for scene loading e.g., loading directly to the level selector
 */
 public static class SceneTransitionStates
 {
