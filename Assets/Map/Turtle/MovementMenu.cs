@@ -11,6 +11,10 @@ public class MovementMenu : Editor
         base.OnInspectorGUI();
         TurtleMovement turtleMovement = (TurtleMovement)target;
 
+        if (GUILayout.Button("Start Queue"))
+        {
+            turtleMovement.StartQueue();
+        }
         if (GUILayout.Button("Move Forward"))
         {
             turtleMovement.WalkForward();
@@ -27,10 +31,6 @@ public class MovementMenu : Editor
         {
             turtleMovement.Jump();
         }
-        if (GUILayout.Button("Start Queue"))
-        {
-            turtleMovement.StartQueue();
-        }
 
         if (GUILayout.Button("Insert IfStatementBegin"))
         {
@@ -40,20 +40,28 @@ public class MovementMenu : Editor
         {
             turtleMovement.EnqueueConditional("IfStatementEnd");
         }
-        if (GUILayout.Button("Insert setConditionRegisterTrue"))
+        if (GUILayout.Button("Insert setConditionTrue"))
         {
-            turtleMovement.setConditionRegisterTrue();
+            turtleMovement.EnqueueConditional("setConditionTrue");
         }
-        if (GUILayout.Button("Insert setConditionRegisterFalse"))
+        if (GUILayout.Button("Insert setConditionFalse"))
         {
-            turtleMovement.setConditionRegisterFalse();
+            turtleMovement.EnqueueConditional("setConditionFalse");
+        }
+        if (GUILayout.Button("Insert WhileStatementBegin"))
+        {
+            turtleMovement.EnqueueConditional("WhileStatementBegin");
+        }
+        if (GUILayout.Button("Insert WhileStatmentEnd"))
+        {
+            turtleMovement.EnqueueConditional("WhileStatementEnd");
         }
 
-        // if (GUILayout.Button("Insert WhileStatementBegin")){
-        //     turtleMovement.EnqueueConditional("WhileStatementBegin");
-        // }
-        // if (GUILayout.Button("Insert WhileStatmentEnd")){
-        //     turtleMovement.EnqueueConditional("WhileStatementEnd");
-        // }
+        if(GUILayout.Button("Directly setConditionTrue")){
+            turtleMovement.setConditionTrue();
+        }
+        if(GUILayout.Button("Directly setConditionFalse")){
+            turtleMovement.setConditionFalse();
+        }
     }
 }
