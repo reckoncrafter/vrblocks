@@ -49,19 +49,19 @@ public class TurtleMovement : MonoBehaviour
         // temp
         // Similar to what you'd see in lua
         // alternatively, you can give this a function to call when the step ends so the queue is in lua (not implemented)
-        WalkForward();
-        RotateRight();
-        WalkForward();
-        RotateLeft();
-        WalkForward();
-        WalkForward();
-        RotateRight();
-        Jump();
-        WalkForward();
-        Jump();
-        WalkForward();
-
-        StartQueue();
+        // WalkForward();
+        // RotateRight();
+        // WalkForward();
+        // RotateLeft();
+        // WalkForward();
+        // WalkForward();
+        // RotateRight();
+        // Jump();
+        // WalkForward();
+        // Jump();
+        // WalkForward();
+        //
+        // StartQueue();
     }
 
 
@@ -116,77 +116,80 @@ public class TurtleMovement : MonoBehaviour
         StartNextAction();
     }
 
-    public void EnqueueConditional(string functionName){
-        if(functionName == "IfStatementBegin"){
-            queue.Enqueue(IfStatementBegin);
-        }
-        else if(functionName == "IfStatementEnd"){
-            queue.Enqueue(IfStatementEnd);
-        }
-        else if(functionName == "WhileStatementBegin"){
-            queue.Enqueue(WhileStatementBegin);
-        }
-        else if(functionName == "WhileStatementEnd"){
-            queue.Enqueue(WhileStatementEnd);
-        }
-        else if(functionName == "setConditionTrue"){
-            queue.Enqueue(setConditionTrue);
-        }
-        else if(functionName == "setConditionFalse"){
-            queue.Enqueue(setConditionFalse);
-        }
-    }
-
     // I will not atone for my sins
     public void setConditionTrue(){
-        conditionFunction = () => true;
-        StartNextAction();
+        queue.Enqueue(()=>{
+            conditionFunction = () => true;
+            StartNextAction();
+        });
     }
 
     public void setConditionFalse(){
-        conditionFunction = () => false;
+        queue.Enqueue(()=>{
+            conditionFunction = () => false;
+            StartNextAction();
+        });
+    }
+
+    public void EnqueueIfStatementBegin(){
+        queue.Enqueue(IfStatementBegin);
+    }
+
+    private void IfStatementBegin(){
+        queue.Enqueue(()=>{
+            Action[] queueArray = queue.ToArray();
+
+            int EndIndex = 0;
+            for(int i = 0; i < queueArray.Length; i++){
+                if(queueArray[i] == IfStatementEnd){
+                    EndIndex = i;
+                    Debug.Log("IfStatement found its end. " + EndIndex);
+                }
+            }
+
+            if(!conditionFunction()){
+                for(int i = 0; i < EndIndex; i++){
+                    queue.Dequeue();
+                }
+                Debug.Log("Condition not satisfied. Skipping.");
+            }
+            else{
+                Debug.Log("Condition satisfied.");
+            }
+            StartNextAction();
+        });
+    }
+
+    public void EnqueueIfStatementEnd(){
+        queue.Enqueue(IfStatementEnd);
+    }
+
+    private void IfStatementEnd(){
         StartNextAction();
     }
 
-    public void IfStatementBegin(){
-        Action[] queueArray = queue.ToArray();
-
-        int EndIndex = 0;
-        for(int i = 0; i < queueArray.Length; i++){
-            if(queueArray[i] == IfStatementEnd){
-                EndIndex = i;
-                Debug.Log("IfStatement found its end. " + EndIndex);
-            }
-        }
-
-        if(!conditionFunction()){
-            for(int i = 0; i < EndIndex; i++){
-                queue.Dequeue();
-            }
-            Debug.Log("Condition not satisfied. Skipping.");
-        }
-        else{
-            Debug.Log("Condition satisfied.");
-        }
-        StartNextAction();
-    }
-
-    public void IfStatementEnd(){
-
+    public void EnqueueWhileStatementBegin(){
+        queue.Enqueue(WhileStatementBegin);
     }
 
     private List<Action> loopList;
     private Queue<Action> swapQueue;
 
-    public void WhileStatementBegin(){
+    private void WhileStatementBegin(){
+        Debug.Log("WhileStatementBegin called.");
         List<Action> queueList = new List<Action>(queue);
 
         int EndIndex = 0;
         for(int i = 0; i < queueList.Count; i++){
+            Debug.Log(queueList[i]);
             if(queueList[i] == WhileStatementEnd){
                 EndIndex = i;
                 Debug.Log("WhileStatement found its end. " + EndIndex);
             }
+        }
+        if(EndIndex == 0){
+            Debug.Log("No WhileStatementEnd found");
+            return;
         }
 
         loopList = queueList.GetRange(0, EndIndex+1);
@@ -207,7 +210,11 @@ public class TurtleMovement : MonoBehaviour
         // 4. execute
     }
 
-    public void WhileStatementEnd(){
+    public void EnqueueWhileStatementEnd(){
+        queue.Enqueue(WhileStatementEnd);
+    }
+
+    private void WhileStatementEnd(){
         Debug.Log("WhileStatementEnd called.");
 
         // 5. When the end is reached, WhileStatementEnd should

@@ -323,7 +323,6 @@ GameObject:
   - component: {fileID: 8863677396530485765}
   - component: {fileID: 7252318290548244527}
   - component: {fileID: 5405742046879034240}
-  - component: {fileID: -1380404877363445918}
   m_Layer: 0
   m_Name: Block (IfBegin)
   m_TagString: Block
@@ -645,33 +644,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorLevel: 0
   padding: 0.1
---- !u!114 &-1380404877363445918
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6713015538121544575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8949930570369046022, guid: 400fef76ef71943d48f3221445efd519, type: 3}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: IfStatementBegin
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &8666319159274101146
 GameObject:
   m_ObjectHideFlags: 0

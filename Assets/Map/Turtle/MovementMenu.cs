@@ -34,34 +34,27 @@ public class MovementMenu : Editor
 
         if (GUILayout.Button("Insert IfStatementBegin"))
         {
-            turtleMovement.EnqueueConditional("IfStatementBegin");
+            turtleMovement.EnqueueIfStatementBegin();
         }
         if (GUILayout.Button("Insert IfStatementEnd"))
         {
-            turtleMovement.EnqueueConditional("IfStatementEnd");
+            turtleMovement.EnqueueIfStatementEnd();
         }
         if (GUILayout.Button("Insert setConditionTrue"))
         {
-            turtleMovement.EnqueueConditional("setConditionTrue");
+            turtleMovement.setConditionTrue();
         }
         if (GUILayout.Button("Insert setConditionFalse"))
         {
-            turtleMovement.EnqueueConditional("setConditionFalse");
+            turtleMovement.setConditionFalse();
         }
         if (GUILayout.Button("Insert WhileStatementBegin"))
         {
-            turtleMovement.EnqueueConditional("WhileStatementBegin");
+            turtleMovement.EnqueueWhileStatementBegin();
         }
-        if (GUILayout.Button("Insert WhileStatmentEnd"))
+        if (GUILayout.Button("Insert WhileStatementEnd"))
         {
-            turtleMovement.EnqueueConditional("WhileStatementEnd");
-        }
-
-        if(GUILayout.Button("Directly setConditionTrue")){
-            turtleMovement.setConditionTrue();
-        }
-        if(GUILayout.Button("Directly setConditionFalse")){
-            turtleMovement.setConditionFalse();
+            turtleMovement.EnqueueWhileStatementEnd();
         }
     }
 }
