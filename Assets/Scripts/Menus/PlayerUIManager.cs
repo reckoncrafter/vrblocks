@@ -36,6 +36,12 @@ public class PlayerUIManager : MonoBehaviour
     public Button endScreenReturnToMenu;
     public Button endScreenReturnToMenuAlt;
 
+    [Header("Block Menu Categories")]
+    public GameObject movementPanel;
+    public GameObject controlPanel;
+    public Button movementTab;
+    public Button controlTab;
+
     //Animations
     public float animationSpeed = .3f;
     private bool isBlockMenuOpen = false; 
@@ -58,6 +64,8 @@ public class PlayerUIManager : MonoBehaviour
         debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
         optionsMenuButton.onClick.AddListener(EnableOptionsMenu);
+        movementTab.onClick.AddListener(() => ShowCategory(movementPanel));
+        controlTab.onClick.AddListener(() => ShowCategory(controlPanel));
 
         foreach (var b in pauseMenuReturnButtons){ b.onClick.AddListener(EnablePauseMenu); }
         foreach (var b in returnToMenuButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
@@ -66,6 +74,13 @@ public class PlayerUIManager : MonoBehaviour
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
 
         StartCoroutine(ClearUIShaderChannels());
+    }
+
+    void ShowCategory(GameObject category)
+    {
+        movementPanel.SetActive(false);
+        controlPanel.SetActive(false);
+        category.SetActive(true);
     }
 
     void OnEnable()
