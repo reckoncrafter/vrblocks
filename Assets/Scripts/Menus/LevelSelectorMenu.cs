@@ -1,5 +1,5 @@
 /*
- Code for Level Selector + animations
+ Level Selector + animations
 */
 using System;
 using System.IO;
