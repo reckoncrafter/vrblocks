@@ -37,7 +37,6 @@ public class StartButton : MonoBehaviour
         queueReading.ReadQueue();
         Queue<UnityEvent> eventQueue = queueReading.GetBlockQueueOfUnityEvents();
         foreach(var unityEvent in eventQueue) {
-            Debug.Log(unityEvent);
             unityEvent.Invoke();
         }
         turtleMovement.StartQueue();

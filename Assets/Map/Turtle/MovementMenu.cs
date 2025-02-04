@@ -11,6 +11,10 @@ public class MovementMenu : Editor
         base.OnInspectorGUI();
         TurtleMovement turtleMovement = (TurtleMovement)target;
 
+        if (GUILayout.Button("Start Queue"))
+        {
+            turtleMovement.StartQueue();
+        }
         if (GUILayout.Button("Move Forward"))
         {
             turtleMovement.WalkForward();
@@ -27,9 +31,30 @@ public class MovementMenu : Editor
         {
             turtleMovement.Jump();
         }
-        if (GUILayout.Button("Start Queue"))
+
+        if (GUILayout.Button("Insert IfStatementBegin"))
         {
-            turtleMovement.StartQueue();
+            turtleMovement.EnqueueIfStatementBegin();
+        }
+        if (GUILayout.Button("Insert IfStatementEnd"))
+        {
+            turtleMovement.EnqueueIfStatementEnd();
+        }
+        if (GUILayout.Button("Insert setConditionTrue"))
+        {
+            turtleMovement.setConditionTrue();
+        }
+        if (GUILayout.Button("Insert setConditionFalse"))
+        {
+            turtleMovement.setConditionFalse();
+        }
+        if (GUILayout.Button("Insert WhileStatementBegin"))
+        {
+            turtleMovement.EnqueueWhileStatementBegin();
+        }
+        if (GUILayout.Button("Insert WhileStatementEnd"))
+        {
+            turtleMovement.EnqueueWhileStatementEnd();
         }
     }
 }
