@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Events;
 
 public class QueueReading : MonoBehaviour
@@ -68,19 +67,5 @@ public class QueueReading : MonoBehaviour
 
     public Queue<UnityEvent> GetBlockQueueOfUnityEvents(){
         return new Queue<UnityEvent>(eventQueue);
-    }
-}
-
-[CustomEditor(typeof(QueueReading))]
-public class QueueReadingMenu : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-        QueueReading queueReading = (QueueReading)target;
-        if (GUILayout.Button("Read Queue"))
-        {
-            queueReading.ReadQueue();
-        }
     }
 }
