@@ -165,6 +165,7 @@ public class BlockSnapping : MonoBehaviour
 
     private void OnRelease(SelectExitEventArgs args)
     {
-        Debug.Log($"Block released: {gameObject.name}");
+        queueReading?.ReadQueue(); // Update Block Queue on unsnap.
+        //Debug.Log($"Block released: {gameObject.name}");
     }
 }
