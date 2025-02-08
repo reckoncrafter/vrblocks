@@ -45,6 +45,7 @@ public class BlockSnapping : MonoBehaviour
             Debug.LogWarning("SnapTriggerTop is missing on: " + gameObject.name);
         }
     }
+
     public void OnChildTriggerEnter(CollisionForwarding sender, Collider other)
     {
         // Check if SnapTriggerTop was entered by SnapTriggerBottom
@@ -84,6 +85,13 @@ public class BlockSnapping : MonoBehaviour
             return;
         }
 
+        Rigidbody topRb = block1.GetComponent<Rigidbody>();
+        Rigidbody bottomRb = block2.GetComponent<Rigidbody>();
+
+        // Allow both blocks to react to physics
+        topRb.constraints = RigidbodyConstraints.None;
+        bottomRb.constraints = RigidbodyConstraints.None;
+
         // Reset X and Z rotations for both blocks
         block1.transform.rotation = Quaternion.Euler(0, block1.transform.rotation.eulerAngles.y, 0);
         block2.transform.rotation = Quaternion.Euler(0, block1.transform.rotation.eulerAngles.y, 0);
@@ -92,7 +100,6 @@ public class BlockSnapping : MonoBehaviour
         block2.transform.position = snapPointTop.position - (snapPointBottom.position - block2.transform.position);
 
         // Add FixedJoint to lock blocks together
-        Rigidbody bottomRb = block2.GetComponent<Rigidbody>();
         if (bottomRb != null)
         {
             FixedJoint joint = block1.AddComponent<FixedJoint>();
@@ -102,13 +109,15 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
-
-        queueReading?.ReadQueue(); // Update Block Queue on snap.
     }
 
     private void OnGrab(SelectEnterEventArgs args)
     {
         Debug.Log($"Block grabbed: {gameObject.name}");
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        rb.constraints = RigidbodyConstraints.None;
 
         // Check for joints connected to objects
         FixedJoint[] joints = GetComponents<FixedJoint>();
@@ -157,14 +166,67 @@ public class BlockSnapping : MonoBehaviour
 
     private IEnumerator ResetSnapStatusAfterDelay()
     {
-        yield return new WaitForSeconds(0.5f); // Wait for 0.5 seconds (change as needed)
+        yield return new WaitForSeconds(0.1f); // Wait for 0.5 seconds (change as needed)
         queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
 
-    private void OnRelease(SelectExitEventArgs args)
+   private void OnRelease(SelectExitEventArgs args)
     {
         Debug.Log($"Block released: {gameObject.name}");
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        SnappedForwarding snappedForwarding = GetComponent<SnappedForwarding>();
+
+        if (rb == null)
+        {
+            Debug.LogWarning("Rigidbody component not found on this block.");
+            return;
+        }
+
+        bool canSnap = snappedForwarding != null && snappedForwarding.CanSnap();
+
+        Debug.Log($"CanSnap: {canSnap}, hasSnapped: {hasSnapped}");
+
+
+        if (gameObject.name == "Block (StartQueue)")
+        {
+            Debug.Log("OnRelease: Block is ReadQueue.");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+        }
+        // Case 1: Block IS snapped on top
+        else if (hasSnapped == true)
+        {
+            Debug.Log($"CASE 1");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            // Do NOT change rb.constraints
+        }
+        // Case 2: Block IS NOT snapped on top or bottom
+        else if (canSnap == false && hasSnapped == false)
+        {
+            Debug.Log($"CASE 2");
+            rb.useGravity = true;
+            rb.constraints = RigidbodyConstraints.None;
+        }
+        // Default case
+        else
+        {
+            Debug.Log($"CASE DEFAULT");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+        }
+
+        queueReading?.ReadQueue();
     }
 }
