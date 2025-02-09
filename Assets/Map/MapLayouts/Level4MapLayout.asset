@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ed87f0b14476402eb1d04d8a2af0138, type: 3}
+  m_Name: Level4MapLayout
+  m_EditorClassIdentifier: 
+  blockPrefabName: MapBlock
+  blockScale: {x: 0.5, y: 0.5, z: 0.5}
+  turtlePrefabName: Turtle
+  movementDuration: 1
+  animationSpeed: 4
+  turtleSpawnPoint: {x: -1, y: 1, z: -1}
+  turtleRotation: 0
+  goalPrefabName: GoalSphere
+  goalSpawnPoint: {x: 1, y: 1, z: 1}
+  goalScale: {x: 0.25, y: 0.25, z: 0.25}
+  spawnPoints:
+  - {x: -1, y: 0, z: -1}
+  - {x: -1, y: 0, z: 0}
+  - {x: -1, y: 0, z: 1}
+  - {x: 0, y: 0, z: -1}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  - {x: 1, y: 0, z: -1}
+  - {x: 1, y: 0, z: 0}
+  - {x: 1, y: 0, z: 1}
