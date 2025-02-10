@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -26,3 +27,4 @@ public class MiniMapBlockSpawnerMenu : Editor
         }
     }
 }
+#endif
