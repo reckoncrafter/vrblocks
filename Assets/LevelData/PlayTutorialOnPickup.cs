@@ -18,6 +18,9 @@ public class PlayTutorialOnPickup : MonoBehaviour
 
     public void TriggerPlayTutorial(SelectEnterEventArgs args)
     {
-        director.Play();
+        if(this.enabled){
+            director.Play();
+            this.enabled = false;
+        }
     }
 }
