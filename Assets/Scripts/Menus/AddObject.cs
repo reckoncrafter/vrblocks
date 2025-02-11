@@ -1,28 +1,31 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class ObjectSpawner : MonoBehaviour
+public class ObjectSpawner : MonoBehaviour, IPointerClickHandler
 {
-    public GameObject objectToSpawn; // Assign the prefab or object you want to spawn
-    public Transform spawnLocation; // Where the object will be spawned
+    public GameObject blockPrefab; // Assign the specific block prefab in Inspector
+    public float spawnDistance = 1f; // Distance in front of the player
 
-    public void Start()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        // Find the button and add an onClick listener
-        Button spawnButton = GameObject.Find("SpawnButton").GetComponent<Button>();
-        spawnButton.onClick.AddListener(SpawnObject);
+        SpawnObject();
     }
 
-    public void SpawnObject()
+    private void SpawnObject()
     {
-        if (objectToSpawn != null && spawnLocation != null)
+        if (blockPrefab != null && Camera.main != null)
         {
-            Instantiate(objectToSpawn, spawnLocation.position, spawnLocation.rotation);
-            Debug.Log("Object spawned at: " + spawnLocation.position);
+            // Calculate spawn position in front of the player
+            Vector3 spawnPos = Camera.main.transform.position + Camera.main.transform.forward * spawnDistance;
+
+            // Instantiate the block at the calculated position
+            Instantiate(blockPrefab, spawnPos, Quaternion.identity);
+            Debug.Log("Spawned: " + blockPrefab.name + " at " + spawnPos);
         }
         else
         {
-            Debug.LogWarning("Missing objectToSpawn or spawnLocation reference.");
+            Debug.LogWarning("Missing blockPrefab or Camera.main is not set.");
         }
     }
 }
+

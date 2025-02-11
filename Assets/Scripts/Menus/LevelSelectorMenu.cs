@@ -34,7 +34,7 @@ public class LevelSelectorMenu : MonoBehaviour
     void Start()
     {
         // Long winded way of grabbing the thumbnails. Wished Resource.LoadAll worked
-        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/Scenes/Thumbnails");
+        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
         levelThumbnails = new Sprite[thumbnailFiles.Length];
         for(int i = 0; i < thumbnailFiles.Length; i++){

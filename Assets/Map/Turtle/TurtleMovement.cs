@@ -18,6 +18,7 @@ public class TurtleMovement : MonoBehaviour
     private Rigidbody rb;
     private BoxCollider turtleCollider;
     private Queue<Action> queue;
+    private Func<bool> conditionFunction = () => false;
 
     // jumping things
     private bool isGrounded = false;
@@ -48,19 +49,19 @@ public class TurtleMovement : MonoBehaviour
         // temp
         // Similar to what you'd see in lua
         // alternatively, you can give this a function to call when the step ends so the queue is in lua (not implemented)
-        WalkForward();
-        RotateRight();
-        WalkForward();
-        RotateLeft();
-        WalkForward();
-        WalkForward();
-        RotateRight();
-        Jump();
-        WalkForward();
-        Jump();
-        WalkForward();
-
-        StartQueue();
+        // WalkForward();
+        // RotateRight();
+        // WalkForward();
+        // RotateLeft();
+        // WalkForward();
+        // WalkForward();
+        // RotateRight();
+        // Jump();
+        // WalkForward();
+        // Jump();
+        // WalkForward();
+        //
+        // StartQueue();
     }
 
 
@@ -112,6 +113,120 @@ public class TurtleMovement : MonoBehaviour
 
     public void StartQueue()
     {
+        StartNextAction();
+    }
+
+    // I will not atone for my sins
+    public void setConditionTrue(){
+        queue.Enqueue(()=>{
+            conditionFunction = () => true;
+            StartNextAction();
+        });
+    }
+
+    public void setConditionFalse(){
+        queue.Enqueue(()=>{
+            conditionFunction = () => false;
+            StartNextAction();
+        });
+    }
+
+    public void EnqueueIfStatementBegin(){
+        queue.Enqueue(IfStatementBegin);
+    }
+
+    private void IfStatementBegin(){
+        queue.Enqueue(()=>{
+            Action[] queueArray = queue.ToArray();
+
+            int EndIndex = 0;
+            for(int i = 0; i < queueArray.Length; i++){
+                if(queueArray[i] == IfStatementEnd){
+                    EndIndex = i;
+                    Debug.Log("IfStatement found its end. " + EndIndex);
+                }
+            }
+
+            if(!conditionFunction()){
+                for(int i = 0; i < EndIndex; i++){
+                    queue.Dequeue();
+                }
+                Debug.Log("Condition not satisfied. Skipping.");
+            }
+            else{
+                Debug.Log("Condition satisfied.");
+            }
+            StartNextAction();
+        });
+    }
+
+    public void EnqueueIfStatementEnd(){
+        queue.Enqueue(IfStatementEnd);
+    }
+
+    private void IfStatementEnd(){
+        StartNextAction();
+    }
+
+    public void EnqueueWhileStatementBegin(){
+        queue.Enqueue(WhileStatementBegin);
+    }
+
+    private List<Action> loopList;
+    private Queue<Action> swapQueue;
+
+    private void WhileStatementBegin(){
+        Debug.Log("WhileStatementBegin called.");
+        List<Action> queueList = new List<Action>(queue);
+
+        int EndIndex = 0;
+        for(int i = 0; i < queueList.Count; i++){
+            Debug.Log(queueList[i]);
+            if(queueList[i] == WhileStatementEnd){
+                EndIndex = i;
+                Debug.Log("WhileStatement found its end. " + EndIndex);
+            }
+        }
+        if(EndIndex == 0){
+            Debug.Log("No WhileStatementEnd found");
+            return;
+        }
+
+        loopList = queueList.GetRange(0, EndIndex+1);
+        Debug.Log("size of while loop: " + loopList.Count);
+        // 1. save segment of queue from WhileStatementBegin to WhileStatementEnd.
+
+        for(int i = 0; i < EndIndex + 1; i++){
+            queue.Dequeue();
+        }
+
+        // 2. remove saved segment from queue.
+
+        swapQueue = new Queue<Action>(queue);
+        queue = new Queue<Action>(loopList);
+        //3. swap main queue with segment
+
+        StartNextAction();
+        // 4. execute
+    }
+
+    public void EnqueueWhileStatementEnd(){
+        queue.Enqueue(WhileStatementEnd);
+    }
+
+    private void WhileStatementEnd(){
+        Debug.Log("WhileStatementEnd called.");
+
+        // 5. When the end is reached, WhileStatementEnd should
+        if(conditionFunction()){
+            queue = new Queue<Action>(loopList);
+        }
+        else{
+            queue = swapQueue;
+        }
+        //     5a. check if the statement should repeat
+        //     5b. if it should, place a the segment in the queue again.
+        //     5c. if not, swap back in the queue and resume execution
         StartNextAction();
     }
 
