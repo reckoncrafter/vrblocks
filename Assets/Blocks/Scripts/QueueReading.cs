@@ -51,6 +51,11 @@ public class QueueReading : MonoBehaviour
 
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
+        // if block is function, get function contents
+        if(blockType == "Block (FunctionCall)"){
+            Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
+        }
+
         // Add the block type to the queue
         blockQueue.Enqueue(blockType);
         eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
