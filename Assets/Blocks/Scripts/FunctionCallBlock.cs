@@ -7,7 +7,7 @@ public class FunctionCallBlock : MonoBehaviour
 {
     public GameObject functionDefinition;
 
-    Queue<UnityEvent> getFunction(){
+    public Queue<UnityEvent> getFunction(){
         QueueReading functionDefinitionQueueReading = functionDefinition.GetComponent<QueueReading>();
 
         return functionDefinitionQueueReading.GetBlockQueueOfUnityEvents();
