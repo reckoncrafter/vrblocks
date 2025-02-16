@@ -26,6 +26,11 @@ public class NewFunctionButton : MonoBehaviour
         GameObject newFunctionDefinitionInstance = Instantiate(functionDefinitionBlockPrefab, functionDefinitionBlockOffset, Quaternion.identity, transform);
         GameObject newFunctionCallInstance = Instantiate(functionCallBlockPrefab, functionCallBlockOffset, Quaternion.identity, transform);
 
+        newFunctionDefinitionInstance.AddComponent(typeof(FunctionBlock));
+        newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
+        FunctionCallBlock fcb = newFunctionCallInstance.AddComponent(typeof(FunctionCallBlock)) as FunctionCallBlock;
+        fcb.functionDefinition = newFunctionDefinitionInstance;
+
         // BROKEN
         var FCLabel = newFunctionCallInstance.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshPro>();
         var FDLabel = newFunctionDefinitionInstance.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshPro>();
