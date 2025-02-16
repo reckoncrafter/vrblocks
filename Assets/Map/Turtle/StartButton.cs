@@ -9,8 +9,8 @@ public class StartButton : MonoBehaviour
     public QueueReading queueReading;
 
     public void Start(){
-        turtleMovement = FindObjectOfType<TurtleMovement>();
-        queueReading = FindObjectOfType<QueueReading>();
+        //turtleMovement = FindObjectOfType<TurtleMovement>();
+        //queueReading = FindObjectOfType<QueueReading>();
     }
 
 

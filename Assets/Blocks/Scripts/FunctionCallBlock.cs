@@ -9,7 +9,7 @@ public class FunctionCallBlock : MonoBehaviour
 
     public Queue<UnityEvent> getFunction(){
         QueueReading functionDefinitionQueueReading = functionDefinition.GetComponent<QueueReading>();
-
+        functionDefinitionQueueReading.ReadQueue();
         return functionDefinitionQueueReading.GetBlockQueueOfUnityEvents();
     }
 }
