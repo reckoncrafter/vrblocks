@@ -51,9 +51,18 @@ public class QueueReading : MonoBehaviour
 
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
+        // if block is function, get function contents
+        if(blockType == "Block (FunctionCall)"){
+            Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
+            while(functionQueue.Count > 0){
+                eventQueue.Enqueue(functionQueue.Dequeue());
+            }
+        }
+        else{
+            eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
+        }
         // Add the block type to the queue
         blockQueue.Enqueue(blockType);
-        eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
 
         // Recursively read the next block in the queue
         ReadBlocks(connectedBlock);
