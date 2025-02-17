@@ -44,6 +44,8 @@ public class NewFunctionButton : MonoBehaviour
         FDLabel.text = "Function " + nextFunctionNumber.ToString();
         FCLabel.text = "Call " + (string)nextFunctionNumber.ToString();
 
+        newFunctionDefinitionInstance.GetComponent<FunctionBlock>().idNumber = nextFunctionNumber;
+
         nextFunctionNumber++;
 
         //newFunctionCallInstance.transform.localScale = blockScale;
