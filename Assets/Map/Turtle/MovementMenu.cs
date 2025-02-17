@@ -1,6 +1,4 @@
 #if UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -15,6 +13,10 @@ public class MovementMenu : Editor
         if (GUILayout.Button("Start Queue"))
         {
             turtleMovement.StartQueue();
+        }
+        if (GUILayout.Button("Reset"))
+        {
+            turtleMovement.Reset();
         }
         if (GUILayout.Button("Move Forward"))
         {
