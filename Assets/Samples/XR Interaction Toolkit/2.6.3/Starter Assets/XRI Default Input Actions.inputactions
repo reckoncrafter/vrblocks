@@ -1559,7 +1559,7 @@
                     "name": "UI Press",
                     "type": "Button",
                     "id": "65174b45-c2ee-4f90-93bb-fb4084eaaab3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1622,6 +1622,15 @@
                     "name": "Block Menu Interaction",
                     "type": "Button",
                     "id": "d78878ca-1364-4e7b-877a-147bf6198ce5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Primary Button",
+                    "type": "Button",
+                    "id": "ce6c656b-31d6-449e-887b-98a03d357704",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -1802,6 +1811,28 @@
                     "processors": "",
                     "groups": ";Generic XR Controller",
                     "action": "Block Menu Interaction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "31c08ee7-48ab-439e-a112-7198c22b2962",
+                    "path": "<XRController>{RightHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Primary Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8fec30c8-5228-4882-a2c3-41e37b11880d",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Primary Button",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
