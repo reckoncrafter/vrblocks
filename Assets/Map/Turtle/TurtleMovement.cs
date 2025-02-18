@@ -11,6 +11,12 @@ public class TurtleMovement : MonoBehaviour
     public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
 
+    private bool isResetable = false;
+    private Vector3 resetPosition = Vector3.zero;
+    private Quaternion resetRotation = Quaternion.identity;
+    private float resetBounciness = 0.0f;
+    private RigidbodyConstraints resetConstraints;
+
     private LTDescr tween;
     private Animator animator;
     private Rigidbody rb;
@@ -41,6 +47,11 @@ public class TurtleMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
         queue = new Queue<Action>();
+
+        resetPosition = transform.position;
+        resetRotation = transform.rotation;
+        resetBounciness = turtleCollider.material.bounciness;
+        resetConstraints = rb.constraints;
 
         SetAnimSpeed(animationSpeed);
     }
@@ -94,6 +105,7 @@ public class TurtleMovement : MonoBehaviour
 
     public void StartQueue()
     {
+        isResetable = true;
         StartNextAction();
     }
 
@@ -255,6 +267,25 @@ public class TurtleMovement : MonoBehaviour
         queue.Enqueue(HandleJump);
     }
 
+    public void Reset()
+    {
+        if (!isResetable)
+        {
+            return;
+        }
+        isResetable = false;
+
+        SetIsWalking(false);
+        queue.Clear();
+        tween.reset();
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        turtleCollider.material.bounciness = resetBounciness;
+        transform.SetPositionAndRotation(resetPosition, resetRotation);
+        rb.constraints = resetConstraints;
+    }
+
     private void StartNextAction()
     {
         if (queue.Count > 0)
@@ -341,6 +372,13 @@ public class TurtleMovement : MonoBehaviour
         });
     }
 
+    // temp for demo purposes but could be a feature
+    private IEnumerator WaitAndReset()
+    {
+        yield return new WaitForSeconds(3.0f);
+        Reset();
+    }
+
     private void Fail(Action failMovement = null)
     {
         rb.constraints = RigidbodyConstraints.None;
@@ -349,5 +387,7 @@ public class TurtleMovement : MonoBehaviour
         tween.reset();
 
         failMovement?.Invoke();
+
+        StartCoroutine(WaitAndReset());
     }
 }
