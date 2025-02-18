@@ -6710,11 +6710,43 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad818c36731146e994540a1896ad8f24, type: 3}
+--- !u!1 &973132420 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 511586c0f91eff410b3752701df07857, type: 3}
+  m_PrefabInstance: {fileID: 1433937782}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &973132428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1389943061981320986, guid: 511586c0f91eff410b3752701df07857, type: 3}
   m_PrefabInstance: {fileID: 1433937782}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &973132429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 973132420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onMove:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1089609111}
+        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
+        m_MethodName: EnqueueElseStatement
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &984974739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10436,7 +10468,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 511586c0f91eff410b3752701df07857, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 973132429}
   m_SourcePrefab: {fileID: 100100000, guid: 511586c0f91eff410b3752701df07857, type: 3}
 --- !u!1 &1449462422
 GameObject:
