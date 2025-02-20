@@ -39,6 +39,10 @@ public class MovementMenu : Editor
         {
             turtleMovement.EnqueueIfStatementBegin();
         }
+        if (GUILayout.Button("Insert ElseStatement"))
+        {
+            turtleMovement.EnqueueElseStatement();
+        }
         if (GUILayout.Button("Insert IfStatementEnd"))
         {
             turtleMovement.EnqueueIfStatementEnd();
