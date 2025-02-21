@@ -5,16 +5,15 @@ using UnityEngine.Events;
 public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
-    private Queue<string> blockQueue = new Queue<string>();
-    private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+    private readonly Queue<string> blockQueue = new Queue<string>();
+    private readonly Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
     private bool amFunction = false;
+    private FunctionBlock functionBlock;
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
 
-        if(gameObject.GetComponent<FunctionBlock>()){
-            amFunction = true;
-        }
+        functionBlock = gameObject.GetComponent<FunctionBlock>();
 
         // Clear previous readings
         blockQueue.Clear();
@@ -58,7 +57,7 @@ public class QueueReading : MonoBehaviour
 
         // if block is function, get function contents
         if(blockType == "Block (FunctionCall)"){
-            if(amFunction){
+            if(functionBlock){
                 int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
                 int thisID = gameObject.GetComponent<FunctionBlock>().FunctionID;
                 if (connectedID == thisID){
