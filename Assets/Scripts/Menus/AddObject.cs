@@ -1,31 +1,48 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using TMPro;
 
-public class ObjectSpawner : MonoBehaviour, IPointerClickHandler
+public class AddObject : MonoBehaviour
 {
-    public GameObject blockPrefab; // Assign the specific block prefab in Inspector
-    public float spawnDistance = 1f; // Distance in front of the player
+    [SerializeField] private GameObject blockPrefab; // Assign corresponding block in inspector
+    [SerializeField] private Transform spawnParent; // Assign "MoveableEntities" as spawn position in hierarchy if that's how we're moving with it.
+    [SerializeField] private Vector3 spawnOffset = new Vector3(0, 0.5f, 0); // Offset to avoid overlap
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        SpawnObject();
-    }
+    private Button button;
 
-    private void SpawnObject()
+    private void Awake()
     {
-        if (blockPrefab != null && Camera.main != null)
+        button = GetComponent<Button>();
+        if (button != null)
         {
-            // Calculate spawn position in front of the player
-            Vector3 spawnPos = Camera.main.transform.position + Camera.main.transform.forward * spawnDistance;
-
-            // Instantiate the block at the calculated position
-            Instantiate(blockPrefab, spawnPos, Quaternion.identity);
-            Debug.Log("Spawned: " + blockPrefab.name + " at " + spawnPos);
+            button.onClick.AddListener(SpawnBlock);
         }
         else
         {
-            Debug.LogWarning("Missing blockPrefab or Camera.main is not set.");
+            Debug.LogError("AddObject script must be attached to a UI Button.");
         }
     }
-}
 
+    private void SpawnBlock()
+    {
+        if (blockPrefab == null)
+        {
+            Debug.LogError("No blockPrefab assigned to " + gameObject.name);
+            return;
+        }
+
+        Transform buttonTransform = GetComponent<Transform>();
+        Transform parentTransform = spawnParent != null ? spawnParent : null;
+
+        GameObject newBlock = Instantiate(
+            blockPrefab,
+            buttonTransform.position + spawnOffset, // Spawning based on button position
+            buttonTransform.rotation,
+            parentTransform
+        );
+
+        newBlock.name = blockPrefab.name; // Because I use strings for block queue.
+
+        Debug.Log("Spawned: " + newBlock.name + " at " + newBlock.transform.position);
+    }
+}

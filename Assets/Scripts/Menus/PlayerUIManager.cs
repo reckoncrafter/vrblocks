@@ -39,8 +39,10 @@ public class PlayerUIManager : MonoBehaviour
     [Header("Block Menu Categories")]
     public GameObject movementPanel;
     public GameObject controlPanel;
+    public GameObject functionPanel;
     public Button movementTab;
     public Button controlTab;
+    public Button functionTab;
 
     //Animations
     public float animationSpeed = .3f;
@@ -66,6 +68,7 @@ public class PlayerUIManager : MonoBehaviour
         optionsMenuButton.onClick.AddListener(EnableOptionsMenu);
         movementTab.onClick.AddListener(() => ShowCategory(movementPanel));
         controlTab.onClick.AddListener(() => ShowCategory(controlPanel));
+        functionTab.onClick.AddListener(() => ShowCategory(functionPanel));
 
         foreach (var b in pauseMenuReturnButtons){ b.onClick.AddListener(EnablePauseMenu); }
         foreach (var b in returnToMenuButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
@@ -80,6 +83,7 @@ public class PlayerUIManager : MonoBehaviour
     {
         movementPanel.SetActive(false);
         controlPanel.SetActive(false);
+        functionPanel.SetActive(false);
         category.SetActive(true);
     }
 
