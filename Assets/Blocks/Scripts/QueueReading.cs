@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,6 +34,8 @@ public class QueueReading : MonoBehaviour
         }
     }
 
+    private Stack<GameObject> incompleteIfStatements = new Stack<GameObject>();
+    private Stack<GameObject> incompleteWhileStatements = new Stack<GameObject>();
     private void ReadBlocks(GameObject currentBlock)
     {
         // Get the SnappedForwarding component from the current block
@@ -40,6 +43,20 @@ public class QueueReading : MonoBehaviour
         if (snappedForwarding == null || snappedForwarding.ConnectedBlock == null)
         {
             Debug.Log($"No SnappedForwarding component or no connected block found for {currentBlock.name}. Stopping traversal.");
+
+            // TODO: setOffendingState not being triggered. Invalid references in stack?
+            if(incompleteIfStatements.Count > 0){
+                Debug.Log($"Found {incompleteIfStatements.Count} incomplete If Statements");
+                foreach(GameObject block in incompleteIfStatements){
+                    block.GetComponent<TurtleCommand>().setOffendingState(true);
+                }
+            }
+            if(incompleteWhileStatements.Count > 0){
+                Debug.Log($"Found {incompleteWhileStatements.Count} incomplete While Statements");
+                foreach(GameObject block in incompleteWhileStatements){
+                    block.GetComponent<TurtleCommand>().setOffendingState(true);
+                }
+            }
             return;
         }
 
@@ -50,6 +67,35 @@ public class QueueReading : MonoBehaviour
         string blockType = connectedBlock.name;
 
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
+
+        // if block is if or while, check if it is complete
+
+        // TODO: Fix currentBlock being null
+        if(blockType == "Block (IfBegin)"){
+            incompleteIfStatements.Push(currentBlock);
+        }
+        if(blockType == "Block (IfEnd)"){
+            try{
+                incompleteIfStatements.Pop();
+            }
+            catch(Exception e) when (e is InvalidOperationException){
+                currentBlock.GetComponent<TurtleCommand>().setOffendingState(true);
+                Debug.Log("Lone IfEnd Detected");
+            }
+        }
+
+        if(blockType == "Block (WhileBegin)"){
+            incompleteWhileStatements.Push(currentBlock);
+        }
+        if(blockType == "Block (WhileEnd)"){
+            try{
+                incompleteWhileStatements.Pop();
+            }
+            catch(Exception e) when (e is InvalidOperationException){
+                currentBlock.GetComponent<TurtleCommand>().setOffendingState(true);
+                Debug.Log("Lone WhileEnd Detected");
+            }
+        }
 
         // if block is function, get function contents
         if(blockType == "Block (FunctionCall)"){
