@@ -58,7 +58,7 @@ public class QueueReading : MonoBehaviour
         if(blockType == "Block (FunctionCall)"){
             if(functionBlock){
                 int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
-                int thisID = gameObject.GetComponent<FunctionBlock>().FunctionID;
+                int thisID = functionBlock.FunctionID;
                 if (connectedID == thisID){
                     Debug.Log("Block (Function): QueueReading: Recursion Detected! Aborting!");
                     return;
