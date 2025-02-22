@@ -310,6 +310,8 @@ public class TurtleMovement : MonoBehaviour
 
         SetIsWalking(false);
         queue.Clear();
+
+        // NullReferenceException!
         tween.reset();
 
         rb.velocity = Vector3.zero;
@@ -414,9 +416,12 @@ public class TurtleMovement : MonoBehaviour
 
     private void Fail(Action failMovement = null)
     {
+
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
         queue.Clear();
+
+        //NullReferenceException!
         tween.reset();
 
         failMovement?.Invoke();
