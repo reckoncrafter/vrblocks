@@ -7,7 +7,6 @@ public class QueueReading : MonoBehaviour
     // Queue to hold the block types (FIFO order)
     private readonly Queue<string> blockQueue = new Queue<string>();
     private readonly Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
-    private bool amFunction = false;
     private FunctionBlock functionBlock;
     public void ReadQueue()
     {

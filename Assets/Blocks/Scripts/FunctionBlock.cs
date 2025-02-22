@@ -19,6 +19,7 @@ public class FunctionBlock : MonoBehaviour
     {
       primaryButton.action.started += onPrimaryButton;
       queueReading = gameObject.GetComponent<QueueReading>();
+      FunctionID = gameObject.GetInstanceID();
     }
 
     void onActivation(){
@@ -27,12 +28,12 @@ public class FunctionBlock : MonoBehaviour
 
     public void OnHoverEntered(){
       isHovered = true;
-      Debug.Log("FunctionDefinintionBlock: Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
     public void OnHoverExited(){
       isHovered = false;
-      Debug.Log("FunctionDefinintionBlock: Not Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
 
     void onPrimaryButton(InputAction.CallbackContext context){
