@@ -45,12 +45,11 @@ public class MiniMapBlockSpawner : MonoBehaviour
         // Return minimap to original position
         if((initPos - transform.position).magnitude >= 0.08)
         {
-            float dt = Time.deltaTime;
             minimapRB.AddForce(
                 new Vector3(
-                    minimapMagnetPIDx.Update(dt, transform.position.x, initPos.x),
-                    minimapMagnetPIDy.Update(dt, transform.position.y, initPos.y),
-                    minimapMagnetPIDz.Update(dt, transform.position.z, initPos.z)
+                    minimapMagnetPIDx.Update(Time.deltaTime, transform.position.x, initPos.x),
+                    minimapMagnetPIDy.Update(Time.deltaTime, transform.position.y, initPos.y),
+                    minimapMagnetPIDz.Update(Time.deltaTime, transform.position.z, initPos.z)
                 ).normalized * (initPos - transform.position).sqrMagnitude, 
                 ForceMode.Force
             );
