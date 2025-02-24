@@ -157,7 +157,8 @@ public class TurtleMovement : MonoBehaviour
 
         if (!conditionFunction())
         {
-            if (isElse){
+            if (isElse)
+            {
                 for (int i = 0; i < elseBlockIndex; i++)
                 {
                     queue.Dequeue();
@@ -178,9 +179,11 @@ public class TurtleMovement : MonoBehaviour
         {
             Debug.Log("Condition satisfied.");
 
-            if (isElse){
+            if (isElse)
+            {
                 var toList = new List<Action>(queue);
-                for(int i = elseBlockIndex+1; i < EndIndex; i++){
+                for (int i = elseBlockIndex + 1; i < EndIndex; i++)
+                {
                     toList.RemoveAt(i);
                     Debug.Log(toList[i].ToString());
                 }
@@ -200,11 +203,13 @@ public class TurtleMovement : MonoBehaviour
         StartNextAction();
     }
 
-    public void EnqueueElseStatement(){
+    public void EnqueueElseStatement()
+    {
         queue.Enqueue(ElseStatement);
     }
 
-    private void ElseStatement(){
+    private void ElseStatement()
+    {
         StartNextAction();
     }
 
@@ -310,9 +315,7 @@ public class TurtleMovement : MonoBehaviour
 
         SetIsWalking(false);
         queue.Clear();
-
-        // NullReferenceException!
-        tween.reset();
+        tween?.reset();
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -420,9 +423,7 @@ public class TurtleMovement : MonoBehaviour
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
         queue.Clear();
-
-        //NullReferenceException!
-        tween.reset();
+        tween?.reset();
 
         failMovement?.Invoke();
 
