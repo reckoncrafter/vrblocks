@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Linq;
 using UnityEngine.XR.Interaction.Toolkit;
+using Unity.VisualScripting;
+using System;
 
 [ExecuteInEditMode]
 public class MiniMapBlockSpawner : MonoBehaviour
@@ -12,8 +14,14 @@ public class MiniMapBlockSpawner : MonoBehaviour
     public GameObject disableLeftHandModelOnGrab;
     public GameObject disableRightHandModelOnGrab;
 
-    private float miniMapScale = 0.1f;
+    public float miniMapScale = 0.1f;
     private Vector3 com;
+    private Rigidbody minimapRB;
+    private bool minimapAtRest = true;
+    private Vector3 initPos;
+    private PIDController minimapMagnetPIDx;
+    private PIDController minimapMagnetPIDy;
+    private PIDController minimapMagnetPIDz;
 
     void Start()
     {
@@ -22,10 +30,38 @@ public class MiniMapBlockSpawner : MonoBehaviour
             SpawnEntities();
         }
 
+        minimapRB = transform.GetComponent<Rigidbody>();
+        initPos = transform.position;
+        minimapMagnetPIDx = new PIDController();
+        minimapMagnetPIDy = new PIDController();
+        minimapMagnetPIDz = new PIDController();
+
         XRGrabInteractable grabInteractable = GetComponent<XRGrabInteractable>();
         grabInteractable.selectEntered.AddListener(HideGrabbingHand);
         grabInteractable.selectExited.AddListener(ShowGrabbingHand);
     }
+    void Update()
+    {
+        // Return minimap to original position
+        if((initPos - transform.position).magnitude >= 0.08)
+        {
+            minimapRB.AddForce(
+                new Vector3(
+                    minimapMagnetPIDx.Update(Time.deltaTime, transform.position.x, initPos.x),
+                    minimapMagnetPIDy.Update(Time.deltaTime, transform.position.y, initPos.y),
+                    minimapMagnetPIDz.Update(Time.deltaTime, transform.position.z, initPos.z)
+                ).normalized * (initPos - transform.position).sqrMagnitude, 
+                ForceMode.Force
+            );
+            minimapAtRest = false;
+        }
+        else if(!minimapAtRest)
+        {
+            minimapRB.velocity = Vector3.zero;
+            minimapAtRest = true;
+        }
+    }
+
     private void CalculateCenterOfMass()
     {
         Vector3 startPositionOffset = mapValues.blockScale / 2;
@@ -37,6 +73,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
     }
     public void SpawnEntities()
     {
+        // Calculate COM and justify the minimap model centered here (and rotate in player's hand properly)
         CalculateCenterOfMass();
         Vector3 startPositionOffset = (mapValues.blockScale / 2) - com;
 
