@@ -22,7 +22,6 @@ public class MiniMapBlockSpawner : MonoBehaviour
     private PIDController minimapMagnetPIDx;
     private PIDController minimapMagnetPIDy;
     private PIDController minimapMagnetPIDz;
-    private float dt;
 
     void Start()
     {
@@ -46,23 +45,21 @@ public class MiniMapBlockSpawner : MonoBehaviour
         // Return minimap to original position
         if((initPos - transform.position).magnitude >= 0.08)
         {
-            minimapAtRest = false;
-            dt = Time.deltaTime;
+            float dt = Time.deltaTime;
             minimapRB.AddForce(
                 new Vector3(
                     minimapMagnetPIDx.Update(dt, transform.position.x, initPos.x),
                     minimapMagnetPIDy.Update(dt, transform.position.y, initPos.y),
                     minimapMagnetPIDz.Update(dt, transform.position.z, initPos.z)
-                ).normalized * 2f, 
+                ).normalized * (initPos - transform.position).sqrMagnitude, 
                 ForceMode.Force
             );
+            minimapAtRest = false;
         }
         else if(!minimapAtRest)
         {
             minimapRB.velocity = Vector3.zero;
-            minimapRB.isKinematic = true;
             minimapAtRest = true;
-            minimapRB.isKinematic = false;
         }
     }
 
