@@ -1035,7 +1035,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 1210087765}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &118832886
 GameObject:
   m_ObjectHideFlags: 0
@@ -2523,7 +2524,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 0}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &358888915
 GameObject:
   m_ObjectHideFlags: 0
@@ -5681,7 +5683,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 848517338}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &816079002
 GameObject:
   m_ObjectHideFlags: 0
@@ -6221,7 +6224,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 8046983326253204511}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1001 &888264141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11011,7 +11015,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 414029109}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &1484447131
 GameObject:
   m_ObjectHideFlags: 0
@@ -15957,7 +15962,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
