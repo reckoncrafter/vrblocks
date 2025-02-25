@@ -481,10 +481,34 @@ MonoBehaviour:
   m_AllowGazeAssistance: 0
   m_FirstHoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6362424727914982184}
+        m_TargetAssemblyTypeName: FunctionBlock, Assembly-CSharp
+        m_MethodName: OnHoverEntered
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_LastHoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6362424727914982184}
+        m_TargetAssemblyTypeName: FunctionBlock, Assembly-CSharp
+        m_MethodName: OnHoverExited
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_HoverEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -639,6 +663,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa675a2c6a3d3aaa5a1538a205afecee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  primaryButton: {fileID: -3059995133750637719, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  functionCallPrefab: {fileID: 6713015538121544575, guid: 6624236ae1e177e2cb847d4bf721f9ca, type: 3}
+  spawnOffset: {x: 0, y: 1, z: 1}
+  FunctionID: 0
 --- !u!1 &8338628556024756916
 GameObject:
   m_ObjectHideFlags: 0

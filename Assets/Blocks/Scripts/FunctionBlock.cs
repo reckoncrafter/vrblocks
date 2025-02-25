@@ -10,7 +10,7 @@ public class FunctionBlock : MonoBehaviour
     public InputActionReference primaryButton;
     public GameObject functionCallPrefab;
     public Vector3 spawnOffset;
-    public int idNumber;
+    public int FunctionID;
 
     private QueueReading queueReading;
     private bool isHovered = false;
@@ -19,6 +19,7 @@ public class FunctionBlock : MonoBehaviour
     {
       primaryButton.action.started += onPrimaryButton;
       queueReading = gameObject.GetComponent<QueueReading>();
+      FunctionID = gameObject.GetInstanceID();
     }
 
     void onActivation(){
@@ -27,12 +28,12 @@ public class FunctionBlock : MonoBehaviour
 
     public void OnHoverEntered(){
       isHovered = true;
-      Debug.Log("FunctionDefinintionBlock: Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
     public void OnHoverExited(){
       isHovered = false;
-      Debug.Log("FunctionDefinintionBlock: Not Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
 
     void onPrimaryButton(InputAction.CallbackContext context){
@@ -49,7 +50,8 @@ public class FunctionBlock : MonoBehaviour
       FunctionCallBlock fcb = newFunctionCall.AddComponent(typeof(FunctionCallBlock)) as FunctionCallBlock;
       fcb.functionDefinition = gameObject;
       var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
-      FCLabel.text = "Call " + idNumber.ToString();
+      FCLabel.text = "Call " + FunctionID.ToString();
+      fcb.GetComponent<FunctionCallBlock>().FunctionID = FunctionID;
     }
 }
 
