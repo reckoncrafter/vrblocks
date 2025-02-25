@@ -135,21 +135,37 @@ public class TurtleMovement : MonoBehaviour
 
     private void IfStatementBegin()
     {
-        queue.Enqueue(() =>
+        int elseBlockIndex = -1;
+        int EndIndex = 0;
+        bool isElse = false;
+        Action[] queueArray = queue.ToArray();
+
+        for (int i = 0; i < queueArray.Length; i++)
         {
-            Action[] queueArray = queue.ToArray();
-
-            int EndIndex = 0;
-            for (int i = 0; i < queueArray.Length; i++)
+            if (queueArray[i] == IfStatementEnd)
             {
-                if (queueArray[i] == IfStatementEnd)
-                {
-                    EndIndex = i;
-                    Debug.Log("IfStatement found its end. " + EndIndex);
-                }
+                EndIndex = i;
+                Debug.Log("IfStatement found its end. " + EndIndex);
             }
+            if (queueArray[i] == ElseStatement)
+            {
+                elseBlockIndex = i;
+                isElse = true;
+                Debug.Log("Found Else Statement. " + elseBlockIndex);
+            }
+        }
 
-            if (!conditionFunction())
+        if (!conditionFunction())
+        {
+            if (isElse)
+            {
+                for (int i = 0; i < elseBlockIndex; i++)
+                {
+                    queue.Dequeue();
+                }
+                Debug.Log("Condition not satisfied. Executing Else Statement.");
+            }
+            else
             {
                 for (int i = 0; i < EndIndex; i++)
                 {
@@ -157,12 +173,24 @@ public class TurtleMovement : MonoBehaviour
                 }
                 Debug.Log("Condition not satisfied. Skipping.");
             }
-            else
+
+        }
+        else
+        {
+            Debug.Log("Condition satisfied.");
+
+            if (isElse)
             {
-                Debug.Log("Condition satisfied.");
+                var toList = new List<Action>(queue);
+                for (int i = elseBlockIndex + 1; i < EndIndex; i++)
+                {
+                    toList.RemoveAt(i);
+                    Debug.Log(toList[i].ToString());
+                }
+                queue = new Queue<Action>(toList);
             }
-            StartNextAction();
-        });
+        }
+        StartNextAction();
     }
 
     public void EnqueueIfStatementEnd()
@@ -171,6 +199,16 @@ public class TurtleMovement : MonoBehaviour
     }
 
     private void IfStatementEnd()
+    {
+        StartNextAction();
+    }
+
+    public void EnqueueElseStatement()
+    {
+        queue.Enqueue(ElseStatement);
+    }
+
+    private void ElseStatement()
     {
         StartNextAction();
     }
@@ -277,7 +315,7 @@ public class TurtleMovement : MonoBehaviour
 
         SetIsWalking(false);
         queue.Clear();
-        tween.reset();
+        tween?.reset();
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -381,10 +419,11 @@ public class TurtleMovement : MonoBehaviour
 
     private void Fail(Action failMovement = null)
     {
+
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
         queue.Clear();
-        tween.reset();
+        tween?.reset();
 
         failMovement?.Invoke();
 

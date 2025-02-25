@@ -5,11 +5,14 @@ using UnityEngine.Events;
 public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
-    private Queue<string> blockQueue = new Queue<string>();
-    private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+    private readonly Queue<string> blockQueue = new Queue<string>();
+    private readonly Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+    private FunctionBlock functionBlock;
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
+
+        functionBlock = gameObject.GetComponent<FunctionBlock>();
 
         // Clear previous readings
         blockQueue.Clear();
@@ -53,6 +56,14 @@ public class QueueReading : MonoBehaviour
 
         // if block is function, get function contents
         if(blockType == "Block (FunctionCall)"){
+            if(functionBlock){
+                int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
+                int thisID = functionBlock.FunctionID;
+                if (connectedID == thisID){
+                    Debug.Log("Block (Function): QueueReading: Recursion Detected! Aborting!");
+                    return;
+                }
+            }
             Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
             while(functionQueue.Count > 0){
                 eventQueue.Enqueue(functionQueue.Dequeue());

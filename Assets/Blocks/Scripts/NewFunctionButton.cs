@@ -9,7 +9,6 @@ public class NewFunctionButton : MonoBehaviour
     public Vector3 functionCallBlockOffset = Vector3.zero;
     public Vector3 blockRotation = new Vector3(0, 180, 0);
     //public Vector3 blockScale = new Vector3(2.5f, 2.25f, 2.5f);
-    public int nextFunctionNumber = 0;
 
     public GameObject functionDefinitionBlockPrefab;
     public GameObject functionCallBlockPrefab;
@@ -23,16 +22,14 @@ public class NewFunctionButton : MonoBehaviour
         var transform = GetComponent<Transform>();
         var blockEntity = GameObject.Find("MoveableEntities/BlockEntity").GetComponent<Transform>();
 
-        functionDefinitionBlockOffset += transform.position;
-        functionCallBlockOffset += transform.position;
+        GameObject newFunctionDefinitionInstance = Instantiate(functionDefinitionBlockPrefab, functionDefinitionBlockOffset + transform.position, Quaternion.Euler(blockRotation), blockEntity);
+        GameObject newFunctionCallInstance = Instantiate(functionCallBlockPrefab, functionCallBlockOffset + transform.position, Quaternion.Euler(blockRotation), blockEntity);
 
-        GameObject newFunctionDefinitionInstance = Instantiate(functionDefinitionBlockPrefab, functionDefinitionBlockOffset, Quaternion.Euler(blockRotation), blockEntity);
-        GameObject newFunctionCallInstance = Instantiate(functionCallBlockPrefab, functionCallBlockOffset, Quaternion.Euler(blockRotation), blockEntity);
+        int FDInstanceID = newFunctionDefinitionInstance.GetInstanceID();
 
         newFunctionDefinitionInstance.name = "Block (Function)";
         newFunctionCallInstance.name = "Block (FunctionCall)";
 
-        newFunctionDefinitionInstance.AddComponent(typeof(FunctionBlock));
         newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
         FunctionCallBlock fcb = newFunctionCallInstance.AddComponent(typeof(FunctionCallBlock)) as FunctionCallBlock;
         fcb.functionDefinition = newFunctionDefinitionInstance;
@@ -41,15 +38,10 @@ public class NewFunctionButton : MonoBehaviour
         var FCLabel = newFunctionCallInstance.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
         var FDLabel = newFunctionDefinitionInstance.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
 
-        FDLabel.text = "Function " + nextFunctionNumber.ToString();
-        FCLabel.text = "Call " + (string)nextFunctionNumber.ToString();
+        FDLabel.text = "Function " + FDInstanceID.ToString();
+        FCLabel.text = "Call " + FDInstanceID.ToString();
 
-        newFunctionDefinitionInstance.GetComponent<FunctionBlock>().idNumber = nextFunctionNumber;
-
-        nextFunctionNumber++;
-
-        //newFunctionCallInstance.transform.localScale = blockScale;
-        //newFunctionDefinitionInstance.transform.localScale = blockScale;
+        newFunctionDefinitionInstance.GetComponent<FunctionBlock>().FunctionID = FDInstanceID;
     }
 
     public void SetGlowEffect(bool isGlow){
