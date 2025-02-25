@@ -15,13 +15,14 @@ public class IncompleteConditionalHandler : MonoBehaviour
         defaultMaterial = renderer.material;
     }
 
-    public void SetOffendingState(bool status){
-        // TODO: Fix material fetch
-        //Material offendingStateMaterial = Resources.Load("Assets/Blocks/Materials/OffendingState", typeof(Material)) as Material;
-        if(status){
+    public void SetOffendingState(bool status)
+    {
+        if(status)
+        {
             renderer.material = offendingStateMaterial;
         }
-        else{
+        else
+        {
             renderer.material = defaultMaterial;
         }
     }

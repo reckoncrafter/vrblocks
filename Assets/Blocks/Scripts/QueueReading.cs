@@ -51,17 +51,21 @@ public class QueueReading : MonoBehaviour
         {
             Debug.Log($"No SnappedForwarding component or no connected block found for {currentBlock.name}. Stopping traversal.");
 
-            // TODO: setOffendingState not being triggered. Invalid references in stack?
-            if(incompleteIfStatements.Count > 0){
+            // check for remaining incomplete statments
+            if(incompleteIfStatements.Count > 0)
+            {
                 Debug.Log($"Found {incompleteIfStatements.Count} incomplete If Statements");
-                foreach(GameObject block in incompleteIfStatements){
+                foreach(GameObject block in incompleteIfStatements)
+                {
                     Debug.Log(block.name);
                     block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
                 }
             }
-            if(incompleteWhileStatements.Count > 0){
+            if(incompleteWhileStatements.Count > 0)
+            {
                 Debug.Log($"Found {incompleteWhileStatements.Count} incomplete While Statements");
-                foreach(GameObject block in incompleteWhileStatements){
+                foreach(GameObject block in incompleteWhileStatements)
+                {
                     Debug.Log(block.name);
                     block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
                 }
@@ -77,69 +81,83 @@ public class QueueReading : MonoBehaviour
 
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
-        // if block is if or while, check if it is complete
-
-        // TODO: Fix currentBlock being null
-        if(blockType == "Block (IfBegin)"){
+        // incomplete conditional statement detection
+        if(blockType == "Block (IfBegin)")
+        {
             incompleteIfStatements.Push(connectedBlock);
         }
-        if(blockType == "Block (Else)"){
+        if(blockType == "Block (Else)")
+        {
             var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try{
+            try
+            {
                 GameObject b = incompleteIfStatements.Peek();
                 b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
                 connectedBlockICH.SetOffendingState(false);
             }
-            catch(Exception e) when (e is InvalidOperationException){
+            catch(Exception e) when (e is InvalidOperationException)
+            {
                 connectedBlockICH.SetOffendingState(true);
                 Debug.Log("Lone Else Detected");
             }
         }
-        if(blockType == "Block (IfEnd)"){
+        if(blockType == "Block (IfEnd)")
+        {
             var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try{
+            try
+            {
                 GameObject b = incompleteIfStatements.Pop();
                 b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
                 connectedBlockICH.SetOffendingState(false);
             }
-            catch(Exception e) when (e is InvalidOperationException){
+            catch(Exception e) when (e is InvalidOperationException)
+            {
                 connectedBlockICH.SetOffendingState(true);
                 Debug.Log("Lone IfEnd Detected");
             }
         }
 
-        if(blockType == "Block (WhileBegin)"){
+        if(blockType == "Block (WhileBegin)")
+        {
             incompleteWhileStatements.Push(connectedBlock);
         }
-        if(blockType == "Block (WhileEnd)"){
+        if(blockType == "Block (WhileEnd)")
+        {
             var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try{
+            try
+            {
                 GameObject b = incompleteWhileStatements.Pop();
                 b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
                 connectedBlockICH.SetOffendingState(false);
             }
-            catch(Exception e) when (e is InvalidOperationException){
+            catch(Exception e) when (e is InvalidOperationException)
+            {
                 connectedBlockICH.SetOffendingState(true);
                 Debug.Log("Lone WhileEnd Detected");
             }
         }
 
         // if block is function, get function contents
-        if(blockType == "Block (FunctionCall)"){
-            if(functionBlock){
+        if(blockType == "Block (FunctionCall)")
+        {
+            if(functionBlock)
+            {
                 int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
                 int thisID = functionBlock.FunctionID;
-                if (connectedID == thisID){
+                if (connectedID == thisID)
+                {
                     Debug.Log("Block (Function): QueueReading: Recursion Detected! Aborting!");
                     return;
                 }
             }
             Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
-            while(functionQueue.Count > 0){
+            while(functionQueue.Count > 0)
+            {
                 eventQueue.Enqueue(functionQueue.Dequeue());
             }
         }
-        else{
+        else
+        {
             eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
         }
         // Add the block type to the queue
