@@ -11,6 +11,7 @@ public class QueueReading : MonoBehaviour
     private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
     private Stack<GameObject> incompleteIfStatements = new Stack<GameObject>();
     private Stack<GameObject> incompleteWhileStatements = new Stack<GameObject>();
+    private FunctionBlock functionBlock;
 
     public void ReadQueue()
     {
