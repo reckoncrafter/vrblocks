@@ -8,6 +8,9 @@ public class QueueReading : MonoBehaviour
     // Queue to hold the block types (FIFO order)
     private Queue<string> blockQueue = new Queue<string>();
     private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+    private Stack<GameObject> incompleteIfStatements = new Stack<GameObject>();
+    private Stack<GameObject> incompleteWhileStatements = new Stack<GameObject>();
+
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
@@ -15,6 +18,8 @@ public class QueueReading : MonoBehaviour
         // Clear previous readings
         blockQueue.Clear();
         eventQueue.Clear();
+        incompleteIfStatements.Clear();
+        incompleteWhileStatements.Clear();
 
         // Start reading from the Queue Block
         ReadBlocks(gameObject);
@@ -34,8 +39,6 @@ public class QueueReading : MonoBehaviour
         }
     }
 
-    private Stack<GameObject> incompleteIfStatements = new Stack<GameObject>();
-    private Stack<GameObject> incompleteWhileStatements = new Stack<GameObject>();
     private void ReadBlocks(GameObject currentBlock)
     {
         // Get the SnappedForwarding component from the current block
@@ -48,13 +51,15 @@ public class QueueReading : MonoBehaviour
             if(incompleteIfStatements.Count > 0){
                 Debug.Log($"Found {incompleteIfStatements.Count} incomplete If Statements");
                 foreach(GameObject block in incompleteIfStatements){
-                    block.GetComponent<TurtleCommand>().setOffendingState(true);
+                    Debug.Log(block.name);
+                    block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
                 }
             }
             if(incompleteWhileStatements.Count > 0){
                 Debug.Log($"Found {incompleteWhileStatements.Count} incomplete While Statements");
                 foreach(GameObject block in incompleteWhileStatements){
-                    block.GetComponent<TurtleCommand>().setOffendingState(true);
+                    Debug.Log(block.name);
+                    block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
                 }
             }
             return;
@@ -72,27 +77,45 @@ public class QueueReading : MonoBehaviour
 
         // TODO: Fix currentBlock being null
         if(blockType == "Block (IfBegin)"){
-            incompleteIfStatements.Push(currentBlock);
+            incompleteIfStatements.Push(connectedBlock);
         }
-        if(blockType == "Block (IfEnd)"){
+        if(blockType == "Block (Else)"){
+            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
             try{
-                incompleteIfStatements.Pop();
+                GameObject b = incompleteIfStatements.Peek();
+                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
+                connectedBlockICH.SetOffendingState(false);
             }
             catch(Exception e) when (e is InvalidOperationException){
-                currentBlock.GetComponent<TurtleCommand>().setOffendingState(true);
+                connectedBlockICH.SetOffendingState(true);
+                Debug.Log("Lone Else Detected");
+            }
+        }
+        if(blockType == "Block (IfEnd)"){
+            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
+            try{
+                GameObject b = incompleteIfStatements.Pop();
+                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
+                connectedBlockICH.SetOffendingState(false);
+            }
+            catch(Exception e) when (e is InvalidOperationException){
+                connectedBlockICH.SetOffendingState(true);
                 Debug.Log("Lone IfEnd Detected");
             }
         }
 
         if(blockType == "Block (WhileBegin)"){
-            incompleteWhileStatements.Push(currentBlock);
+            incompleteWhileStatements.Push(connectedBlock);
         }
         if(blockType == "Block (WhileEnd)"){
+            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
             try{
-                incompleteWhileStatements.Pop();
+                GameObject b = incompleteWhileStatements.Pop();
+                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
+                connectedBlockICH.SetOffendingState(false);
             }
             catch(Exception e) when (e is InvalidOperationException){
-                currentBlock.GetComponent<TurtleCommand>().setOffendingState(true);
+                connectedBlockICH.SetOffendingState(true);
                 Debug.Log("Lone WhileEnd Detected");
             }
         }
