@@ -7,7 +7,9 @@ using TMPro;
 
 public class FunctionBlock : MonoBehaviour
 {
-    public InputActionReference primaryButton;
+    //public ControllerModels controllerModels;
+    public InputActionReference primaryButtonRight;
+    public InputActionReference primaryButtonLeft;
     public GameObject functionCallPrefab;
     public Vector3 spawnOffset;
     public int FunctionID;
@@ -17,7 +19,9 @@ public class FunctionBlock : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-      primaryButton.action.started += onPrimaryButton;
+      //controllerModels = GameObject.Find("XR Origin (XR Rig)").GetComponent<ControllerModels>();
+      primaryButtonRight.action.started += onPrimaryButton;
+      primaryButtonLeft.action.started += onPrimaryButton;
       queueReading = gameObject.GetComponent<QueueReading>();
       FunctionID = gameObject.GetInstanceID();
     }
@@ -28,11 +32,13 @@ public class FunctionBlock : MonoBehaviour
 
     public void OnHoverEntered(){
       isHovered = true;
+      //controllerModels.EnableControllerHands(false);
       //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
     public void OnHoverExited(){
       isHovered = false;
+      //controllerModels.EnableControllerHands(true);
       //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
 
