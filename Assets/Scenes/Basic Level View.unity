@@ -7730,6 +7730,7 @@ GameObject:
   - component: {fileID: 1070190953}
   - component: {fileID: 1070190952}
   - component: {fileID: 1070190951}
+  - component: {fileID: 1070190957}
   m_Layer: 0
   m_Name: NewFunctionButton
   m_TagString: Untagged
@@ -7792,10 +7793,34 @@ MonoBehaviour:
       m_Calls: []
   m_HoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1070190957}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverEntered
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_HoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1070190957}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverExited
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -7978,6 +8003,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1070190957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070190950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c01e0ed98aeff95bb97a9eefaa852b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  XRControllerSubmeshesToIndicate:
+  - {fileID: 2065925858}
+  - {fileID: 1723523836}
+  controllerModels: {fileID: 416215827}
+  indicationMaterial: {fileID: 2100000, guid: 1a8a641804e005e98b8219ec77611560, type: 2}
+  submeshDefaultMaterial: {fileID: 670224309865224971, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  submeshRenderers: []
 --- !u!1 &1082075728
 GameObject:
   m_ObjectHideFlags: 0
@@ -8639,6 +8683,7 @@ GameObject:
   - component: {fileID: 1166485201}
   - component: {fileID: 1166485200}
   - component: {fileID: 1166485205}
+  - component: {fileID: 1166485206}
   m_Layer: 0
   m_Name: StartButton
   m_TagString: Untagged
@@ -8684,10 +8729,34 @@ MonoBehaviour:
       m_Calls: []
   m_HoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1166485206}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverEntered
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_HoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1166485206}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverExited
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -8884,6 +8953,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turtleMovement: {fileID: 1089609111}
   queueReading: {fileID: 1866267872}
+--- !u!114 &1166485206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166485199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c01e0ed98aeff95bb97a9eefaa852b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  XRControllerSubmeshesToIndicate:
+  - {fileID: 2065925858}
+  - {fileID: 1723523836}
+  controllerModels: {fileID: 416215827}
+  indicationMaterial: {fileID: 2100000, guid: 1a8a641804e005e98b8219ec77611560, type: 2}
+  submeshDefaultMaterial: {fileID: 670224309865224971, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  submeshRenderers: []
 --- !u!1 &1176638032
 GameObject:
   m_ObjectHideFlags: 0
@@ -12925,6 +13013,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1706113582}
   m_Mesh: {fileID: 1136998128906261172, guid: 40e95b051df24428f834cda5561cadfa, type: 3}
+--- !u!1 &1723523836 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -9195334384663461526, guid: 11cd62256b1d470f922b2c8e6446cc77, type: 3}
+  m_PrefabInstance: {fileID: 982052833}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1730378929
 GameObject:
   m_ObjectHideFlags: 0
@@ -15983,6 +16076,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2043682220}
   m_CullTransparentMesh: 1
+--- !u!1 &2065925858 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -9195334384663461526, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  m_PrefabInstance: {fileID: 237536892}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2077051717
 MonoBehaviour:
   m_ObjectHideFlags: 0
