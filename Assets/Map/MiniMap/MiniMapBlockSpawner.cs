@@ -119,7 +119,6 @@ public class MiniMapBlockSpawner : MonoBehaviour
     }
     public void HideGrabbingHand(SelectEnterEventArgs args)
     {
-        Debug.Log(args.interactorObject.ToString());
         if(args.interactorObject.transform.CompareTag("Left Hand"))
         {
             disableLeftHandModelOnGrab.SetActive(false);

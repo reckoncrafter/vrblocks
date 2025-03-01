@@ -28,9 +28,9 @@ public class ThumbnailScreenshots : MonoBehaviour
 
         Type gameViewType = Type.GetType("UnityEditor.GameView,UnityEditor");
         EditorWindow.GetWindow(gameViewType);
-        Directory.CreateDirectory(Application.dataPath + "/Scenes/Thumbnails/");
+        Directory.CreateDirectory(Application.dataPath + "/LevelData/Thumbnails");
         new WaitForSeconds(1);
-        ScreenCapture.CaptureScreenshot(Application.dataPath + "/Scenes/Thumbnails/" + fileName + ".png");
+        ScreenCapture.CaptureScreenshot(Application.dataPath + "/LevelData/Thumbnails/" + fileName + ".png");
         //TODO: Convert the .png into a Sprite (2D and UI)
 
         Debug.Log("Screenshot saved to " + fileName + ".png");
