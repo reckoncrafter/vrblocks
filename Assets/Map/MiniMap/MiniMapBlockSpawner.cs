@@ -101,8 +101,10 @@ public class MiniMapBlockSpawner : MonoBehaviour
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
         turtleEntity.transform.SetParent(gameObject.transform, false);
         turtleEntity.name = mapValues.turtlePrefabName;
-        foreach (Component c in turtleEntity.GetComponents<Component>().ToList()){
-            if(!typeof(Transform).IsAssignableFrom(c.GetType())){
+        foreach (Component c in turtleEntity.GetComponents<Component>().ToList())
+        {
+            if(!typeof(Transform).IsAssignableFrom(c.GetType()))
+            {
                 DestroyImmediate(c);
             }
         }
