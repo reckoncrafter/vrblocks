@@ -88,30 +88,24 @@ public class MiniMapBlockSpawner : MonoBehaviour
             currentEntity.transform.localScale = mapValues.blockScale;
         }
 
-        // Triggerable Goal
+        // Goal Sphere
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
         GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
         generatedGoalSphere.transform.SetParent(gameObject.transform, false);
         generatedGoalSphere.transform.localScale = mapValues.goalScale;
         generatedGoalSphere.name = mapValues.goalPrefabName;
-        //
 
-        // Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
-        // TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
-
-        // turtleEntity.transform.SetParent(gameObject.transform, false);
-
-        // turtleEntity.name = mapValues.turtlePrefabName;
-
-        // turtleEntity.movementDuration = mapValues.movementDuration;
-        // turtleEntity.animationSpeed = mapValues.animationSpeed;
-
-
-        // if (currentEntity != null)
-        // {
-        //     turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
-        // }
-
+        // Turtle
+        Vector3 turtlePositionOffset = new Vector3(0, -0.2f, 0);
+        Vector3 turtleCoords = startPositionOffset + turtlePositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
+        TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
+        turtleEntity.transform.SetParent(gameObject.transform, false);
+        turtleEntity.name = mapValues.turtlePrefabName;
+        foreach (Component c in turtleEntity.GetComponents<Component>().ToList()){
+            if(!typeof(Transform).IsAssignableFrom(c.GetType())){
+                DestroyImmediate(c);
+            }
+        }
         
         SphereCollider sCollider = transform.gameObject.AddComponent<SphereCollider>();
         sCollider.center = Vector3.zero;
