@@ -41,11 +41,18 @@ public class SnappedForwarding : MonoBehaviour
             return;
         }
 
+        // Stop at other root block
+        SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
+        if (snappedForwarding != null && snappedForwarding.IsRootBlock && blockCount > 4)
+        {
+            Debug.Log($"Encountered another root block {currentBlock.name}. Stopping traversal.");
+            return;
+        }
+
         // Count the current block
         blockCount++;
 
         // Check if there is a connected block and read the next one
-        SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
         if (snappedForwarding != null && snappedForwarding.ConnectedBlock != null)
         {
             GameObject connectedBlock = snappedForwarding.ConnectedBlock;
