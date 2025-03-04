@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Linq;
 using UnityEngine.XR.Interaction.Toolkit;
-using Unity.VisualScripting;
-using System;
 
 [ExecuteInEditMode]
 public class MiniMapBlockSpawner : MonoBehaviour
@@ -15,7 +13,6 @@ public class MiniMapBlockSpawner : MonoBehaviour
     public GameObject disableRightHandModelOnGrab;
 
     public float miniMapScale = 0.1f;
-    private Vector3 com;
     private Rigidbody minimapRB;
     private bool minimapAtRest = true;
     private Vector3 initPos;
@@ -62,19 +59,21 @@ public class MiniMapBlockSpawner : MonoBehaviour
         }
     }
 
-    private void CalculateCenterOfMass()
+    private Vector3 CalculateCenterOfMass()
     {
+        Vector3 com = new Vector3();
         Vector3 startPositionOffset = mapValues.blockScale / 2;
         foreach (Vector3 mapBlockTransform in mapValues.spawnPoints)
         {
             com += startPositionOffset + Vector3.Scale(mapBlockTransform, mapValues.blockScale);
         }
         com /= mapValues.spawnPoints.Length;
+        return com;
     }
     public void SpawnEntities()
     {
         // Calculate COM and justify the minimap model centered here (and rotate in player's hand properly)
-        CalculateCenterOfMass();
+        Vector3 com = CalculateCenterOfMass();
         Vector3 startPositionOffset = (mapValues.blockScale / 2) - com;
 
         GameObject currentEntity = null;
@@ -89,30 +88,26 @@ public class MiniMapBlockSpawner : MonoBehaviour
             currentEntity.transform.localScale = mapValues.blockScale;
         }
 
-        // Triggerable Goal
+        // Goal Sphere
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
         GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
         generatedGoalSphere.transform.SetParent(gameObject.transform, false);
         generatedGoalSphere.transform.localScale = mapValues.goalScale;
         generatedGoalSphere.name = mapValues.goalPrefabName;
-        //
 
-        // Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
-        // TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
-
-        // turtleEntity.transform.SetParent(gameObject.transform, false);
-
-        // turtleEntity.name = mapValues.turtlePrefabName;
-
-        // turtleEntity.movementDuration = mapValues.movementDuration;
-        // turtleEntity.animationSpeed = mapValues.animationSpeed;
-
-
-        // if (currentEntity != null)
-        // {
-        //     turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
-        // }
-
+        // Turtle
+        Vector3 turtlePositionOffset = new Vector3(0, -0.2f, 0);
+        Vector3 turtleCoords = startPositionOffset + turtlePositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
+        TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
+        turtleEntity.transform.SetParent(gameObject.transform, false);
+        turtleEntity.name = mapValues.turtlePrefabName;
+        foreach (Component c in turtleEntity.GetComponents<Component>().ToList())
+        {
+            if(!typeof(Transform).IsAssignableFrom(c.GetType()))
+            {
+                DestroyImmediate(c);
+            }
+        }
         
         SphereCollider sCollider = transform.gameObject.AddComponent<SphereCollider>();
         sCollider.center = Vector3.zero;
@@ -120,23 +115,22 @@ public class MiniMapBlockSpawner : MonoBehaviour
     }
     public void HideGrabbingHand(SelectEnterEventArgs args)
     {
-        Debug.Log(args.interactorObject.ToString());
-        if(args.interactorObject.transform.tag == "Left Hand")
+        if(args.interactorObject.transform.CompareTag("Left Hand"))
         {
             disableLeftHandModelOnGrab.SetActive(false);
         }
-        else if(args.interactorObject.transform.tag == "Right Hand")
+        else if(args.interactorObject.transform.CompareTag("Right Hand"))
         {
             disableRightHandModelOnGrab.SetActive(false);
         }
     }
     public void ShowGrabbingHand(SelectExitEventArgs args)
     {
-        if(args.interactorObject.transform.tag == "Left Hand")
+        if(args.interactorObject.transform.CompareTag("Left Hand"))
         {
             disableLeftHandModelOnGrab.SetActive(true);
         }
-        else if(args.interactorObject.transform.tag == "Right Hand")
+        else if(args.interactorObject.transform.CompareTag("Right Hand"))
         {
             disableRightHandModelOnGrab.SetActive(true);
         }
@@ -144,13 +138,14 @@ public class MiniMapBlockSpawner : MonoBehaviour
     public void ClearMap()
     {
         // https://discussions.unity.com/t/why-does-foreach-work-only-1-2-of-a-time/91068/2
+        // forgot you dont mutate the same list you're looping through
         foreach(Transform child in transform.Cast<Transform>().ToList())
         {
             DestroyImmediate(child.gameObject);
         }
 
-        if(transform.gameObject.GetComponents<SphereCollider>().Length > 0){
-            foreach(SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>())
+        foreach(SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
+        {
             DestroyImmediate(sCollider);
         }
     }

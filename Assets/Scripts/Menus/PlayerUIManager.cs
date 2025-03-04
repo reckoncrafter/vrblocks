@@ -18,25 +18,26 @@ public class PlayerUIManager : MonoBehaviour
     //TODO: These are for development. Depending on what we do, everything that starts with "debug_" will be affected
 
     [Header("UI Pages")]
-    public GameObject UIContainer;
     public GameObject pauseMenu;
-    public GameObject mainMenuConfirmWindow;
+    public GameObject returnToMenuConfirmWindow;
     public GameObject optionsMenu;
     public GameObject blockMenu; 
     public GameObject endScreen;
+    public float animationSpeed = .3f;
 
-    [Header("Player UI Buttons")]
+    [Header("Pause Menu")]
     public Button resumeGameButton;
-    public Button optionsMenuButton;
-    public List<Button> pauseMenuReturnButtons;
-    public List<Button> returnToMenuButtons;
-    public Button returnToMenuYButton;
-    public Button returnToMenuNButton;
-    public Button nextLevelButton;
-    public Button endScreenReturnToMenu;
-    public Button endScreenReturnToMenuAlt;
+    public List<Button> openPauseMenuButtons;
 
-    [Header("Block Menu Categories")]
+    [Header("Menu Return Buttons")]
+    public List<Button> returnToMenuWithConfirmationButtons;
+    public Button returnToMenuConfirmButton;
+    public Button returnToMenuDenyButton;
+
+    [Header("Options Menu")]
+    public List<Button> openOptionsMenuButtons;
+
+    [Header("Block Menu")]
     public GameObject movementPanel;
     public GameObject controlPanel;
     public GameObject functionPanel;
@@ -44,16 +45,19 @@ public class PlayerUIManager : MonoBehaviour
     public Button controlTab;
     public Button functionTab;
 
-    //Animations
-    public float animationSpeed = .3f;
-    private bool isBlockMenuOpen = false; 
+    [Header("End Screen Menu")]
+    public Button nextLevelButton;
+    public Button endScreenReturnToMenu;
+    public Button endScreenReturnToMenuAlt;
+    
+    private bool toggleBlockMenu = false; 
 
     void Start()
     {
         pauseMenu.SetActive(true);
         pauseMenu.LeanScale(Vector3.zero, 0f);
-        mainMenuConfirmWindow.SetActive(true);
-        mainMenuConfirmWindow.LeanScale(Vector3.zero, 0f);
+        returnToMenuConfirmWindow.SetActive(true);
+        returnToMenuConfirmWindow.LeanScale(Vector3.zero, 0f);
         optionsMenu.SetActive(true);
         optionsMenu.LeanScale(Vector3.zero, 0f);
         blockMenu.SetActive(true); 
@@ -65,26 +69,16 @@ public class PlayerUIManager : MonoBehaviour
         blockMenuAction.action.started += context => { ToggleBlockMenu(); }; 
         debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
-        optionsMenuButton.onClick.AddListener(EnableOptionsMenu);
-        movementTab.onClick.AddListener(() => ShowCategory(movementPanel));
-        controlTab.onClick.AddListener(() => ShowCategory(controlPanel));
-        functionTab.onClick.AddListener(() => ShowCategory(functionPanel));
+        movementTab.onClick.AddListener(() => ShowBlockMenuCategory(movementPanel));
+        controlTab.onClick.AddListener(() => ShowBlockMenuCategory(controlPanel));
+        functionTab.onClick.AddListener(() => ShowBlockMenuCategory(functionPanel));
 
-        foreach (var b in pauseMenuReturnButtons){ b.onClick.AddListener(EnablePauseMenu); }
-        foreach (var b in returnToMenuButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
-        returnToMenuNButton.onClick.AddListener(CloseConfirmationWindow);
-        returnToMenuYButton.onClick.AddListener(ReturnToLevelSelector);
+        foreach (var b in openPauseMenuButtons){ b.onClick.AddListener(EnablePauseMenu); }
+        foreach (var b in returnToMenuWithConfirmationButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
+        foreach (var b in openOptionsMenuButtons){ b.onClick.AddListener(EnableOptionsMenu); }
+        returnToMenuDenyButton.onClick.AddListener(CloseConfirmationWindow);
+        returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
-
-        StartCoroutine(ClearUIShaderChannels());
-    }
-
-    void ShowCategory(GameObject category)
-    {
-        movementPanel.SetActive(false);
-        controlPanel.SetActive(false);
-        functionPanel.SetActive(false);
-        category.SetActive(true);
     }
 
     void OnEnable()
@@ -99,15 +93,6 @@ public class PlayerUIManager : MonoBehaviour
         blockMenuAction.action.Disable();
     }
 
-    IEnumerator ClearUIShaderChannels()
-    {
-        while (true)
-        {
-            // UIContainer.GetComponent<Canvas>().additionalShaderChannels = AdditionalCanvasShaderChannels.None;
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
-
     public void EnablePauseMenu()
     {
         pauseMenu.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
@@ -118,17 +103,17 @@ public class PlayerUIManager : MonoBehaviour
     {
         pauseMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
-        mainMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        returnToMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
     }
 
     public void OpenConfirmationWindow()
     {
-        mainMenuConfirmWindow.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
+        returnToMenuConfirmWindow.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
     }
 
     public void CloseConfirmationWindow()
     {
-        mainMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        returnToMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
     }
 
     public void EnableOptionsMenu()
@@ -154,16 +139,23 @@ public class PlayerUIManager : MonoBehaviour
 
     public void ToggleBlockMenu()
     {
-        if (isBlockMenuOpen)
-        {
-            blockMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
-        }
-        else
+        toggleBlockMenu = !toggleBlockMenu;
+        if (toggleBlockMenu)
         {
             blockMenu.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
         }
+        else
+        {
+            blockMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        }
+    }
 
-        isBlockMenuOpen = !isBlockMenuOpen; // Toggle state
+    void ShowBlockMenuCategory(GameObject category)
+    {
+        movementPanel.SetActive(false);
+        controlPanel.SetActive(false);
+        functionPanel.SetActive(false);
+        category.SetActive(true);
     }
 
     public void EnableEndScreen()
@@ -171,11 +163,12 @@ public class PlayerUIManager : MonoBehaviour
         endScreen.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
         pauseMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
-        mainMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        returnToMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         blockMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        toggleBlockMenu = false;
 
         // Show "Next Level" Button only if the current level is not the last playable level
-        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/Scenes/Thumbnails");
+        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         FileInfo[] fin = thumbnailDir.GetFiles("*.png");
         if(SceneTransitionStates.GetSelectedLevel() + 1 >= fin.Length){
             nextLevelButton.GameObject().LeanScale(Vector3.zero, 0f);
