@@ -76,8 +76,8 @@ public class PlayerUIManager : MonoBehaviour
         foreach (var b in openPauseMenuButtons){ b.onClick.AddListener(EnablePauseMenu); }
         foreach (var b in returnToMenuWithConfirmationButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
         foreach (var b in openOptionsMenuButtons){ b.onClick.AddListener(EnableOptionsMenu); }
-        returnToMenuConfirmButton.onClick.AddListener(CloseConfirmationWindow);
-        returnToMenuDenyButton.onClick.AddListener(ReturnToLevelSelector);
+        returnToMenuDenyButton.onClick.AddListener(CloseConfirmationWindow);
+        returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
     }
 
