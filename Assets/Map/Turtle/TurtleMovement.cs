@@ -253,7 +253,7 @@ public class TurtleMovement : MonoBehaviour
         if (EndIndex == 0)
         {
             Debug.Log("No WhileStatementEnd found");
-            failureDialog.text += "Incomlete While Statement! (No WhileEnd Block)";
+            failureDialog.text += "Incomplete While Statement! (No WhileEnd Block)";
             Fail();
             return;
         }

@@ -9,8 +9,7 @@ public class QueueReading : MonoBehaviour
 
     private Queue<string> blockQueue = new Queue<string>();
     private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
-    private Stack<GameObject> incompleteIfStatements = new Stack<GameObject>();
-    private Stack<GameObject> incompleteWhileStatements = new Stack<GameObject>();
+    private Stack<GameObject> incompleteConditionals = new Stack<GameObject>();
     private FunctionBlock functionBlock;
 
     public void ReadQueue()
@@ -22,8 +21,14 @@ public class QueueReading : MonoBehaviour
         // Clear previous readings
         blockQueue.Clear();
         eventQueue.Clear();
-        incompleteIfStatements.Clear();
-        incompleteWhileStatements.Clear();
+
+        // set textures of incomplete conditional blocks back to normal before clearing the stack.
+        foreach(GameObject b in incompleteConditionals)
+        {
+            b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
+        }
+
+        incompleteConditionals.Clear();
 
         // Start reading from the Queue Block
         ReadBlocks(gameObject);
@@ -52,23 +57,8 @@ public class QueueReading : MonoBehaviour
             Debug.Log($"No SnappedForwarding component or no connected block found for {currentBlock.name}. Stopping traversal.");
 
             // check for remaining incomplete statments
-            if(incompleteIfStatements.Count > 0)
-            {
-                Debug.Log($"Found {incompleteIfStatements.Count} incomplete If Statements");
-                foreach(GameObject block in incompleteIfStatements)
-                {
-                    Debug.Log(block.name);
-                    block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
-                }
-            }
-            if(incompleteWhileStatements.Count > 0)
-            {
-                Debug.Log($"Found {incompleteWhileStatements.Count} incomplete While Statements");
-                foreach(GameObject block in incompleteWhileStatements)
-                {
-                    Debug.Log(block.name);
-                    block.GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
-                }
+            if(incompleteConditionals.Count > 0){
+                incompleteConditionals.Pop().GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
             }
             return;
         }
@@ -82,60 +72,33 @@ public class QueueReading : MonoBehaviour
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
         // incomplete conditional statement detection
-        if(blockType == "Block (IfBegin)")
+        if(blockType == "Block (IfBegin)" || blockType == "Block (WhileBegin)")
         {
-            incompleteIfStatements.Push(connectedBlock);
-        }
-        if(blockType == "Block (Else)")
-        {
-            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try
-            {
-                GameObject b = incompleteIfStatements.Peek();
-                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
-                connectedBlockICH.SetOffendingState(false);
-            }
-            catch(Exception e) when (e is InvalidOperationException)
-            {
-                connectedBlockICH.SetOffendingState(true);
-                Debug.Log("Lone Else Detected");
-            }
-        }
-        if(blockType == "Block (IfEnd)")
-        {
-            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try
-            {
-                GameObject b = incompleteIfStatements.Pop();
-                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
-                connectedBlockICH.SetOffendingState(false);
-            }
-            catch(Exception e) when (e is InvalidOperationException)
-            {
-                connectedBlockICH.SetOffendingState(true);
-                Debug.Log("Lone IfEnd Detected");
-            }
+            incompleteConditionals.Push(connectedBlock);
         }
 
-        if(blockType == "Block (WhileBegin)")
+        Action<string, string, bool> CheckEnds = (string EndBlockName, string BeginBlockName, bool peek) =>
         {
-            incompleteWhileStatements.Push(connectedBlock);
-        }
-        if(blockType == "Block (WhileEnd)")
-        {
-            var connectedBlockICH = connectedBlock.GetComponent<IncompleteConditionalHandler>();
-            try
+            if(blockType == EndBlockName)
             {
-                GameObject b = incompleteWhileStatements.Pop();
-                b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
-                connectedBlockICH.SetOffendingState(false);
+                try
+                {
+                    GameObject b = peek ? incompleteConditionals.Peek() : incompleteConditionals.Pop();
+                    if(b.name != BeginBlockName)
+                    {
+                        incompleteConditionals.Push(connectedBlock);
+                    }
+                }
+                catch(Exception e) when (e is InvalidOperationException)
+                {
+                    incompleteConditionals.Push(connectedBlock);
+                }
             }
-            catch(Exception e) when (e is InvalidOperationException)
-            {
-                connectedBlockICH.SetOffendingState(true);
-                Debug.Log("Lone WhileEnd Detected");
-            }
-        }
+        };
+
+        CheckEnds("Block (IfEnd)", "Block (IfBegin)", false);
+        CheckEnds("Block (WhileEnd)", "Block (WhileBegin)", false);
+        CheckEnds("Block (Else)", "Block (IfBegin)", true);
 
         // if block is function, get function contents
         if(blockType == "Block (FunctionCall)")
