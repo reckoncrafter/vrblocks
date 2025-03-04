@@ -43,7 +43,7 @@ public class SnappedForwarding : MonoBehaviour
 
         // Stop at other root block
         SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
-        if (snappedForwarding != null && snappedForwarding.IsRootBlock && blockCount > 4)
+        if (snappedForwarding != null && snappedForwarding.IsRootBlock && blockCount > 1)
         {
             Debug.Log($"Encountered another root block {currentBlock.name}. Stopping traversal.");
             return;
@@ -51,6 +51,13 @@ public class SnappedForwarding : MonoBehaviour
 
         // Count the current block
         blockCount++;
+
+        // Call UpdatePhysics to help with physics issues
+        Rigidbody rb = currentBlock.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            UpdatePhysics(rb);
+        }
 
         // Check if there is a connected block and read the next one
         if (snappedForwarding != null && snappedForwarding.ConnectedBlock != null)
@@ -124,5 +131,76 @@ public class SnappedForwarding : MonoBehaviour
 
         Debug.Log($"No root block found starting from {startingBlock.name}");
         return null;
+    }
+
+    private void UpdatePhysics(Rigidbody rb)
+    {
+        SnappedForwarding snappedForwarding = rb.GetComponentInChildren<SnappedForwarding>();
+        BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
+        bool canSnap = snappedForwarding != null && snappedForwarding.CanSnap();
+        bool hasSnapped = blockSnapping != null && blockSnapping.hasSnapped;
+
+        Debug.Log($"CanSnap: {canSnap}, hasSnapped: {hasSnapped}");
+
+        if (rb.gameObject.name == "Block (StartQueue)")
+        {
+            Debug.Log("Physics Update: Block is StartQueue.");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+        }
+        else if (hasSnapped)
+        {
+            Debug.Log($"Physics Update: CASE 1 (Snapped on top)");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+            // No changes to rb.constraints
+        }
+        else if (canSnap && !hasSnapped)
+        {
+            Debug.Log($"Physics Update: CASE 2 (Can snap but not snapped)");
+            rb.useGravity = true;
+            rb.constraints = RigidbodyConstraints.None;
+        }
+        else
+        {
+            Debug.Log($"Physics Update: CASE DEFAULT");
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+        }
+
+        // Rotation and position update based on parent block.
+        if (snappedForwarding != null && !snappedForwarding.IsRootBlock)
+        {
+            // Find parent block through the FixedJoint (as used in OnGrab())
+            FixedJoint[] joints = rb.GetComponents<FixedJoint>();
+            foreach (FixedJoint joint in joints)
+            {
+                Rigidbody otherRb = joint.connectedBody;
+                if (otherRb != null)
+                {
+                    GameObject parentBlock = otherRb.gameObject;
+
+                    // Ignore wires
+                    if (!parentBlock.name.Contains("Wire"))
+                    {
+                        // Update position to match the X and Z of the parent block
+                        Vector3 parentPosition = parentBlock.transform.position;
+                        rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
+                        // Reset rotation to 0
+                        rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+                        Debug.Log($"Physics Update: Position/Rotation reset");
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

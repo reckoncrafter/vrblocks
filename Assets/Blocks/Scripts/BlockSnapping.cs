@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class BlockSnapping : MonoBehaviour
 {
-    private bool hasSnapped = false; // Flag to prevent repeated snapping
+    public bool hasSnapped = false; // Flag to prevent repeated snapping
     private QueueReading queueReading;
 
     private void Awake()
@@ -129,6 +129,8 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log($"{block2.name} snapped to {block1.name}.");
     }
 
+    private Coroutine resetSnapStatusCoroutine;
+
     private void OnGrab(SelectEnterEventArgs args)
     {
         Debug.Log($"Block grabbed: {gameObject.name}");
@@ -160,15 +162,55 @@ public class BlockSnapping : MonoBehaviour
             }
 
             Destroy(joint);
+            //UpdatePhysics(otherRb);
         }
 
-        StartCoroutine(ResetSnapStatusAfterDelay());
+        // Start the coroutine and store reference for OnRelease()
+        resetSnapStatusCoroutine = StartCoroutine(ResetSnapStatusAfterDelay());
 
         SnappedForwarding snappedForwarding = gameObject.GetComponentInChildren<SnappedForwarding>();
         if (snappedForwarding != null)
         {
             snappedForwarding.IsRootBlock = true;
         }
+    }
+
+    private void OnRelease(SelectExitEventArgs args)
+    {
+        Debug.Log($"Block released: {gameObject.name}");
+
+        // Check if ResetSnapStatusAfterDelay is complete to prevent physics bugs.
+        if (resetSnapStatusCoroutine != null)
+        {
+            StartCoroutine(WaitForCoroutineToComplete(resetSnapStatusCoroutine));
+        }
+        else
+        {
+            ProceedWithRelease();
+        }
+    }
+
+    private IEnumerator WaitForCoroutineToComplete(Coroutine coroutine)
+    {
+        // Wait until the coroutine has finished
+        yield return coroutine;
+
+        // Once the coroutine finishes, proceed with the release actions
+        ProceedWithRelease();
+    }
+
+    private void ProceedWithRelease()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+        {
+            Debug.LogWarning("Rigidbody component not found on this block.");
+            return;
+        }
+
+        CheckColumnSize();
+        queueReading?.ReadQueue();
     }
 
     private void ResetSnapStatusOnOtherBlock(GameObject otherBlock)
@@ -198,69 +240,10 @@ public class BlockSnapping : MonoBehaviour
 
     private IEnumerator ResetSnapStatusAfterDelay()
     {
-        yield return new WaitForSeconds(0.1f); // Wait for 0.5 seconds (change as needed)
+        yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds (change as needed)
         queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
-    }
-
-   private void OnRelease(SelectExitEventArgs args)
-    {
-        Debug.Log($"Block released: {gameObject.name}");
-
-        Rigidbody rb = GetComponent<Rigidbody>();
-        SnappedForwarding snappedForwarding = GetComponentInChildren<SnappedForwarding>();
-
-        if (rb == null)
-        {
-            Debug.LogWarning("Rigidbody component not found on this block.");
-            return;
-        }
-
-        bool canSnap = snappedForwarding != null && snappedForwarding.CanSnap();
-
-        Debug.Log($"CanSnap: {canSnap}, hasSnapped: {hasSnapped}");
-
-
-        if (gameObject.name == "Block (StartQueue)")
-        {
-            Debug.Log("OnRelease: Block is ReadQueue.");
-            rb.useGravity = false;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-        }
-        // Case 1: Block IS snapped on top
-        else if (hasSnapped == true)
-        {
-            Debug.Log($"CASE 1");
-            rb.useGravity = false;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-            // Do NOT change rb.constraints
-        }
-        // Case 2: Block IS NOT snapped on top or bottom
-        else if (canSnap == true && hasSnapped == false)
-        {
-            Debug.Log($"CASE 2");
-            rb.useGravity = true;
-            rb.constraints = RigidbodyConstraints.None;
-        }
-        // Default case
-        else
-        {
-            Debug.Log($"CASE DEFAULT");
-            rb.useGravity = false;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-            rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-        }
-
-        CheckColumnSize();
-        queueReading?.ReadQueue();
     }
 
     private GameObject GetNthBlock(GameObject startingBlock, int n) // Function created to find blocks for CheckColumnSize()
