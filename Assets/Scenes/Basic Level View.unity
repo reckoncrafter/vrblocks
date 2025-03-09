@@ -1035,7 +1035,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 1210087765}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &118832886
 GameObject:
   m_ObjectHideFlags: 0
@@ -2523,7 +2524,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 0}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &358888915
 GameObject:
   m_ObjectHideFlags: 0
@@ -3013,33 +3015,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorLevel: 0
   padding: 0.1
---- !u!114 &414029119
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 414029109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: RotateLeft
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1 &416215823
 GameObject:
   m_ObjectHideFlags: 0
@@ -3728,9 +3703,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 252830763283630294, guid: 85fa779b5cc618e4e8e985532f31d004, type: 3}
       insertIndex: -1
       addedObject: {fileID: 414029118}
-    - targetCorrespondingSourceObject: {fileID: 252830763283630294, guid: 85fa779b5cc618e4e8e985532f31d004, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 414029119}
     - targetCorrespondingSourceObject: {fileID: 7890242021257262063, guid: 85fa779b5cc618e4e8e985532f31d004, type: 3}
       insertIndex: -1
       addedObject: {fileID: 943172214}
@@ -4393,10 +4365,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: d3276e007c5dcd895a5aa374fc2ebf68, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1150993534}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d3276e007c5dcd895a5aa374fc2ebf68, type: 3}
 --- !u!4 &591238219 stripped
 Transform:
@@ -5609,7 +5578,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 848517338}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &816079002
 GameObject:
   m_ObjectHideFlags: 0
@@ -5972,9 +5942,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6122732868338158301, guid: 062e00bc7d87f6d49a53faf40f9f75d8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 848517339}
     - targetCorrespondingSourceObject: {fileID: 9187168534958783521, guid: 062e00bc7d87f6d49a53faf40f9f75d8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 405460787}
@@ -5987,33 +5954,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6122732868338158301, guid: 062e00bc7d87f6d49a53faf40f9f75d8, type: 3}
   m_PrefabInstance: {fileID: 848517337}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &848517339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 848517338}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: WalkForward
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1 &885056061
 GameObject:
   m_ObjectHideFlags: 0
@@ -6149,7 +6089,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 8046983326253204511}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1001 &888264141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6711,43 +6652,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad818c36731146e994540a1896ad8f24, type: 3}
---- !u!1 &973132420 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 511586c0f91eff410b3752701df07857, type: 3}
-  m_PrefabInstance: {fileID: 1433937782}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &973132428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1389943061981320986, guid: 511586c0f91eff410b3752701df07857, type: 3}
   m_PrefabInstance: {fileID: 1433937782}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &973132429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 973132420}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: EnqueueElseStatement
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1001 &984974739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7227,43 +7136,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: fc6a480fdfcf753a7ab3cf7f77370cfb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1051561073}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fc6a480fdfcf753a7ab3cf7f77370cfb, type: 3}
---- !u!1 &1051561072 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: fc6a480fdfcf753a7ab3cf7f77370cfb, type: 3}
-  m_PrefabInstance: {fileID: 1051561071}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1051561073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1051561072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: setConditionFalse
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!4 &1051561074 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1389943061981320986, guid: fc6a480fdfcf753a7ab3cf7f77370cfb, type: 3}
@@ -8309,38 +8183,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 23f69f763336f67488996af0a5d95f78, type: 3}
   m_PrefabInstance: {fileID: 1145040887}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1150993524 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: d3276e007c5dcd895a5aa374fc2ebf68, type: 3}
-  m_PrefabInstance: {fileID: 591238218}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1150993534
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1150993524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: EnqueueIfStatementEnd
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1001 &1163399818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9175,10 +9017,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 2716c0cd83709dbf7a75dbb1f39d0c6a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1875346692}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2716c0cd83709dbf7a75dbb1f39d0c6a, type: 3}
 --- !u!4 &1181824759 stripped
 Transform:
@@ -9725,38 +9564,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1300004789}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1316968883 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 772f817ab7b8f50ffbbe1a9227287330, type: 3}
-  m_PrefabInstance: {fileID: 1430452012}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1316968893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316968883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: EnqueueWhileStatementEnd
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &1334641980
 GameObject:
   m_ObjectHideFlags: 0
@@ -10403,10 +10210,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 772f817ab7b8f50ffbbe1a9227287330, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1316968893}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 772f817ab7b8f50ffbbe1a9227287330, type: 3}
 --- !u!4 &1430452013 stripped
 Transform:
@@ -10468,10 +10272,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 511586c0f91eff410b3752701df07857, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 973132429}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 511586c0f91eff410b3752701df07857, type: 3}
 --- !u!1 &1449462422
 GameObject:
@@ -10939,7 +10740,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 414029109}
-  spawnDistance: 1
+  spawnParent: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &1484447131
 GameObject:
   m_ObjectHideFlags: 0
@@ -11490,43 +11292,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 426a6673e16fbc5e791cb3fe390eaf9e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1549221830}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 426a6673e16fbc5e791cb3fe390eaf9e, type: 3}
---- !u!1 &1549221829 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 426a6673e16fbc5e791cb3fe390eaf9e, type: 3}
-  m_PrefabInstance: {fileID: 1549221828}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1549221830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549221829}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: setConditionTrue
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!4 &1549221831 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1389943061981320986, guid: 426a6673e16fbc5e791cb3fe390eaf9e, type: 3}
@@ -14376,38 +14143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa0bb0545cb23344a907b689c68e9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1875346682 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 2716c0cd83709dbf7a75dbb1f39d0c6a, type: 3}
-  m_PrefabInstance: {fileID: 1181824758}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1875346692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875346682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: EnqueueWhileStatementBegin
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &1877415405
 GameObject:
   m_ObjectHideFlags: 0
@@ -14637,38 +14372,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 23f69f763336f67488996af0a5d95f78, type: 3}
   m_PrefabInstance: {fileID: 1879337237}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1890178681 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 74284c1ee8e2fd2dcb31c63d645fefac, type: 3}
-  m_PrefabInstance: {fileID: 1891330364}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1890178691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1890178681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: EnqueueIfStatementBegin
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1001 &1891330364
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14724,10 +14427,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 74284c1ee8e2fd2dcb31c63d645fefac, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1890178691}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74284c1ee8e2fd2dcb31c63d645fefac, type: 3}
 --- !u!4 &1891330365 stripped
 Transform:
@@ -16021,33 +15721,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorLevel: 0
   padding: 0.1
---- !u!114 &1097122006887147360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1210087765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: RotateRight
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!4 &5829829922070722075 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1389943061981320986, guid: 15a727c439458884ea9f54a311a21905, type: 3}
@@ -16114,9 +15787,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2595958130031381277, guid: ea0469b6216597c4bb8062100be0b2e1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1097122006887147359}
-    - targetCorrespondingSourceObject: {fileID: 2595958130031381277, guid: ea0469b6216597c4bb8062100be0b2e1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1097122006887147360}
     - targetCorrespondingSourceObject: {fileID: 8893305039762880505, guid: ea0469b6216597c4bb8062100be0b2e1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1026748097}
@@ -16182,9 +15852,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6713015538121544575, guid: 15a727c439458884ea9f54a311a21905, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8046983326253204512}
     - targetCorrespondingSourceObject: {fileID: 8756861190917617692, guid: 15a727c439458884ea9f54a311a21905, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1672551481}
@@ -16197,33 +15864,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6713015538121544575, guid: 15a727c439458884ea9f54a311a21905, type: 3}
   m_PrefabInstance: {fileID: 8046983326253204510}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8046983326253204512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8046983326253204511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: Jump
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
