@@ -1,13 +1,17 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
-    private readonly Queue<string> blockQueue = new Queue<string>();
-    private readonly Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+
+    private Queue<string> blockQueue = new Queue<string>();
+    private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
+    private Stack<GameObject> incompleteConditionals = new Stack<GameObject>();
     private FunctionBlock functionBlock;
+
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
@@ -17,6 +21,14 @@ public class QueueReading : MonoBehaviour
         // Clear previous readings
         blockQueue.Clear();
         eventQueue.Clear();
+
+        // set textures of incomplete conditional blocks back to normal before clearing the stack.
+        foreach(GameObject b in incompleteConditionals)
+        {
+            b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
+        }
+
+        incompleteConditionals.Clear();
 
         // Start reading from the Queue Block
         ReadBlocks(gameObject);
@@ -43,6 +55,11 @@ public class QueueReading : MonoBehaviour
         if (snappedForwarding == null || snappedForwarding.ConnectedBlock == null)
         {
             Debug.Log($"No SnappedForwarding component or no connected block found for {currentBlock.name}. Stopping traversal.");
+
+            // check for remaining incomplete statments
+            if(incompleteConditionals.Count > 0){
+                incompleteConditionals.Pop().GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
+            }
             return;
         }
 
@@ -54,22 +71,56 @@ public class QueueReading : MonoBehaviour
 
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
+        // incomplete conditional statement detection
+        if(blockType == "Block (IfBegin)" || blockType == "Block (WhileBegin)")
+        {
+            incompleteConditionals.Push(connectedBlock);
+        }
+
+        Action<string, string, bool> CheckEnds = (string EndBlockName, string BeginBlockName, bool peek) =>
+        {
+            if(blockType == EndBlockName)
+            {
+                try
+                {
+                    GameObject b = peek ? incompleteConditionals.Peek() : incompleteConditionals.Pop();
+                    if(b.name != BeginBlockName)
+                    {
+                        incompleteConditionals.Push(connectedBlock);
+                    }
+                }
+                catch(Exception e) when (e is InvalidOperationException)
+                {
+                    incompleteConditionals.Push(connectedBlock);
+                }
+            }
+        };
+
+        CheckEnds("Block (IfEnd)", "Block (IfBegin)", false);
+        CheckEnds("Block (WhileEnd)", "Block (WhileBegin)", false);
+        CheckEnds("Block (Else)", "Block (IfBegin)", true);
+
         // if block is function, get function contents
-        if(blockType == "Block (FunctionCall)"){
-            if(functionBlock){
+        if(blockType == "Block (FunctionCall)")
+        {
+            if(functionBlock)
+            {
                 int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
                 int thisID = functionBlock.FunctionID;
-                if (connectedID == thisID){
+                if (connectedID == thisID)
+                {
                     Debug.Log("Block (Function): QueueReading: Recursion Detected! Aborting!");
                     return;
                 }
             }
             Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
-            while(functionQueue.Count > 0){
+            while(functionQueue.Count > 0)
+            {
                 eventQueue.Enqueue(functionQueue.Dequeue());
             }
         }
-        else{
+        else
+        {
             eventQueue.Enqueue(connectedBlock.GetComponent<TurtleCommand>().onMove);
         }
         // Add the block type to the queue
