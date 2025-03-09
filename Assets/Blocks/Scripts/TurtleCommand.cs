@@ -68,7 +68,6 @@ public class TurtleCommand : MonoBehaviour
         turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
 
         if(turtleMovement != null){
-            Debug.Log("Block connected successfully to Turtle.");
             onMove.AddListener(AssignCommand());
         }
         else{
