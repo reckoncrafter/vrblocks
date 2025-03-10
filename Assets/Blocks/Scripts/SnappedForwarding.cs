@@ -1,10 +1,11 @@
+using System.Linq;
 using UnityEngine;
 
 public class SnappedForwarding : MonoBehaviour
 {
     public bool IsRootBlock { get; set; } = true;
     public bool IsSnapped { get; private set; } = false;  // Flag to prevent further snapping
-    public GameObject ConnectedBlock { get; set; }
+    public GameObject? ConnectedBlock { get; set; }
 
     // Get snapped status
     public bool CanSnap()
@@ -78,7 +79,7 @@ public class SnappedForwarding : MonoBehaviour
         }
     }
 
-    public GameObject FindRootBlock(GameObject startingBlock)
+    public GameObject? FindRootBlock(GameObject startingBlock)
     {
         // Null check for starting block
         if (startingBlock == null)
@@ -181,24 +182,18 @@ public class SnappedForwarding : MonoBehaviour
         {
             // Find parent block through the FixedJoint (as used in OnGrab())
             FixedJoint[] joints = rb.GetComponents<FixedJoint>();
-            foreach (FixedJoint joint in joints)
+            foreach (GameObject otherRbParent in joints.Select(j => j.connectedBody.gameObject))
             {
-                Rigidbody otherRb = joint.connectedBody;
-                if (otherRb != null)
+                // Ignore wires
+                if (!otherRbParent.name.Contains("Wire"))
                 {
-                    GameObject parentBlock = otherRb.gameObject;
-
-                    // Ignore wires
-                    if (!parentBlock.name.Contains("Wire"))
-                    {
-                        // Update position to match the X and Z of the parent block
-                        Vector3 parentPosition = parentBlock.transform.position;
-                        rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
-                        // Reset rotation to 0
-                        rb.transform.rotation = Quaternion.Euler(0, 0, 0);
-                        Debug.Log($"Physics Update: Position/Rotation reset");
-                        break;
-                    }
+                    // Update position to match the X and Z of the parent block
+                    Vector3 parentPosition = otherRbParent.transform.position;
+                    rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
+                    // Reset rotation to 0
+                    rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+                    Debug.Log($"Physics Update: Position/Rotation reset");
+                    break;
                 }
             }
         }

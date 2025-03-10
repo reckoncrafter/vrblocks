@@ -18,7 +18,7 @@ public class TurtleMovement : MonoBehaviour
     private float resetBounciness = 0.0f;
     private RigidbodyConstraints resetConstraints;
 
-    private LTDescr tween;
+    private LTDescr? tween;
     private Animator animator;
     private Rigidbody rb;
     private BoxCollider turtleCollider;
@@ -162,7 +162,8 @@ public class TurtleMovement : MonoBehaviour
             }
         }
 
-        if(!isComplete){
+        if (!isComplete)
+        {
             Debug.Log("No IfStatementEnd Found");
             failureDialog.text += "Incomplete If Statement! (No IfEnd Block)\n";
             Fail();
@@ -232,13 +233,13 @@ public class TurtleMovement : MonoBehaviour
         queue.Enqueue(WhileStatementBegin);
     }
 
-    private List<Action> loopList;
-    private Queue<Action> swapQueue;
+    private List<Action>? loopList;
+    private Queue<Action>? swapQueue;
 
     private void WhileStatementBegin()
     {
         Debug.Log("WhileStatementBegin called.");
-        List<Action> queueList = new List<Action>(queue);
+        List<Action> queueList = new(queue);
 
         int EndIndex = 0;
         for (int i = 0; i < queueList.Count; i++)
@@ -285,6 +286,12 @@ public class TurtleMovement : MonoBehaviour
     private void WhileStatementEnd()
     {
         Debug.Log("WhileStatementEnd called.");
+
+        if (loopList == null || swapQueue == null)
+        {
+            Debug.LogError("WhileStatementEnd called without a loopList or swapQueue");
+            return;
+        }
 
         // 5. When the end is reached, WhileStatementEnd should
         if (conditionFunction())
@@ -433,7 +440,7 @@ public class TurtleMovement : MonoBehaviour
         Reset();
     }
 
-    private void Fail(Action failMovement = null)
+    private void Fail(Action? failMovement = null)
     {
 
         rb.constraints = RigidbodyConstraints.None;

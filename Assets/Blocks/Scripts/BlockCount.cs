@@ -5,8 +5,8 @@ using TMPro;
 
 public class BlockCount : MonoBehaviour
 {
-    [SerializeField] private QueueReading queueReading; // Attach object that contains this script
-    [SerializeField] private TextMeshProUGUI blockCountText; // Attach TMP text in BlockCount prefab
+    [SerializeField] private QueueReading? queueReading; // Attach object that contains this script
+    [SerializeField] private TextMeshProUGUI? blockCountText; // Attach TMP text in BlockCount prefab
 
     void Start()
     {

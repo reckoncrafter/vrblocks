@@ -14,9 +14,4 @@ public class GoToBlock : MonoBehaviour
 
         parameterLabel.text = JumpToLine.ToString();
     }
-
-    void onActivation()
-    {
-
-    }
 }

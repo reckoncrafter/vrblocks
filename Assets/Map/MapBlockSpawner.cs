@@ -20,7 +20,7 @@ public class MapBlockSpawner : MonoBehaviour
     {
         Vector3 startPositionOffset = mapValues.blockScale / 2;
 
-        GameObject currentEntity = null;
+        GameObject? currentEntity = null;
         for (int i = 0; i < mapValues.spawnPoints.Length; i++)
         {
             Vector3 coords = startPositionOffset + Vector3.Scale(mapValues.spawnPoints[i], mapValues.blockScale);

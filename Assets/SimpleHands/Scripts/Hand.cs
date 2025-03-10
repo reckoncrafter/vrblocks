@@ -6,7 +6,7 @@ public class Hand : MonoBehaviour
 {
   [SerializeField] private InputActionReference gripAction;
   [SerializeField] private InputActionReference triggerAction;
-  Animator animator;
+  Animator? animator;
   private readonly string animatorGripParam = "Grip";
   private readonly string animatorTriggerParam = "Trigger";
 
@@ -17,7 +17,7 @@ public class Hand : MonoBehaviour
 
   void Update()
   {
-    if (!animator)
+    if (animator == null)
     {
       Debug.LogError("No animator found");
       return;
