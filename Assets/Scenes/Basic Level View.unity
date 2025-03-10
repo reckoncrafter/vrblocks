@@ -4571,7 +4571,7 @@ PrefabInstance:
     - target: {fileID: 5460322276127385670, guid: 6a0d2a4104e79044ab2718ed367beee0, type: 3}
       propertyPath: queueReading
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1866267872}
     - target: {fileID: 6173332826153927004, guid: 6a0d2a4104e79044ab2718ed367beee0, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.42
@@ -8559,7 +8559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839e8ec8ed89e713a9c7cbec41e8e73e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turtleMovement: {fileID: 1089609111}
+  turtleMovement: {fileID: 0}
   queueReading: {fileID: 0}
 --- !u!1 &1176638032
 GameObject:
@@ -14093,6 +14093,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7868320082566465073, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
   m_PrefabInstance: {fileID: 1821506446}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1866267872 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5354081781134567555, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
+  m_PrefabInstance: {fileID: 1821506446}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1872294335 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 457222226745981360, guid: 15a727c439458884ea9f54a311a21905, type: 3}
@@ -14618,7 +14629,7 @@ PrefabInstance:
     - target: {fileID: 5460322276127385670, guid: 6a0d2a4104e79044ab2718ed367beee0, type: 3}
       propertyPath: queueReading
       value: 
-      objectReference: {fileID: 1866267872}
+      objectReference: {fileID: 0}
     - target: {fileID: 6173332826153927004, guid: 6a0d2a4104e79044ab2718ed367beee0, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.141
@@ -15766,33 +15777,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorLevel: 0
   padding: 0.1
---- !u!114 &1097122006887147360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1210087765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089609111}
-        m_TargetAssemblyTypeName: TurtleMovement, Assembly-CSharp
-        m_MethodName: RotateRight
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1001 &1107197726269526062
 PrefabInstance:
   m_ObjectHideFlags: 0
