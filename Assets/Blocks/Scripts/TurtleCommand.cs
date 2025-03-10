@@ -24,44 +24,24 @@ public class TurtleCommand : MonoBehaviour
     public TurtleMovement turtleMovement;
     public Command commandEnum;
 
-    UnityAction AssignCommand(){
-        switch(commandEnum)
+    UnityAction AssignCommand()
+    {
+        return commandEnum switch
         {
-            case Command.MoveForward:
-                return turtleMovement.WalkForward;
-
-            case Command.RotateRight:
-                return turtleMovement.RotateRight;
-
-            case Command.RotateLeft:
-                return turtleMovement.RotateLeft;
-
-            case Command.Jump:
-                return turtleMovement.Jump;
-
-            case Command.IfBegin:
-                return turtleMovement.EnqueueIfStatementBegin;
-
-            case Command.Else:
-                return turtleMovement.EnqueueElseStatement;
-
-            case Command.IfEnd:
-                return turtleMovement.EnqueueIfStatementEnd;
-
-            case Command.WhileBegin:
-                return turtleMovement.EnqueueWhileStatementBegin;
-
-            case Command.WhileEnd:
-                return turtleMovement.EnqueueWhileStatementEnd;
-
-            case Command.ConditionTrue:
-                return turtleMovement.setConditionTrue;
-
-            case Command.ConditionFalse:
-                return turtleMovement.setConditionFalse;
-
-        }
-        return () => {};
+            Command.MoveForward => turtleMovement.WalkForward,
+            Command.RotateRight => turtleMovement.RotateRight,
+            Command.RotateLeft => turtleMovement.RotateLeft,
+            Command.Jump => turtleMovement.Jump,
+            Command.IfBegin => turtleMovement.EnqueueIfStatementBegin,
+            Command.Else => turtleMovement.EnqueueElseStatement,
+            Command.IfEnd => turtleMovement.EnqueueIfStatementEnd,
+            Command.WhileBegin => turtleMovement.EnqueueWhileStatementBegin,
+            Command.WhileEnd => turtleMovement.EnqueueWhileStatementEnd,
+            Command.ConditionTrue => turtleMovement.setConditionTrue,
+            Command.ConditionFalse => turtleMovement.setConditionFalse,
+            _ => () => { }
+            ,
+        };
     }
 
     void Start(){
