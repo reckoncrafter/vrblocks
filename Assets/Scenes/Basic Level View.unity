@@ -3089,10 +3089,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c66200aade35a9baf85bdc15fd320de7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LeftHand: {fileID: 0}
-  RightHand: {fileID: 0}
-  XRControllerLeft: {fileID: 0}
-  XRControllerRight: {fileID: 0}
+  LeftHand: {fileID: 1251118338}
+  RightHand: {fileID: 1996191083}
+  XRControllerLeft: {fileID: 2053727081}
+  XRControllerRight: {fileID: 919441565}
 --- !u!1001 &418739506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6340,6 +6340,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 892811103}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &919441565 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 11cd62256b1d470f922b2c8e6446cc77, type: 3}
+  m_PrefabInstance: {fileID: 709881768}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &919441566 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 11cd62256b1d470f922b2c8e6446cc77, type: 3}
@@ -7817,7 +7822,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controllerModels: {fileID: 0}
-  controlsToIndicate: 
+  controlsToIndicate: 0000000006000000
   indicationMaterial: {fileID: 2100000, guid: 1a8a641804e005e98b8219ec77611560, type: 2}
   submeshDefaultMaterial: {fileID: 670224309865224971, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
   XRControllerSubmeshesToIndicate: []
@@ -8451,6 +8456,7 @@ GameObject:
   - component: {fileID: 1166485201}
   - component: {fileID: 1166485200}
   - component: {fileID: 1166485205}
+  - component: {fileID: 1166485206}
   m_Layer: 0
   m_Name: StartButton
   m_TagString: Untagged
@@ -8497,7 +8503,7 @@ MonoBehaviour:
   m_HoverEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1166485206}
         m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
         m_MethodName: OnHoverEntered
         m_Mode: 1
@@ -8512,7 +8518,7 @@ MonoBehaviour:
   m_HoverExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1166485206}
         m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
         m_MethodName: OnHoverExited
         m_Mode: 1
@@ -8720,6 +8726,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turtleMovement: {fileID: 0}
   queueReading: {fileID: 0}
+--- !u!114 &1166485206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166485199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c01e0ed98aeff95bb97a9eefaa852b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerModels: {fileID: 0}
+  controlsToIndicate: 0000000006000000
+  indicationMaterial: {fileID: 2100000, guid: 1a8a641804e005e98b8219ec77611560, type: 2}
+  submeshDefaultMaterial: {fileID: 670224309865224971, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  XRControllerSubmeshesToIndicate: []
+  submeshRenderers: []
 --- !u!1 &1176638032
 GameObject:
   m_ObjectHideFlags: 0
@@ -15779,6 +15803,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2043682220}
   m_CullTransparentMesh: 1
+--- !u!1 &2053727081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  m_PrefabInstance: {fileID: 1959443220}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2053727082 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
