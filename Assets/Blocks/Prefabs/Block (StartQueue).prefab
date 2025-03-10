@@ -348,7 +348,6 @@ GameObject:
   - component: {fileID: 175977446721164471}
   - component: {fileID: 2724822605195957764}
   - component: {fileID: 704375314700345918}
-  - component: {fileID: 4947266194977902083}
   - component: {fileID: 4180480759335816501}
   - component: {fileID: 6630869357201564972}
   - component: {fileID: 5354081781134567555}
@@ -630,24 +629,6 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
---- !u!114 &4947266194977902083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122732868338158301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d765b78f17bfc8957897007f4beb16b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateName: Blue
-  transitions:
-  - NextObject: {fileID: 0}
-    Action:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!114 &4180480759335816501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,6 +641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 734ba02fec88d0949a0ed1b098564a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasSnapped: 0
 --- !u!114 &6630869357201564972
 MonoBehaviour:
   m_ObjectHideFlags: 0
