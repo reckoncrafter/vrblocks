@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
 
 public class TurtleMovement : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class TurtleMovement : MonoBehaviour
 
     public UnityEvent EndOfMovementEvent;
 
+    private TMP_Text failureDialog;
+
     private void SetIsWalking(bool value)
     {
         animator.SetBool("isWalking", value);
@@ -47,6 +50,7 @@ public class TurtleMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
         queue = new Queue<Action>();
+        failureDialog = GameObject.Find("FailureDialog/Canvas/Text").GetComponent<TextMeshProUGUI>();
 
         resetPosition = transform.position;
         resetRotation = transform.rotation;
@@ -107,6 +111,7 @@ public class TurtleMovement : MonoBehaviour
     {
         isResetable = true;
         StartNextAction();
+        failureDialog.text = "";
     }
 
     // I will not atone for my sins
@@ -138,6 +143,7 @@ public class TurtleMovement : MonoBehaviour
         int elseBlockIndex = -1;
         int EndIndex = 0;
         bool isElse = false;
+        bool isComplete = false;
         Action[] queueArray = queue.ToArray();
 
         for (int i = 0; i < queueArray.Length; i++)
@@ -145,6 +151,7 @@ public class TurtleMovement : MonoBehaviour
             if (queueArray[i] == IfStatementEnd)
             {
                 EndIndex = i;
+                isComplete = true;
                 Debug.Log("IfStatement found its end. " + EndIndex);
             }
             if (queueArray[i] == ElseStatement)
@@ -153,6 +160,13 @@ public class TurtleMovement : MonoBehaviour
                 isElse = true;
                 Debug.Log("Found Else Statement. " + elseBlockIndex);
             }
+        }
+
+        if(!isComplete){
+            Debug.Log("No IfStatementEnd Found");
+            failureDialog.text += "Incomplete If Statement! (No IfEnd Block)\n";
+            Fail();
+            return;
         }
 
         if (!conditionFunction())
@@ -239,6 +253,8 @@ public class TurtleMovement : MonoBehaviour
         if (EndIndex == 0)
         {
             Debug.Log("No WhileStatementEnd found");
+            failureDialog.text += "Incomplete While Statement! (No WhileEnd Block)";
+            Fail();
             return;
         }
 
