@@ -24,6 +24,7 @@ public class TurtleMovement : MonoBehaviour
     private BoxCollider turtleCollider;
     private Queue<Action> queue;
     private Func<bool> conditionFunction = () => false;
+    private TurtleProximity turtleProximity;
 
     // jumping things
     private bool isGrounded = false;
@@ -51,6 +52,7 @@ public class TurtleMovement : MonoBehaviour
         turtleCollider = GetComponent<BoxCollider>();
         queue = new Queue<Action>();
         failureDialog = GameObject.Find("FailureDialog/Canvas/Text").GetComponent<TextMeshProUGUI>();
+        turtleProximity = GetComponent<TurtleProximity>();
 
         resetPosition = transform.position;
         resetRotation = transform.rotation;
@@ -115,6 +117,18 @@ public class TurtleMovement : MonoBehaviour
     }
 
     // I will not atone for my sins
+    public void conditionFacingWall()
+    {
+        queue.Enqueue(() =>
+        {
+           conditionFunction = () =>
+           {
+             return turtleProximity.isTouchingMapBlock;
+           };
+        });
+    }
+
+
     public void setConditionTrue()
     {
         queue.Enqueue(() =>
