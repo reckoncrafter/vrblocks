@@ -6,12 +6,14 @@ public class DetectTurtle : MonoBehaviour
 {
     public GameObject GoalSphere;
     public GameObject Turtle;
+    public AudioClip turtleSuccessAudio;
     public float distanceActivationThreshold;
     public bool isNearby;
 
     public float distance;
 
-    void Start(){
+    void Start()
+    {
         Turtle = GameObject.Find("/MapSpawner/Turtle");
         GoalSphere = GameObject.Find("/MapSpawner/GoalSphere");
 
@@ -20,12 +22,19 @@ public class DetectTurtle : MonoBehaviour
 
     void CheckDistance()
     {
-        distance = Vector3.Distance (GoalSphere.transform.position, Turtle.transform.position);
+        distance = Vector3.Distance(GoalSphere.transform.position, Turtle.transform.position);
 
-        if (distance <= distanceActivationThreshold){
+        if (distance <= distanceActivationThreshold)
+        {
+            if (!isNearby)
+            {
+                AudioSource.PlayClipAtPoint(turtleSuccessAudio, Turtle.transform.position);
+            }
+
             isNearby = true;
         }
-        else{
+        else
+        {
             isNearby = false;
         }
     }
