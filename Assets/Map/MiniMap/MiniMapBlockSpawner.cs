@@ -40,19 +40,19 @@ public class MiniMapBlockSpawner : MonoBehaviour
     void Update()
     {
         // Return minimap to original position
-        if((initPos - transform.position).magnitude >= 0.08)
+        if ((initPos - transform.position).magnitude >= 0.08)
         {
             minimapRB.AddForce(
                 new Vector3(
                     minimapMagnetPIDx.Update(Time.deltaTime, transform.position.x, initPos.x),
                     minimapMagnetPIDy.Update(Time.deltaTime, transform.position.y, initPos.y),
                     minimapMagnetPIDz.Update(Time.deltaTime, transform.position.z, initPos.z)
-                ).normalized * (initPos - transform.position).sqrMagnitude, 
+                ).normalized * (initPos - transform.position).sqrMagnitude,
                 ForceMode.Force
             );
             minimapAtRest = false;
         }
-        else if(!minimapAtRest)
+        else if (!minimapAtRest)
         {
             minimapRB.velocity = Vector3.zero;
             minimapAtRest = true;
@@ -76,11 +76,10 @@ public class MiniMapBlockSpawner : MonoBehaviour
         Vector3 com = CalculateCenterOfMass();
         Vector3 startPositionOffset = (mapValues.blockScale / 2) - com;
 
-        GameObject currentEntity = null;
         for (int i = 0; i < mapValues.spawnPoints.Length; i++)
         {
             Vector3 coords = startPositionOffset + Vector3.Scale(mapValues.spawnPoints[i], mapValues.blockScale);
-            currentEntity = Instantiate(mapBlock, coords, Quaternion.identity);
+            GameObject currentEntity = Instantiate(mapBlock, coords, Quaternion.identity);
 
             currentEntity.transform.SetParent(gameObject.transform, false);
 
@@ -103,34 +102,34 @@ public class MiniMapBlockSpawner : MonoBehaviour
         turtleEntity.name = mapValues.turtlePrefabName;
         foreach (Component c in turtleEntity.GetComponents<Component>().ToList())
         {
-            if(!typeof(Transform).IsAssignableFrom(c.GetType()))
+            if (!typeof(Transform).IsAssignableFrom(c.GetType()))
             {
                 DestroyImmediate(c);
             }
         }
-        
+
         SphereCollider sCollider = transform.gameObject.AddComponent<SphereCollider>();
         sCollider.center = Vector3.zero;
         sCollider.radius = 1.0f;
     }
     public void HideGrabbingHand(SelectEnterEventArgs args)
     {
-        if(args.interactorObject.transform.CompareTag("Left Hand"))
+        if (args.interactorObject.transform.CompareTag("Left Hand"))
         {
             disableLeftHandModelOnGrab.SetActive(false);
         }
-        else if(args.interactorObject.transform.CompareTag("Right Hand"))
+        else if (args.interactorObject.transform.CompareTag("Right Hand"))
         {
             disableRightHandModelOnGrab.SetActive(false);
         }
     }
     public void ShowGrabbingHand(SelectExitEventArgs args)
     {
-        if(args.interactorObject.transform.CompareTag("Left Hand"))
+        if (args.interactorObject.transform.CompareTag("Left Hand"))
         {
             disableLeftHandModelOnGrab.SetActive(true);
         }
-        else if(args.interactorObject.transform.CompareTag("Right Hand"))
+        else if (args.interactorObject.transform.CompareTag("Right Hand"))
         {
             disableRightHandModelOnGrab.SetActive(true);
         }
@@ -139,12 +138,12 @@ public class MiniMapBlockSpawner : MonoBehaviour
     {
         // https://discussions.unity.com/t/why-does-foreach-work-only-1-2-of-a-time/91068/2
         // forgot you dont mutate the same list you're looping through
-        foreach(Transform child in transform.Cast<Transform>().ToList())
+        foreach (Transform child in transform.Cast<Transform>().ToList())
         {
             DestroyImmediate(child.gameObject);
         }
 
-        foreach(SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
+        foreach (SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
         {
             DestroyImmediate(sCollider);
         }
