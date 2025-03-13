@@ -2034,6 +2034,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a42a1b0dbd33a432baf76868fe0b7e62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turtleCollisionAudio: {fileID: 0}
+  turtleFallAudio: {fileID: 0}
+  turtleJumpAudio: {fileID: 0}
   movementDuration: 1
   animationSpeed: 4
   failBounciness: 0.3
@@ -4314,6 +4317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac091e3d1f084707adc527b6eb70e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turtleSuccessAudio: {fileID: 8300000, guid: fd2d9e198d018434095c2d9bec43ab8f, type: 3}
   mapBlock: {fileID: 2844158347067402648, guid: 040b808da240c4b54a6a4135c497a5ec, type: 3}
   goalSphere: {fileID: 6847032777414124592, guid: 3e6d969a24c925663b9eed7f3131d177, type: 3}
   turtle: {fileID: 8949930570369046022, guid: 400fef76ef71943d48f3221445efd519, type: 3}
@@ -14410,12 +14414,12 @@ MonoBehaviour:
   m_margin: {x: -0.03583335, y: -28.862024, z: -9.593889, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 1690691602}
-  m_maskType: 0
   _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
+  m_hasFontAssetChanged: 0
+  m_renderer: {fileID: 1690691602}
+  m_maskType: 0
 --- !u!23 &1690691602
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -3,17 +3,26 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class MapBlockSpawner : MonoBehaviour
 {
+    public AudioClip turtleSuccessAudio;
     public GameObject mapBlock;
     public GameObject goalSphere;
     public TurtleMovement turtle;
     public MapBlockScriptableObject mapValues;
 
+    private readonly DetectTurtle detectTurtle = new();
+
     void Start()
     {
+        detectTurtle.TurtleSuccessAudio = turtleSuccessAudio;
+
         // delete children to spawn again
         if (transform.childCount == 0)
         {
             SpawnEntities();
+        }
+        else
+        {
+            detectTurtle.FindTurtle();
         }
     }
     private void SpawnEntities()
@@ -38,7 +47,6 @@ public class MapBlockSpawner : MonoBehaviour
         generatedGoalSphere.transform.SetParent(gameObject.transform, false);
         generatedGoalSphere.transform.localScale = mapValues.goalScale;
         generatedGoalSphere.name = mapValues.goalPrefabName;
-        //
 
         Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
@@ -55,5 +63,7 @@ public class MapBlockSpawner : MonoBehaviour
         {
             turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
         }
+
+        detectTurtle.SetTurtleAndGoal(turtleEntity, generatedGoalSphere);
     }
 }
