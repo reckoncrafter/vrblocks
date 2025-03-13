@@ -1,34 +1,76 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class DetectTurtle : MonoBehaviour
+public class DetectTurtle
 {
-    public GameObject GoalSphere;
-    public GameObject Turtle;
-    public AudioClip turtleSuccessAudio;
-    public float distanceActivationThreshold;
-    public bool isNearby;
+    private PlayerUIManager? playerUIManager;
+    private GameObject? GoalSphere;
+    private GameObject? Turtle;
+    public AudioClip? TurtleSuccessAudio { get; set; }
+    private readonly float distanceActivationThreshold = 0.25f;
+    private bool isNearby;
 
-    public float distance;
-
-    void Start()
+    void AddTurtleListener()
     {
+        if (Turtle != null)
+        {
+            Turtle.GetComponent<TurtleMovement>().EndOfMovementEvent.AddListener(CheckDistance);
+        }
+
+        playerUIManager = GameObject.Find("PlayerUIManager").GetComponent<PlayerUIManager>();
+    }
+
+    void RemoveTurtleListener()
+    {
+        if (Turtle != null)
+        {
+            Turtle.GetComponent<TurtleMovement>().EndOfMovementEvent.RemoveListener(CheckDistance);
+        }
+    }
+
+    public void FindTurtle()
+    {
+        RemoveTurtleListener();
+
         Turtle = GameObject.Find("/MapSpawner/Turtle");
         GoalSphere = GameObject.Find("/MapSpawner/GoalSphere");
 
         Turtle.GetComponent<TurtleMovement>().EndOfMovementEvent.AddListener(CheckDistance);
+
+        if (Turtle == null || GoalSphere == null)
+        {
+            Debug.LogError("Turtle or GoalSphere not found");
+            return;
+        }
+
+        AddTurtleListener();
+    }
+
+    public void SetTurtleAndGoal(TurtleMovement tempTurtle, GameObject goal)
+    {
+        RemoveTurtleListener();
+
+        Turtle = tempTurtle.gameObject;
+        GoalSphere = goal;
+
+        AddTurtleListener();
     }
 
     void CheckDistance()
     {
-        distance = Vector3.Distance(GoalSphere.transform.position, Turtle.transform.position);
+        if (Turtle == null || GoalSphere == null || playerUIManager == null)
+        {
+            Debug.LogError("Turtle, GoalSphere, or PlayerUIManager is null for CheckDistance");
+            return;
+        }
+
+        float distance = Vector3.Distance(GoalSphere.transform.position, Turtle.transform.position);
 
         if (distance <= distanceActivationThreshold)
         {
             if (!isNearby)
             {
-                AudioSource.PlayClipAtPoint(turtleSuccessAudio, Turtle.transform.position);
+                AudioSource.PlayClipAtPoint(TurtleSuccessAudio, Turtle.transform.position);
+                playerUIManager.EnableEndScreen();
             }
 
             isNearby = true;
