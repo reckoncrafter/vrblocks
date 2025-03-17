@@ -9,6 +9,8 @@ public class ConditionSelectorBlock : MonoBehaviour
     string[] dropdownOptions =
     {
         "Is Facing Wall",
+        "Is Facing Cliff",
+        "Is Facing Step Down",
         "Literal True",
         "Literal False",
     };
@@ -31,8 +33,10 @@ public class ConditionSelectorBlock : MonoBehaviour
         turtleCommand.onMove.RemoveAllListeners();
         turtleCommand.onMove.AddListener(dd.value switch {
             0 => turtleMovement.ConditionFacingWall,
-            1 => turtleMovement.setConditionTrue,
-            2 => turtleMovement.setConditionFalse,
+            1 => turtleMovement.ConditionFacingCliff,
+            2 => turtleMovement.ConditionFacingStepDown,
+            3 => turtleMovement.setConditionTrue,
+            4 => turtleMovement.setConditionFalse,
             _ => () => {}
         });
     }

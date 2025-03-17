@@ -133,11 +133,53 @@ public class TurtleMovement : MonoBehaviour
             conditionFunction = () =>
             {
                 RaycastHit hit;
+                Debug.DrawRay(transform.position, transform.forward, Color.red, 10);
                 if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
                 {
                     if(hit.transform.parent.gameObject.name == "MapSpawner"){
                         return true;
                     }
+                }
+                return false;
+            };
+            StartNextAction();
+        });
+    }
+
+    public void ConditionFacingCliff()
+    {
+        queue.Enqueue(() =>
+        {
+          conditionFunction = () =>
+          {
+              RaycastHit hit;
+              Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
+              if(!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
+              {
+                  Debug.Log("ConditionFacingMapEdge: Cliff detected!");
+                  return true;
+              }
+              return false;
+          };
+          StartNextAction();
+        });
+    }
+
+    public void ConditionFacingStepDown()
+    {
+        queue.Enqueue(() =>
+        {
+            conditionFunction = () =>
+            {
+                RaycastHit hit;
+                Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
+                bool aheadLevel = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 0.05f);
+                bool aheadNotEmpty = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f);
+
+                if(!aheadLevel && aheadNotEmpty)
+                {
+                    Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
+                    return true;
                 }
                 return false;
             };
