@@ -7,18 +7,24 @@ using TMPro;
 
 public class TurtleMovement : MonoBehaviour
 {
+    public AudioClip turtleCollisionAudio;
+    public AudioClip turtleFallAudio;
+    public AudioClip turtleJumpAudio;
+
+
     public float movementDuration = 2.0f;
     public float animationSpeed = 1.0f;
     public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
 
-    private bool isResetable = false;
+    private bool canReset = false; // separate from fail because external things can call reset
+    private bool canFail = false;
     private Vector3 resetPosition = Vector3.zero;
     private Quaternion resetRotation = Quaternion.identity;
     private float resetBounciness = 0.0f;
     private RigidbodyConstraints resetConstraints;
 
-    private LTDescr tween;
+    private LTDescr? tween;
     private Animator animator;
     private Rigidbody rb;
     private BoxCollider turtleCollider;
@@ -66,7 +72,10 @@ public class TurtleMovement : MonoBehaviour
     {
         if (!Physics.Raycast(transform.position, -transform.up, moveDistance.y * 2))
         {
-            Fail();
+            Fail(() =>
+            {
+                AudioSource.PlayClipAtPoint(turtleFallAudio, transform.position);
+            });
         }
 
         if (shouldJump && isGrounded)
@@ -110,7 +119,8 @@ public class TurtleMovement : MonoBehaviour
 
     public void StartQueue()
     {
-        isResetable = true;
+        canFail = true;
+        canReset = true;
         StartNextAction();
         failureDialog.text = "";
     }
@@ -183,7 +193,8 @@ public class TurtleMovement : MonoBehaviour
             }
         }
 
-        if(!isComplete){
+        if (!isComplete)
+        {
             Debug.Log("No IfStatementEnd Found");
             failureDialog.text += "Incomplete If Statement! (No IfEnd Block)\n";
             Fail();
@@ -253,13 +264,13 @@ public class TurtleMovement : MonoBehaviour
         queue.Enqueue(WhileStatementBegin);
     }
 
-    private List<Action> loopList;
-    private Queue<Action> swapQueue;
+    private List<Action>? loopList;
+    private Queue<Action>? swapQueue;
 
     private void WhileStatementBegin()
     {
         Debug.Log("WhileStatementBegin called.");
-        List<Action> queueList = new List<Action>(queue);
+        List<Action> queueList = new(queue);
 
         int EndIndex = 0;
         for (int i = 0; i < queueList.Count; i++)
@@ -307,6 +318,12 @@ public class TurtleMovement : MonoBehaviour
     {
         Debug.Log("WhileStatementEnd called.");
 
+        if (loopList == null || swapQueue == null)
+        {
+            Debug.LogError("WhileStatementEnd called without a loopList or swapQueue");
+            return;
+        }
+
         // 5. When the end is reached, WhileStatementEnd should
         if (conditionFunction())
         {
@@ -344,11 +361,12 @@ public class TurtleMovement : MonoBehaviour
 
     public void Reset()
     {
-        if (!isResetable)
+        if (!canReset)
         {
             return;
         }
-        isResetable = false;
+        canReset = false;
+        canFail = false;
 
         SetIsWalking(false);
         queue.Clear();
@@ -369,8 +387,10 @@ public class TurtleMovement : MonoBehaviour
         }
         else
         {
-            Debug.Log("No Actions in Queue!");
-            Fail();
+            Fail(() =>
+            {
+                AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
+            });
         }
     }
 
@@ -423,7 +443,9 @@ public class TurtleMovement : MonoBehaviour
 
     private void PerformJump()
     {
+        AudioSource.PlayClipAtPoint(turtleJumpAudio, transform.position);
         // animator.SetTrigger("jump");
+
         float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * Mathf.Abs(Physics.gravity.y)); // h = (µsin(θ))^2 / 2g with 50% more height
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
@@ -434,6 +456,7 @@ public class TurtleMovement : MonoBehaviour
     {
         Fail(() =>
         {
+            AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
             rb.AddTorque(new Vector3(UnityEngine.Random.Range(-10f, 10f), 0, UnityEngine.Random.Range(-10f, 10f)), ForceMode.Impulse);
         });
     }
@@ -442,6 +465,7 @@ public class TurtleMovement : MonoBehaviour
     {
         Fail(() =>
         {
+            AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
             rb.AddForce((-transform.forward + transform.up) * Mathf.Sqrt(moveDistance.y * 0.3f * 2 * Mathf.Abs(Physics.gravity.y)), ForceMode.Impulse);
             rb.AddTorque(-transform.right * 5, ForceMode.Impulse);
         });
@@ -454,15 +478,20 @@ public class TurtleMovement : MonoBehaviour
         Reset();
     }
 
-    private void Fail(Action failMovement = null)
+    private void Fail(Action? failAction = null)
     {
+        if (!canFail)
+        {
+            return;
+        }
+        canFail = false;
 
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
         queue.Clear();
         tween?.reset();
 
-        failMovement?.Invoke();
+        failAction?.Invoke();
 
         StartCoroutine(WaitAndReset());
     }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CollisionForwarding : MonoBehaviour
 {
-    public BlockSnapping parentBlockSnapping;
+    public BlockSnapping? parentBlockSnapping;
 
     private void OnTriggerEnter(Collider other)
     {

@@ -7,21 +7,21 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class LevelUIManager : MonoBehaviour
 {
     public PlayableDirector director;
-    
+
     [Header("Signal Timeline to Play")]
     public List<GameObject> interactables;
 
     void Start()
     {
-        foreach(GameObject interactable in interactables)
+        foreach (GameObject interactable in interactables)
         {
-            if(interactable.GetComponent<Button>() != null)
+            if (interactable.GetComponent<Button>() != null)
             {
                 interactable.GetComponent<Button>().onClick.AddListener(ResumeTimeline);
             }
-            else if(interactable.GetComponent<XRGrabInteractable>() != null)
+            else if (interactable.GetComponent<XRGrabInteractable>() != null)
             {
-               interactable.GetComponent<XRGrabInteractable>().selectEntered.AddListener(ResumeTimeline); 
+                interactable.GetComponent<XRGrabInteractable>().selectEntered.AddListener(ResumeTimeline);
             }
         }
     }

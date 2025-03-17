@@ -4,16 +4,13 @@ using TMPro;
 
 public class AddObject : MonoBehaviour
 {
-    [SerializeField] private GameObject blockPrefab; // Assign corresponding block in inspector
+    [SerializeField] private GameObject? blockPrefab; // Assign corresponding block in inspector
     [SerializeField] private Transform spawnParent; // Assign "MoveableEntities" as spawn position in hierarchy if that's how we're moving with it.
-    [SerializeField] private Vector3 spawnOffset = new Vector3(0, 0.5f, 0); // Offset to avoid overlap
-
-    private Button button;
+    [SerializeField] private Vector3 spawnOffset = new(0, 0.5f, 0); // Offset to avoid overlap
 
     private void Awake()
     {
-        button = GetComponent<Button>();
-        if (button != null)
+        if (TryGetComponent<Button>(out var button))
         {
             button.onClick.AddListener(SpawnBlock);
         }
@@ -32,13 +29,11 @@ public class AddObject : MonoBehaviour
         }
 
         Transform buttonTransform = GetComponent<Transform>();
-        Transform parentTransform = spawnParent != null ? spawnParent : null;
-
         GameObject newBlock = Instantiate(
             blockPrefab,
             buttonTransform.position + spawnOffset, // Spawning based on button position
             buttonTransform.rotation,
-            parentTransform
+            spawnParent
         );
 
         newBlock.name = blockPrefab.name; // Because I use strings for block queue.
