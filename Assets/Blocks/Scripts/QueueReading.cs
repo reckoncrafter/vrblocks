@@ -7,10 +7,10 @@ public class QueueReading : MonoBehaviour
 {
     // Queue to hold the block types (FIFO order)
 
-    private Queue<string> blockQueue = new Queue<string>();
-    private Queue<UnityEvent> eventQueue = new Queue<UnityEvent>();
-    private Stack<GameObject> incompleteConditionals = new Stack<GameObject>();
-    private FunctionBlock functionBlock;
+    private readonly Queue<string> blockQueue = new();
+    private readonly Queue<UnityEvent> eventQueue = new();
+    private readonly Stack<GameObject> incompleteConditionals = new();
+    private FunctionBlock? functionBlock;
 
     public void ReadQueue()
     {
@@ -23,7 +23,7 @@ public class QueueReading : MonoBehaviour
         eventQueue.Clear();
 
         // set textures of incomplete conditional blocks back to normal before clearing the stack.
-        foreach(GameObject b in incompleteConditionals)
+        foreach (GameObject b in incompleteConditionals)
         {
             b.GetComponent<IncompleteConditionalHandler>().SetOffendingState(false);
         }
@@ -57,7 +57,8 @@ public class QueueReading : MonoBehaviour
             Debug.Log($"No SnappedForwarding component or no connected block found for {currentBlock.name}. Stopping traversal.");
 
             // check for remaining incomplete statments
-            if(incompleteConditionals.Count > 0){
+            if (incompleteConditionals.Count > 0)
+            {
                 incompleteConditionals.Pop().GetComponent<IncompleteConditionalHandler>().SetOffendingState(true);
             }
             return;
@@ -72,24 +73,24 @@ public class QueueReading : MonoBehaviour
         Debug.Log($"Detected connected block: {connectedBlock.name} with type: {blockType}");
 
         // incomplete conditional statement detection
-        if(blockType == "Block (IfBegin)" || blockType == "Block (WhileBegin)")
+        if (blockType == "Block (IfBegin)" || blockType == "Block (WhileBegin)")
         {
             incompleteConditionals.Push(connectedBlock);
         }
 
         Action<string, string, bool> CheckEnds = (string EndBlockName, string BeginBlockName, bool peek) =>
         {
-            if(blockType == EndBlockName)
+            if (blockType == EndBlockName)
             {
                 try
                 {
                     GameObject b = peek ? incompleteConditionals.Peek() : incompleteConditionals.Pop();
-                    if(b.name != BeginBlockName)
+                    if (b.name != BeginBlockName)
                     {
                         incompleteConditionals.Push(connectedBlock);
                     }
                 }
-                catch(Exception e) when (e is InvalidOperationException)
+                catch (Exception e) when (e is InvalidOperationException)
                 {
                     incompleteConditionals.Push(connectedBlock);
                 }
@@ -101,9 +102,9 @@ public class QueueReading : MonoBehaviour
         CheckEnds("Block (Else)", "Block (IfBegin)", true);
 
         // if block is function, get function contents
-        if(blockType == "Block (FunctionCall)")
+        if (blockType == "Block (FunctionCall)")
         {
-            if(functionBlock)
+            if (functionBlock != null)
             {
                 int connectedID = connectedBlock.GetComponent<FunctionCallBlock>().FunctionID;
                 int thisID = functionBlock.FunctionID;
@@ -114,7 +115,7 @@ public class QueueReading : MonoBehaviour
                 }
             }
             Queue<UnityEvent> functionQueue = connectedBlock.GetComponent<FunctionCallBlock>().getFunction();
-            while(functionQueue.Count > 0)
+            while (functionQueue.Count > 0)
             {
                 eventQueue.Enqueue(functionQueue.Dequeue());
             }
@@ -136,7 +137,8 @@ public class QueueReading : MonoBehaviour
         return new Queue<string>(blockQueue);
     }
 
-    public Queue<UnityEvent> GetBlockQueueOfUnityEvents(){
+    public Queue<UnityEvent> GetBlockQueueOfUnityEvents()
+    {
         return new Queue<UnityEvent>(eventQueue);
     }
 }

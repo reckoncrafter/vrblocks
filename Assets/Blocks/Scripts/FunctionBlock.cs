@@ -53,7 +53,7 @@ public class FunctionBlock : MonoBehaviour
       var blockEntity = GameObject.Find("MoveableEntities/BlockEntity").GetComponent<Transform>();
       GameObject newFunctionCall = Instantiate(functionCallPrefab, transform.position + spawnOffset, transform.rotation, blockEntity);
       newFunctionCall.name = "Block (FunctionCall)";
-      FunctionCallBlock fcb = newFunctionCall.AddComponent(typeof(FunctionCallBlock)) as FunctionCallBlock;
+      FunctionCallBlock fcb = newFunctionCall.AddComponent<FunctionCallBlock>();
       fcb.functionDefinition = gameObject;
       var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
       FCLabel.text = "Call " + FunctionID.ToString();

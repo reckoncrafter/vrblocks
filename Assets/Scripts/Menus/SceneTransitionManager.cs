@@ -18,7 +18,8 @@ public class SceneTransitionManager : MonoBehaviour
 
     public static FileInfo[] scenes;
 
-    public void Start(){
+    public void Start()
+    {
         DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Scenes/PlayableLevels");
         scenes = dir.GetFiles("*.unity");
     }
@@ -26,60 +27,77 @@ public class SceneTransitionManager : MonoBehaviour
     private void Awake()
     {
         if (singleton && singleton != this)
+        {
             Destroy(singleton);
+        }
 
         singleton = this;
     }
-    
-    public void GoToScene(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder){
+
+    public void GoToScene(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder)
+    {
         StartCoroutine(GoToSceneRoutine(sceneIndex, loadOption));
     }
-    public void GoToScene(string sceneName){
+    public void GoToScene(string sceneName)
+    {
         StartCoroutine(GoToSceneRoutine(sceneName));
     }
 
-    IEnumerator GoToSceneRoutine(int sceneIndex, LoadSceneBy loadOption){
+    IEnumerator GoToSceneRoutine(int sceneIndex, LoadSceneBy loadOption)
+    {
         yield return new WaitForSeconds(waitDuration);
-        if(loadOption == LoadSceneBy.AssetDirectoryOrder){
+        if (loadOption == LoadSceneBy.AssetDirectoryOrder)
+        {
             SceneManager.LoadScene(scenes[sceneIndex].Name.Replace(".unity", ""));
         }
-        else if(loadOption == LoadSceneBy.BuildSettingsOrder){
+        else if (loadOption == LoadSceneBy.BuildSettingsOrder)
+        {
             SceneManager.LoadScene(sceneIndex);
         }
     }
-    IEnumerator GoToSceneRoutine(string sceneName){
+    IEnumerator GoToSceneRoutine(string sceneName)
+    {
         yield return new WaitForSeconds(waitDuration);
         SceneManager.LoadScene(sceneName);
     }
 
-    public void GoToSceneAsync(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder){
+    public void GoToSceneAsync(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder)
+    {
         StartCoroutine(GoToSceneAsyncRoutine(sceneIndex, loadOption));
     }
-    public void GoToSceneAsync(string sceneName){
+    public void GoToSceneAsync(string sceneName)
+    {
         StartCoroutine(GoToSceneAsyncRoutine(sceneName));
     }
 
-    IEnumerator GoToSceneAsyncRoutine(int sceneIndex, LoadSceneBy loadOption){
-        AsyncOperation operation = null;
-        if(loadOption == LoadSceneBy.AssetDirectoryOrder){
+    IEnumerator GoToSceneAsyncRoutine(int sceneIndex, LoadSceneBy loadOption)
+    {
+        AsyncOperation operation;
+        if (loadOption == LoadSceneBy.AssetDirectoryOrder)
+        {
             operation = SceneManager.LoadSceneAsync(scenes[sceneIndex].Name.Replace(".unity", ""));
         }
-        else if(loadOption == LoadSceneBy.BuildSettingsOrder){
+        else // LoadSceneBy.BuildSettingsOrder
+        {
             operation = SceneManager.LoadSceneAsync(sceneIndex);
         }
+
         operation.allowSceneActivation = false;
         float timer = 0;
-        while(timer <= waitDuration && !operation.isDone){
+        while (timer <= waitDuration && !operation.isDone)
+        {
             timer += Time.deltaTime;
             yield return null;
         }
         operation.allowSceneActivation = true;
     }
-    IEnumerator GoToSceneAsyncRoutine(string sceneName){
+    IEnumerator GoToSceneAsyncRoutine(string sceneName)
+    {
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
         float timer = 0;
-        while(timer <= waitDuration && !operation.isDone){
+        while (timer <= waitDuration && !operation.isDone)
+        {
             timer += Time.deltaTime;
             yield return null;
         }

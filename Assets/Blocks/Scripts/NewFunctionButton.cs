@@ -10,11 +10,13 @@ public class NewFunctionButton : MonoBehaviour
     public Vector3 blockRotation = new Vector3(0, 180, 0);
     //public Vector3 blockScale = new Vector3(2.5f, 2.25f, 2.5f);
 
-    public GameObject functionDefinitionBlockPrefab;
-    public GameObject functionCallBlockPrefab;
+    public GameObject? functionDefinitionBlockPrefab;
+    public GameObject? functionCallBlockPrefab;
 
-    public void spawnFunctionBlocks(){
-        if(functionCallBlockPrefab == null || functionDefinitionBlockPrefab == null){
+    public void spawnFunctionBlocks()
+    {
+        if (functionCallBlockPrefab == null || functionDefinitionBlockPrefab == null)
+        {
             Debug.Log("Function block prefabs are unreferenced.");
             return;
         }
@@ -31,7 +33,7 @@ public class NewFunctionButton : MonoBehaviour
         newFunctionCallInstance.name = "Block (FunctionCall)";
 
         newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
-        FunctionCallBlock fcb = newFunctionCallInstance.AddComponent(typeof(FunctionCallBlock)) as FunctionCallBlock;
+        FunctionCallBlock fcb = newFunctionCallInstance.AddComponent<FunctionCallBlock>();
         fcb.functionDefinition = newFunctionDefinitionInstance;
 
         // BROKEN
@@ -44,21 +46,26 @@ public class NewFunctionButton : MonoBehaviour
         newFunctionDefinitionInstance.GetComponent<FunctionBlock>().FunctionID = FDInstanceID;
     }
 
-    public void SetGlowEffect(bool isGlow){
+    public void SetGlowEffect(bool isGlow)
+    {
         Renderer renderer = GetComponent<Renderer>();
-        if(renderer != null){
+        if (renderer != null)
+        {
             Material material = renderer.material;
 
-            if(isGlow){
+            if (isGlow)
+            {
                 material.SetColor("_EmissionColor", new Color32(162, 1, 230, 255));
                 material.EnableKeyword("_EMISSION");
             }
-            else{
+            else
+            {
                 material.SetColor("_EmissionColor", Color.black);
                 material.DisableKeyword("_EMISSION");
             }
         }
-        else{
+        else
+        {
             Debug.LogWarning("Renderer not found on GameObject");
         }
     }

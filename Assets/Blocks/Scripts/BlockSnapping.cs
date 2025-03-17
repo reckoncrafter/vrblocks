@@ -5,7 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class BlockSnapping : MonoBehaviour
 {
     public bool hasSnapped = false; // Flag to prevent repeated snapping
-    private QueueReading queueReading;
+    private QueueReading? queueReading;
 
     private void Awake()
     {
@@ -58,11 +58,11 @@ public class BlockSnapping : MonoBehaviour
             // Check if the bottom trigger is already snapped
             if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
             {
-                GameObject parentObject = other.transform.parent?.gameObject;
+                GameObject? parentObject = other.transform.parent?.gameObject;
                 if (parentObject != null)
                 {
                     Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
-                    SnapToBlock(this.gameObject, other.transform.parent.gameObject);
+                    SnapToBlock(this.gameObject, parentObject);
 
                     hasSnapped = true;
                     otherSnappedForwarding.ConnectedBlock = this.gameObject;
@@ -129,7 +129,7 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log($"{block2.name} snapped to {block1.name}.");
     }
 
-    private Coroutine resetSnapStatusCoroutine;
+    private Coroutine? resetSnapStatusCoroutine;
 
     private void OnGrab(SelectEnterEventArgs args)
     {
@@ -220,7 +220,7 @@ public class BlockSnapping : MonoBehaviour
         if (otherSnapTriggerBottom != null)
         {
             // Get the SnappedForwarding component of the other block
-            SnappedForwarding otherSnappedForwarding = otherSnapTriggerBottom.GetComponent<SnappedForwarding>();
+            SnappedForwarding? otherSnappedForwarding = otherSnapTriggerBottom.GetComponent<SnappedForwarding>();
             if (otherSnappedForwarding != null)
             {
                 // Reset the snap status of the other block to false
@@ -246,7 +246,7 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
 
-    private GameObject GetNthBlock(GameObject startingBlock, int n) // Function created to find blocks for CheckColumnSize()
+    private GameObject? GetNthBlock(GameObject startingBlock, int n) // Function created to find blocks for CheckColumnSize()
     {
         int count = 1;
         GameObject current = startingBlock;
@@ -280,7 +280,7 @@ public class BlockSnapping : MonoBehaviour
         GameObject startingBlock = transform.gameObject;
 
         // Find the root block
-        GameObject rootBlock = thisSnappedForwarding.FindRootBlock(startingBlock);
+        GameObject? rootBlock = thisSnappedForwarding.FindRootBlock(startingBlock);
         if (rootBlock == null)
         {
             Debug.LogWarning("Root block not found.");
@@ -295,7 +295,7 @@ public class BlockSnapping : MonoBehaviour
         if (columnCount > 5)
         {
             // Retrieve the 6th block in the chain
-            GameObject sixthBlock = GetNthBlock(rootBlock, 6);
+            GameObject? sixthBlock = GetNthBlock(rootBlock, 6);
             if (sixthBlock != null)
             {
                 // Break the joint connection on the sixth block if it exists to allow repositioning
@@ -331,7 +331,7 @@ public class BlockSnapping : MonoBehaviour
                 }
 
                 //Create a new joint between the 5th and 6th blocks
-                GameObject fifthBlock = GetNthBlock(rootBlock, 5);
+                GameObject? fifthBlock = GetNthBlock(rootBlock, 5);
                 if (fifthBlock != null)
                 {
                     Rigidbody rbFifth = fifthBlock.GetComponent<Rigidbody>();

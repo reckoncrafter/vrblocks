@@ -19,7 +19,7 @@ public class LevelSelectorMenu : MonoBehaviour
     private Sprite[] levelThumbnails;
 
     // Animations
-    private float levelNavAnimationSpeed = 0.1f;
+    private readonly float levelNavAnimationSpeed = 0.1f;
     private Vector3 middleLevelViewPos;
     private Vector3 leftLevelViewPos;
     private Vector3 rightLevelViewPos;
@@ -37,23 +37,26 @@ public class LevelSelectorMenu : MonoBehaviour
         DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
         levelThumbnails = new Sprite[thumbnailFiles.Length];
-        for(int i = 0; i < thumbnailFiles.Length; i++){
+        for (int i = 0; i < thumbnailFiles.Length; i++)
+        {
             Texture2D tex = new Texture2D(2, 2);                                // Texture size should not matter (https://discussions.unity.com/t/how-to-load-a-texture2d-from-path-without-resources-load/796449/6)
             tex.LoadImage(File.ReadAllBytes(thumbnailFiles[i].FullName));
             levelThumbnails[i] = Sprite.Create(
-                tex, 
+                tex,
                 new Rect(0.0f, 0.0f, tex.width, tex.height),
                 new Vector2(0.5f, 0.5f)
             );
         }
 
         playLevelButton.onClick.AddListener(GoToLevel);
-        leftNavigateButton.onClick.AddListener(() => {
-            selectedLevelIndex = Math.Max(0, selectedLevelIndex - 1); 
+        leftNavigateButton.onClick.AddListener(() =>
+        {
+            selectedLevelIndex = Math.Max(0, selectedLevelIndex - 1);
             UpdateDisplayView();
             AnimateNavigateLeft();
         });
-        rightNavigateButton.onClick.AddListener(() => {
+        rightNavigateButton.onClick.AddListener(() =>
+        {
             selectedLevelIndex = Math.Min(selectedLevelIndex + 1, levelThumbnails.Length - 1);
             UpdateDisplayView();
             AnimateNavigateRight();
@@ -72,13 +75,15 @@ public class LevelSelectorMenu : MonoBehaviour
         rightLevelViewScale = rightLevelView.transform.localScale;
     }
 
-    public void GoToLevel(){
+    public void GoToLevel()
+    {
         SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.AssetDirectoryOrder);
         // SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.BuildSettingsOrder);
         SceneTransitionStates.SetSelectedLevel(selectedLevelIndex);
     }
 
-    public void AnimateNavigateLeft(){
+    public void AnimateNavigateLeft()
+    {
         middleLevelView.transform.position = leftLevelViewPos;
         middleLevelView.transform.rotation = leftLevelViewRot;
         middleLevelView.transform.localScale = leftLevelViewScale;
@@ -92,12 +97,14 @@ public class LevelSelectorMenu : MonoBehaviour
         rightLevelView.LeanRotate(rightLevelViewRot.eulerAngles, levelNavAnimationSpeed).setEaseOutCubic();
         rightLevelView.LeanScale(rightLevelViewScale, levelNavAnimationSpeed).setEaseOutCubic();
         leftLevelView.LeanScale(Vector3.zero, 0f);
-        if(selectedLevelIndex > 0){
+        if (selectedLevelIndex > 0)
+        {
             leftLevelView.LeanScale(leftLevelViewScale, levelNavAnimationSpeed).setEaseOutCubic();
         }
     }
 
-    public void AnimateNavigateRight(){
+    public void AnimateNavigateRight()
+    {
         middleLevelView.transform.position = rightLevelViewPos;
         middleLevelView.transform.rotation = rightLevelViewRot;
         middleLevelView.transform.localScale = rightLevelViewScale;
@@ -111,40 +118,48 @@ public class LevelSelectorMenu : MonoBehaviour
         leftLevelView.LeanRotate(leftLevelViewRot.eulerAngles, levelNavAnimationSpeed).setEaseOutCubic();
         leftLevelView.LeanScale(leftLevelViewScale, levelNavAnimationSpeed).setEaseOutCubic();
         rightLevelView.LeanScale(Vector3.zero, 0f);
-        if(selectedLevelIndex < levelThumbnails.Length - 1){
+        if (selectedLevelIndex < levelThumbnails.Length - 1)
+        {
             rightLevelView.LeanScale(rightLevelViewScale, levelNavAnimationSpeed).setEaseOutCubic();
         }
     }
-    
-    public void UpdateDisplayView(){
+
+    public void UpdateDisplayView()
+    {
         // For error handling, show nothing if there are no levels
-        if(levelThumbnails.Length > 0){
+        if (levelThumbnails.Length > 0)
+        {
             middleLevelView.SetActive(true);
             Image mThumbnail = middleLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             mThumbnail.sprite = levelThumbnails[selectedLevelIndex];
         }
-        else{
+        else
+        {
             middleLevelView.SetActive(false);
         }
 
         // Display Left View
-        if(selectedLevelIndex > 0){
+        if (selectedLevelIndex > 0)
+        {
             leftNavigateButton.gameObject.SetActive(true);
             Image lThumbnail = leftLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             lThumbnail.sprite = levelThumbnails[selectedLevelIndex - 1];
         }
-        else{
+        else
+        {
             leftNavigateButton.gameObject.SetActive(false);
             leftLevelView.LeanScale(Vector3.zero, 0f);
         }
-        
+
         // Display Right View
-        if(selectedLevelIndex < levelThumbnails.Length - 1){
+        if (selectedLevelIndex < levelThumbnails.Length - 1)
+        {
             rightNavigateButton.gameObject.SetActive(true);
             Image rThumbnail = rightLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             rThumbnail.sprite = levelThumbnails[selectedLevelIndex + 1];
         }
-        else{
+        else
+        {
             rightNavigateButton.gameObject.SetActive(false);
             rightLevelView.LeanScale(Vector3.zero, 0f);
         }
