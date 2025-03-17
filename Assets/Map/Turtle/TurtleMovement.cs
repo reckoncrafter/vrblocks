@@ -150,7 +150,7 @@ public class TurtleMovement : MonoBehaviour
 
     private void IfStatementBegin()
     {
-        int elseBlockIndex = -1;
+        int nextControlBlockIndex = 0;
         int EndIndex = 0;
         bool isElse = false;
         bool isComplete = false;
@@ -164,12 +164,6 @@ public class TurtleMovement : MonoBehaviour
                 isComplete = true;
                 Debug.Log("IfStatement found its end. " + EndIndex);
             }
-            if (queueArray[i] == ElseStatement)
-            {
-                elseBlockIndex = i;
-                isElse = true;
-                Debug.Log("Found Else Statement. " + elseBlockIndex);
-            }
         }
 
         if (!isComplete)
@@ -180,15 +174,33 @@ public class TurtleMovement : MonoBehaviour
             return;
         }
 
+        for(int i = 0; i < queueArray.Length; i++)
+        {
+            if(queueArray[i] == ElseStatement)
+            {
+                nextControlBlockIndex = i;
+                isElse = true;
+                Debug.Log("IfStatementBegin found ElseStatement");
+                break;
+            }
+            else if(queueArray[i] == ElseIfStatement)
+            {
+                nextControlBlockIndex = i - 1;
+                isElse = true;
+                Debug.Log("IfStatementBegin found ElseIfStatement");
+                break;
+            }
+        }
+
         if (!conditionFunction())
         {
             if (isElse)
             {
-                for (int i = 0; i < elseBlockIndex; i++)
+                for (int i = 0; i < nextControlBlockIndex; i++)
                 {
                     queue.Dequeue();
                 }
-                Debug.Log("Condition not satisfied. Executing Else Statement.");
+                Debug.Log("Condition not satisfied. Executing Else or ElseIf Statement.");
             }
             else
             {
@@ -207,7 +219,7 @@ public class TurtleMovement : MonoBehaviour
             if (isElse)
             {
                 var toList = new List<Action>(queue);
-                for (int i = elseBlockIndex + 1; i < EndIndex; i++)
+                for (int i = nextControlBlockIndex + 1; i < EndIndex; i++)
                 {
                     toList.RemoveAt(i);
                     Debug.Log(toList[i].ToString());
@@ -235,6 +247,44 @@ public class TurtleMovement : MonoBehaviour
 
     private void ElseStatement()
     {
+        StartNextAction();
+    }
+
+    public void EnqueueElseIfStatement()
+    {
+        queue.Enqueue(ElseIfStatement);
+    }
+
+    private void ElseIfStatement()
+    {
+        int nextControlBlockIndex = 0;
+        Action[] queueArray = queue.ToArray();
+
+        for (int i = 0; i < queueArray.Length; i++)
+        {
+            if (queueArray[i] == IfStatementEnd || queueArray[i] == ElseStatement)
+            {
+                nextControlBlockIndex = i;
+                Debug.Log("ElseIfStatement found next IfStatementEnd or ElseStatement. " + nextControlBlockIndex);
+                break;
+            }
+            else if (queueArray[i] == ElseIfStatement)
+            {
+                nextControlBlockIndex = i - 1;
+                Debug.Log("ElseIfStatement found next ElseIfStatement. " + nextControlBlockIndex);
+            }
+        }
+
+        if(!conditionFunction())
+        {
+            for (int i = 0; i < nextControlBlockIndex; i++)
+            {
+                queue.Dequeue();
+            }
+            Debug.Log("IfElse condition not satisfied. Skipping to next control block.");
+        }
+
+
         StartNextAction();
     }
 
