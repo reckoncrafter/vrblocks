@@ -1,4 +1,3 @@
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LevelMetadataScriptableObject", menuName = "ScriptableObjects/LevelMetadataScriptableObject", order = 2)]
