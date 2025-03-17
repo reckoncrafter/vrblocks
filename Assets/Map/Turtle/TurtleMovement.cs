@@ -51,8 +51,7 @@ public class TurtleMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
         queue = new Queue<Action>();
-        failureDialog = GameObject.Find("FailureDialog/Canvas/Text").GetComponent<TextMeshProUGUI>();
-        turtleProximity = GetComponent<TurtleProximity>();
+        failureDialog = GameObject.Find("FailureDialog/Canvas/Text")?.GetComponent<TextMeshProUGUI>();
 
         resetPosition = transform.position;
         resetRotation = transform.rotation;
@@ -117,14 +116,22 @@ public class TurtleMovement : MonoBehaviour
     }
 
     // I will not atone for my sins
-    public void conditionFacingWall()
+    public void ConditionFacingWall()
     {
         queue.Enqueue(() =>
         {
-           conditionFunction = () =>
-           {
-             return turtleProximity.isTouchingMapBlock;
-           };
+            conditionFunction = () =>
+            {
+                RaycastHit hit;
+                if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
+                {
+                    if(hit.transform.parent.gameObject.name == "MapSpawner"){
+                        return true;
+                    }
+                }
+                return false;
+            };
+            StartNextAction();
         });
     }
 
