@@ -153,6 +153,7 @@ public class TurtleMovement : MonoBehaviour
         int nextControlBlockIndex = 0;
         int EndIndex = 0;
         bool isElse = false;
+        bool isElseIf = false;
         bool isComplete = false;
         Action[] queueArray = queue.ToArray();
 
@@ -187,6 +188,7 @@ public class TurtleMovement : MonoBehaviour
             {
                 nextControlBlockIndex = i - 1;
                 isElse = true;
+                isElseIf = true;
                 Debug.Log("IfStatementBegin found ElseIfStatement");
                 break;
             }
@@ -219,7 +221,7 @@ public class TurtleMovement : MonoBehaviour
             if (isElse)
             {
                 var toList = new List<Action>(queue);
-                for (int i = nextControlBlockIndex + 1; i < EndIndex; i++)
+                for (int i = nextControlBlockIndex + (isElseIf? 2 : 1); i < EndIndex; i++)
                 {
                     toList.RemoveAt(i);
                     Debug.Log(toList[i].ToString());
