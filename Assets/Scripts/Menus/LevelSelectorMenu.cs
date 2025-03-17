@@ -11,9 +11,11 @@ public class LevelSelectorMenu : MonoBehaviour
     public Button playLevelButton;
     public Button leftNavigateButton;
     public Button rightNavigateButton;
+    public Button lockedLevelButton;
     public GameObject middleLevelView;
     public GameObject leftLevelView;
     public GameObject rightLevelView;
+    public LevelMetadataScriptableObject[] levelMetadata;
 
     private int selectedLevelIndex = SceneTransitionStates.GetSelectedLevel();
     private Sprite[] levelThumbnails;
@@ -46,6 +48,13 @@ public class LevelSelectorMenu : MonoBehaviour
                 new Rect(0.0f, 0.0f, tex.width, tex.height),
                 new Vector2(0.5f, 0.5f)
             );
+        }
+
+        // Unlock levels that do not have prerequisites
+        for (int i = 0; i < LevelStates.getNumStates(); i++){
+            if (levelMetadata[i].prerequisiteLevel == ""){
+                LevelStates.setIsLockedLevel(i, false);
+            }
         }
 
         playLevelButton.onClick.AddListener(GoToLevel);
@@ -162,6 +171,18 @@ public class LevelSelectorMenu : MonoBehaviour
         {
             rightNavigateButton.gameObject.SetActive(false);
             rightLevelView.LeanScale(Vector3.zero, 0f);
+        }
+
+        // Display Locked Level Button
+        if (LevelStates.getIsLockedLevel(selectedLevelIndex))
+        {
+            playLevelButton.gameObject.SetActive(false);
+            lockedLevelButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            playLevelButton.gameObject.SetActive(true);
+            lockedLevelButton.gameObject.SetActive(false);
         }
     }
 }

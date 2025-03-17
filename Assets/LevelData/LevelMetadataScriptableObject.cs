@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelMetadataScriptableObject : ScriptableObject
 {
     public int maxStarCount = 3;
-    public Asset[] prerequisiteLevelsPlaceholder;          //placeholder for now
+    public string prerequisiteLevel;
     public string[] levelTutorialEvents;
 
     public string[] levelHints;
