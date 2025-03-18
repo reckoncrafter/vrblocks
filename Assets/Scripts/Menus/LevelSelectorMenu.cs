@@ -2,6 +2,7 @@
  Level Selector + animations
 */
 using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -81,6 +82,11 @@ public class LevelSelectorMenu : MonoBehaviour
         UpdateDisplayView();
     }
 
+    private IEnumerable UntilLevelStatesInitialize()
+    {
+        yield return new WaitUntil(() => LevelStates.isInit() == true);
+    }
+
     public void GoToLevel()
     {
         SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.AssetDirectoryOrder);
@@ -132,6 +138,8 @@ public class LevelSelectorMenu : MonoBehaviour
 
     public void UpdateDisplayView()
     {
+        UntilLevelStatesInitialize();
+
         // For error handling, show nothing if there are no levels
         if (levelThumbnails.Length > 0)
         {

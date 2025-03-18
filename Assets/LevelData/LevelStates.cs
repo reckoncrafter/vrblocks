@@ -22,6 +22,7 @@ public class LevelState
 
 public static class LevelStates
 {
+    private static bool init = false;
     private static int numStates = Directory.GetDirectories(Application.dataPath + "/LevelData/MetaData").Length;
     private static LevelState[] states = new LevelState[numStates];
     private static LevelMetadataScriptableObject[] metadata = new LevelMetadataScriptableObject[numStates];
@@ -49,12 +50,15 @@ public static class LevelStates
             }
 
             // Unlock levels that do not have prerequisites
-            if (metadata[i].prerequisiteLevel == ""){
+            if (metadata[i].prerequisiteLevel.Trim() == ""){
                 states[i].setIsLockedLevel(false);
             }
         }
+
+        init = true;
     }
 
+    public static bool isInit(){ return init; }
     public static int getNumStates(){ return states.Length; }
     public static bool getIsLockedLevel(int levelIndex){ return states[levelIndex].getIsLockedLevel(); }
     public static void setIsLockedLevel(int levelIndex, bool isLocked){ states[levelIndex].setIsLockedLevel(isLocked); }
@@ -64,7 +68,7 @@ public static class LevelStates
         string prerequisiteLevelName = states[prerequisiteLevelIndex].getName();
         for (int i = 0; i < numStates; i++)
         {
-            if (metadata[i].prerequisiteLevel == prerequisiteLevelName)
+            if (metadata[i].prerequisiteLevel.Trim() == prerequisiteLevelName.Trim())
             {
                 unlockLevel(i);
             }

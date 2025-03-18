@@ -4,6 +4,7 @@ using UnityEditor;
 using System;
 using UnityEngine.SceneManagement;
 using System.IO;
+using System.Collections;
 
 public class ThumbnailScreenshots : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class ThumbnailScreenshots : MonoBehaviour
         Type gameViewType = Type.GetType("UnityEditor.GameView,UnityEditor");
         EditorWindow.GetWindow(gameViewType);
         Directory.CreateDirectory(Application.dataPath + "/LevelData/Thumbnails");
-        new WaitForSeconds(1);
+        WaitForSecondsRoutine();
         ScreenCapture.CaptureScreenshot(Application.dataPath + "/LevelData/Thumbnails/" + fileName + ".png");
         //TODO: Convert the .png into a Sprite (2D and UI)
 
@@ -40,6 +41,11 @@ public class ThumbnailScreenshots : MonoBehaviour
         // mainCam.gameObject.SetActive(true);
         // thumbnailCam.gameObject.SetActive(false);
 
+    }
+
+    private static IEnumerable WaitForSecondsRoutine()
+    {
+        yield return new WaitForSeconds(1);
     }
 }
 #endif
