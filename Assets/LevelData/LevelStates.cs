@@ -22,7 +22,6 @@ public class LevelState
 
 public static class LevelStates
 {
-    private static bool init = false;
     private static int numStates = Directory.GetDirectories(Application.dataPath + "/LevelData/MetaData").Length;
     private static LevelState[] states = new LevelState[numStates];
     private static LevelMetadataScriptableObject[] metadata = new LevelMetadataScriptableObject[numStates];
@@ -55,10 +54,9 @@ public static class LevelStates
             }
         }
 
-        init = true;
+
     }
 
-    public static bool isInit(){ return init; }
     public static int getNumStates(){ return states.Length; }
     public static bool getIsLockedLevel(int levelIndex){ return states[levelIndex].getIsLockedLevel(); }
     public static void setIsLockedLevel(int levelIndex, bool isLocked){ states[levelIndex].setIsLockedLevel(isLocked); }
