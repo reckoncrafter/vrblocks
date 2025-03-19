@@ -27,6 +27,7 @@ public class PlayerUIManager : MonoBehaviour
 
     [Header("Pause Menu")]
     public Button resumeGameButton;
+    public Button resetTurtleButton;
     public List<Button> openPauseMenuButtons;
 
     [Header("Menu Return Buttons")]
@@ -69,6 +70,7 @@ public class PlayerUIManager : MonoBehaviour
         blockMenuAction.action.started += context => { ToggleBlockMenu(); }; 
         debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
+        resetTurtleButton.onClick.AddListener(ResetTurtle);
         movementTab.onClick.AddListener(() => ShowBlockMenuCategory(movementPanel));
         controlTab.onClick.AddListener(() => ShowBlockMenuCategory(controlPanel));
         functionTab.onClick.AddListener(() => ShowBlockMenuCategory(functionPanel));
@@ -104,6 +106,19 @@ public class PlayerUIManager : MonoBehaviour
         pauseMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
         returnToMenuConfirmWindow.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+    }
+
+    public void ResetTurtle()
+    {
+        TurtleMovement turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
+        if(turtleMovement != null)
+        {
+            turtleMovement.Reset();
+        }
+        else
+        {
+            Debug.Log("ResetTurtleButton: Can't find Turtle!");
+        }
     }
 
     public void OpenConfirmationWindow()
