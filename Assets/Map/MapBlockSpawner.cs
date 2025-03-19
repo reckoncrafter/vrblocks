@@ -5,7 +5,7 @@ public class MapBlockSpawner : MonoBehaviour
 {
     public AudioClip turtleSuccessAudio;
     public GameObject mapBlock;
-    public GameObject goalSphere;
+    public GameObject goalObject;
     public TurtleMovement turtle;
     public MapBlockScriptableObject mapValues;
 
@@ -43,10 +43,10 @@ public class MapBlockSpawner : MonoBehaviour
 
         // Triggerable Goal
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
-        GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
-        generatedGoalSphere.transform.SetParent(gameObject.transform, false);
-        generatedGoalSphere.transform.localScale = mapValues.goalScale;
-        generatedGoalSphere.name = mapValues.goalPrefabName;
+        GameObject generatedGoalObject = Instantiate(goalObject, goalCoords, Quaternion.identity);
+        generatedGoalObject.transform.SetParent(gameObject.transform, false);
+        generatedGoalObject.transform.localScale = mapValues.goalScale;
+        generatedGoalObject.name = mapValues.goalPrefabName;
 
         Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
@@ -64,6 +64,6 @@ public class MapBlockSpawner : MonoBehaviour
             turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
         }
 
-        detectTurtle.SetTurtleAndGoal(turtleEntity, generatedGoalSphere);
+        detectTurtle.SetTurtleAndGoal(turtleEntity, generatedGoalObject);
     }
 }
