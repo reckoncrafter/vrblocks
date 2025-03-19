@@ -89,9 +89,10 @@ public class MiniMapBlockSpawner : MonoBehaviour
 
         // Goal Sphere
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
-        GameObject generatedGoalObject = Instantiate(goalObject, goalCoords, Quaternion.identity);
+        GameObject generatedGoalObject = Instantiate(goalObject, goalCoords, Quaternion.Euler(mapValues.goalRotation));
         generatedGoalObject.transform.SetParent(gameObject.transform, false);
         generatedGoalObject.transform.localScale = mapValues.goalScale;
+        generatedGoalObject.transform.position += mapValues.goalPositionOffset * miniMapScale;
         generatedGoalObject.name = mapValues.goalPrefabName;
 
         // Turtle
