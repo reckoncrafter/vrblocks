@@ -47,10 +47,12 @@ public static class LevelStates
                 Debug.LogError("No LevelMetadataScriptableObject found within " + levelDir);
                 metadata[i] = new LevelMetadataScriptableObject();
             }
-        }
 
-        // Unlock levels that do not have prerequisites
-        triggerPrerequisiteLevelUnlock("");
+            // Unlock levels that do not have prerequisites
+            if (metadata[i].prerequisiteLevel == null || metadata[i].prerequisiteLevel.Trim() == ""){
+                states[i].setIsLockedLevel(false);
+            }
+        }
     }
 
     public static int getNumStates(){ return states.Length; }
