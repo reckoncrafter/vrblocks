@@ -50,9 +50,6 @@ public class LevelSelectorMenu : MonoBehaviour
 
     void Start()
     {
-        LevelStatesManager.singleton.InitializeLevelStates();
-        LevelStatesManager.singleton.triggerPrerequisiteLevelUnlock("");        // Unlock Levels that do not have prerequisites
-
         // Long winded way of grabbing the thumbnails. Wished Resource.LoadAll worked
         DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
@@ -176,7 +173,7 @@ public class LevelSelectorMenu : MonoBehaviour
         }
 
         // Display Locked Level Button
-        if (LevelStatesManager.singleton.getIsLockedLevel(selectedLevelIndex))
+        if (LevelStates.getIsLockedLevel(selectedLevelIndex))
         {
             playLevelButton.gameObject.SetActive(false);
             lockedLevelButton.gameObject.SetActive(true);
