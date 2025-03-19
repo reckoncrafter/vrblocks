@@ -58,6 +58,11 @@ public class LevelStatesManager: MonoBehaviour
     {
         for (int i = 0; i < numStates; i++)
         {
+            if (metadata[i].prerequisiteLevel == null)
+            {
+                Debug.Log($"metadata[{i}].prerequisiteLevel (string) is null. Replacing with empty string");
+                metadata[i].prerequisiteLevel = "";
+            }
             if (metadata[i].prerequisiteLevel.Trim() == prerequisiteLevelName.Trim())
             {
                 unlockLevel(i);
