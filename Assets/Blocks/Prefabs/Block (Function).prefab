@@ -385,6 +385,7 @@ GameObject:
   - component: {fileID: 7252318290548244527}
   - component: {fileID: 5405742046879034240}
   - component: {fileID: 6362424727914982184}
+  - component: {fileID: 3681838429516486516}
   m_Layer: 0
   m_Name: Block (Function)
   m_TagString: Block
@@ -575,10 +576,34 @@ MonoBehaviour:
         m_CallState: 2
   m_HoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3681838429516486516}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverEntered
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_HoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3681838429516486516}
+        m_TargetAssemblyTypeName: ControlSchemeIndicator, Assembly-CSharp
+        m_MethodName: OnHoverExited
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -701,6 +726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 734ba02fec88d0949a0ed1b098564a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasSnapped: 0
 --- !u!114 &5405742046879034240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -727,10 +753,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa675a2c6a3d3aaa5a1538a205afecee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  primaryButton: {fileID: -3059995133750637719, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  primaryButtonRight: {fileID: -3059995133750637719, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  primaryButtonLeft: {fileID: 8449975300579844527, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   functionCallPrefab: {fileID: 6713015538121544575, guid: 6624236ae1e177e2cb847d4bf721f9ca, type: 3}
   spawnOffset: {x: 0, y: 1, z: 1}
   FunctionID: 0
+--- !u!114 &3681838429516486516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6713015538121544575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c01e0ed98aeff95bb97a9eefaa852b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerModels: {fileID: 0}
+  controlsToIndicate: 0300000009000000
+  indicationMaterial: {fileID: 2100000, guid: 1a8a641804e005e98b8219ec77611560, type: 2}
+  submeshDefaultMaterial: {fileID: 670224309865224971, guid: be3083a5f26d4e859d594ecbe632f87e, type: 3}
+  XRControllerSubmeshesToIndicate: []
+  submeshRenderers: []
 --- !u!1 &8338628556024756916
 GameObject:
   m_ObjectHideFlags: 0
