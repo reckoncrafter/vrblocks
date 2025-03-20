@@ -11,6 +11,8 @@ public class LevelSelectorMenu : MonoBehaviour
     public Button playLevelButton;
     public Button leftNavigateButton;
     public Button rightNavigateButton;
+    public Button lockedLevelButton;
+
     public GameObject middleLevelView;
     public GameObject leftLevelView;
     public GameObject rightLevelView;
@@ -30,6 +32,21 @@ public class LevelSelectorMenu : MonoBehaviour
 
     private Vector2 leftLevelViewScale;
     private Vector2 rightLevelViewScale;
+
+    void Awake()
+    {
+        // Animations
+        // Note: Keeping this here to fix scaling bugs when returning to the level selector menu from a level since Start() is run each time.
+        middleLevelViewPos = middleLevelView.transform.position;
+        middleLevelViewRot = middleLevelView.transform.localRotation;
+        middleLevelViewScale = middleLevelView.transform.localScale;
+        leftLevelViewPos = leftLevelView.transform.position;
+        leftLevelViewRot = leftLevelView.transform.localRotation;
+        leftLevelViewScale = leftLevelView.transform.localScale;
+        rightLevelViewPos = rightLevelView.transform.position;
+        rightLevelViewRot = rightLevelView.transform.localRotation;
+        rightLevelViewScale = rightLevelView.transform.localScale;
+    }
 
     void Start()
     {
@@ -61,18 +78,8 @@ public class LevelSelectorMenu : MonoBehaviour
             UpdateDisplayView();
             AnimateNavigateRight();
         });
-        UpdateDisplayView();
 
-        // Animations
-        middleLevelViewPos = middleLevelView.transform.position;
-        middleLevelViewRot = middleLevelView.transform.localRotation;
-        middleLevelViewScale = middleLevelView.transform.localScale;
-        leftLevelViewPos = leftLevelView.transform.position;
-        leftLevelViewRot = leftLevelView.transform.localRotation;
-        leftLevelViewScale = leftLevelView.transform.localScale;
-        rightLevelViewPos = rightLevelView.transform.position;
-        rightLevelViewRot = rightLevelView.transform.localRotation;
-        rightLevelViewScale = rightLevelView.transform.localScale;
+        UpdateDisplayView();
     }
 
     public void GoToLevel()
@@ -126,6 +133,7 @@ public class LevelSelectorMenu : MonoBehaviour
 
     public void UpdateDisplayView()
     {
+
         // For error handling, show nothing if there are no levels
         if (levelThumbnails.Length > 0)
         {
@@ -162,6 +170,18 @@ public class LevelSelectorMenu : MonoBehaviour
         {
             rightNavigateButton.gameObject.SetActive(false);
             rightLevelView.LeanScale(Vector3.zero, 0f);
+        }
+
+        // Display Locked Level Button
+        if (LevelStates.getIsLockedLevel(selectedLevelIndex))
+        {
+            playLevelButton.gameObject.SetActive(false);
+            lockedLevelButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            playLevelButton.gameObject.SetActive(true);
+            lockedLevelButton.gameObject.SetActive(false);
         }
     }
 }
