@@ -1,11 +1,43 @@
 using UnityEngine;
+using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+
+
+[CustomEditor(typeof(MapBlockSpawner))]
+public class MapBlockSpawnerMenu : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        MapBlockSpawner mapBlockSpawner = (MapBlockSpawner)target;
+
+        if (GUILayout.Button("Spawn Entities"))
+        {
+            if (mapBlockSpawner.transform.childCount == 0)
+            {
+                mapBlockSpawner.SpawnEntities();
+            }
+            else
+            {
+                Debug.Log("Map GameObject contains children. Skiping Spawn");
+            }
+        }
+        if (GUILayout.Button("Clear Children"))
+        {
+            mapBlockSpawner.ClearMap();
+        }
+    }
+}
+#endif
 
 [ExecuteInEditMode]
 public class MapBlockSpawner : MonoBehaviour
 {
     public AudioClip turtleSuccessAudio;
     public GameObject mapBlock;
-    public GameObject goalSphere;
+    public GameObject goalObject;
     public TurtleMovement turtle;
     public MapBlockScriptableObject mapValues;
 
@@ -25,7 +57,7 @@ public class MapBlockSpawner : MonoBehaviour
             detectTurtle.FindTurtle();
         }
     }
-    private void SpawnEntities()
+    public void SpawnEntities()
     {
         Vector3 startPositionOffset = mapValues.blockScale / 2;
 
@@ -43,10 +75,11 @@ public class MapBlockSpawner : MonoBehaviour
 
         // Triggerable Goal
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
-        GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
-        generatedGoalSphere.transform.SetParent(gameObject.transform, false);
-        generatedGoalSphere.transform.localScale = mapValues.goalScale;
-        generatedGoalSphere.name = mapValues.goalPrefabName;
+        GameObject generatedGoalObject = Instantiate(goalObject, goalCoords, Quaternion.Euler(mapValues.goalRotation));
+        generatedGoalObject.transform.SetParent(gameObject.transform, false);
+        generatedGoalObject.transform.localScale = mapValues.goalScale;
+        generatedGoalObject.transform.position += mapValues.goalPositionOffset;
+        generatedGoalObject.name = mapValues.goalPrefabName;
 
         Vector3 turtleCoords = startPositionOffset + Vector3.Scale(mapValues.turtleSpawnPoint, mapValues.blockScale);
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
@@ -64,6 +97,21 @@ public class MapBlockSpawner : MonoBehaviour
             turtleEntity.moveDistance = Vector3.Scale(currentEntity.GetComponent<BoxCollider>().bounds.size, mapValues.blockScale);
         }
 
-        detectTurtle.SetTurtleAndGoal(turtleEntity, generatedGoalSphere);
+        detectTurtle.SetTurtleAndGoal(turtleEntity, generatedGoalObject);
+    }
+
+    public void ClearMap()
+    {
+        // https://discussions.unity.com/t/why-does-foreach-work-only-1-2-of-a-time/91068/2
+        // forgot you dont mutate the same list you're looping through
+        foreach (Transform child in transform.Cast<Transform>().ToList())
+        {
+            DestroyImmediate(child.gameObject);
+        }
+
+        foreach (SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
+        {
+            DestroyImmediate(sCollider);
+        }
     }
 }

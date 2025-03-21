@@ -67,6 +67,18 @@ public class MovementMenu : Editor
         {
             turtleMovement.EnqueueWhileStatementEnd();
         }
+        if (GUILayout.Button("Insert ConditionFacingWall"))
+        {
+            turtleMovement.ConditionFacingWall();
+        }
+        if (GUILayout.Button("Insert ConditionFacingCliff"))
+        {
+            turtleMovement.ConditionFacingCliff();
+        }
+        if (GUILayout.Button("Insert ConditionFacingStepDown"))
+        {
+            turtleMovement.ConditionFacingStepDown();
+        }
     }
 }
 #endif
