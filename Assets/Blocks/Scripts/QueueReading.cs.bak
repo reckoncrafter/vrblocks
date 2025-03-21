@@ -12,11 +12,13 @@ public class QueueReading : MonoBehaviour
     private readonly Stack<GameObject> incompleteConditionals = new();
     private FunctionBlock? functionBlock;
 
+
     public void ReadQueue()
     {
         Debug.Log("Starting Queue Reading...");
 
-        functionBlock = gameObject.GetComponent<FunctionBlock>();
+        FunctionBlock functionBlock;
+        gameObject.TryGetComponent<FunctionBlock>(out functionBlock);
 
         // Clear previous readings
         blockQueue.Clear();

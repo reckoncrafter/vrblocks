@@ -28,18 +28,17 @@ public class TurtleMovement : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
     private BoxCollider turtleCollider;
-    private Queue<Action> queue;
-    private Func<bool> conditionFunction = () => false;
-    private TurtleProximity turtleProximity;
 
     // jumping things
     private bool isGrounded = false;
-    private bool shouldJump = false;
+    public bool shouldJump = false; // sorry! i need it!
     private bool canBeGrounded = true;
 
     public UnityEvent EndOfMovementEvent;
+    public UnityEvent FailEvent = new UnityEvent();
 
-    private TMP_Text failureDialog;
+    public Action afterJumpAction = () => {};
+
 
     private void SetIsWalking(bool value)
     {
@@ -56,8 +55,6 @@ public class TurtleMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
-        queue = new Queue<Action>();
-        failureDialog = GameObject.Find("FailureDialog/Canvas/Text")?.GetComponent<TextMeshProUGUI>();
 
         resetPosition = transform.position;
         resetRotation = transform.rotation;
@@ -68,7 +65,7 @@ public class TurtleMovement : MonoBehaviour
     }
 
 
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         if (!Physics.Raycast(transform.position, -transform.up, moveDistance.y * 2))
         {
@@ -116,342 +113,59 @@ public class TurtleMovement : MonoBehaviour
             }
         }
     }
-
-    public void StartQueue()
-    {
-        canFail = true;
-        canReset = true;
-        StartNextAction();
-        failureDialog.text = "";
-    }
-
     // I will not atone for my sins
-    public void ConditionFacingWall()
+    public bool ConditionFacingWall()
     {
-        queue.Enqueue(() =>
+        RaycastHit hit;
+        Debug.DrawRay(transform.position, transform.forward, Color.red, 10);
+        if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
         {
-            conditionFunction = () =>
-            {
-                RaycastHit hit;
-                Debug.DrawRay(transform.position, transform.forward, Color.red, 10);
-                if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
-                {
-                    if(hit.transform.parent.gameObject.name == "MapSpawner"){
-                        return true;
-                    }
-                }
-                return false;
-            };
-            StartNextAction();
-        });
-    }
-
-    public void ConditionFacingCliff()
-    {
-        queue.Enqueue(() =>
-        {
-          conditionFunction = () =>
-          {
-              RaycastHit hit;
-              Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
-              if(!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
-              {
-                  Debug.Log("ConditionFacingMapEdge: Cliff detected!");
-                  return true;
-              }
-              return false;
-          };
-          StartNextAction();
-        });
-    }
-
-    public void ConditionFacingStepDown()
-    {
-        queue.Enqueue(() =>
-        {
-            conditionFunction = () =>
-            {
-                RaycastHit hit;
-                Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
-                bool aheadLevel = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 0.05f);
-                bool aheadNotEmpty = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f);
-
-                if(!aheadLevel && aheadNotEmpty)
-                {
-                    Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
-                    return true;
-                }
-                return false;
-            };
-            StartNextAction();
-        });
-    }
-
-
-    public void setConditionTrue()
-    {
-        queue.Enqueue(() =>
-        {
-            conditionFunction = () => true;
-            StartNextAction();
-        });
-    }
-
-    public void setConditionFalse()
-    {
-        queue.Enqueue(() =>
-        {
-            conditionFunction = () => false;
-            StartNextAction();
-        });
-    }
-
-    public void EnqueueIfStatementBegin()
-    {
-        queue.Enqueue(IfStatementBegin);
-    }
-
-    private void IfStatementBegin()
-    {
-        int nextControlBlockIndex = 0;
-        int EndIndex = 0;
-        bool isElse = false;
-        bool isElseIf = false;
-        bool isComplete = false;
-        Action[] queueArray = queue.ToArray();
-
-        for (int i = 0; i < queueArray.Length; i++)
-        {
-            if (queueArray[i] == IfStatementEnd)
-            {
-                EndIndex = i;
-                isComplete = true;
-                Debug.Log("IfStatement found its end. " + EndIndex);
+            if(hit.transform.parent.gameObject.name == "MapSpawner"){
+                return true;
             }
         }
+        return false;
+    }
 
-        if (!isComplete)
+    public bool ConditionFacingCliff()
+    {
+        RaycastHit hit;
+        Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
+        if(!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
         {
-            Debug.Log("No IfStatementEnd Found");
-            failureDialog.text += "Incomplete If Statement! (No IfEnd Block)\n";
-            Fail();
-            return;
+            Debug.Log("ConditionFacingMapEdge: Cliff detected!");
+            return true;
         }
+        return false;
+    }
 
-        for(int i = 0; i < queueArray.Length; i++)
+    public bool ConditionFacingStepDown()
+    {
+
+        RaycastHit hit;
+        Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
+        bool aheadLevel = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 0.05f);
+        bool aheadNotEmpty = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f);
+
+        if(!aheadLevel && aheadNotEmpty)
         {
-            if(queueArray[i] == ElseStatement)
-            {
-                nextControlBlockIndex = i;
-                isElse = true;
-                Debug.Log("IfStatementBegin found ElseStatement");
-                break;
-            }
-            else if(queueArray[i] == ElseIfStatement)
-            {
-                nextControlBlockIndex = i - 1;
-                isElse = true;
-                isElseIf = true;
-                Debug.Log("IfStatementBegin found ElseIfStatement");
-                break;
-            }
+            Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
+            return true;
         }
-
-        if (!conditionFunction())
-        {
-            if (isElse)
-            {
-                for (int i = 0; i < nextControlBlockIndex; i++)
-                {
-                    queue.Dequeue();
-                }
-                Debug.Log("Condition not satisfied. Executing Else or ElseIf Statement.");
-            }
-            else
-            {
-                for (int i = 0; i < EndIndex; i++)
-                {
-                    queue.Dequeue();
-                }
-                Debug.Log("Condition not satisfied. Skipping.");
-            }
-
-        }
-        else
-        {
-            Debug.Log("Condition satisfied.");
-
-            if (isElse)
-            {
-                var toList = new List<Action>(queue);
-                for (int i = nextControlBlockIndex + (isElseIf? 2 : 1); i < EndIndex; i++)
-                {
-                    toList.RemoveAt(i);
-                    Debug.Log(toList[i].ToString());
-                }
-                queue = new Queue<Action>(toList);
-            }
-        }
-        StartNextAction();
+        return false;
     }
 
-    public void EnqueueIfStatementEnd()
+
+    public bool ConditionTrue()
     {
-        queue.Enqueue(IfStatementEnd);
+        return true;
     }
 
-    private void IfStatementEnd()
+    public bool ConditionFalse()
     {
-        StartNextAction();
+        return false;
     }
 
-    public void EnqueueElseStatement()
-    {
-        queue.Enqueue(ElseStatement);
-    }
-
-    private void ElseStatement()
-    {
-        StartNextAction();
-    }
-
-    public void EnqueueElseIfStatement()
-    {
-        queue.Enqueue(ElseIfStatement);
-    }
-
-    private void ElseIfStatement()
-    {
-        int nextControlBlockIndex = 0;
-        Action[] queueArray = queue.ToArray();
-
-        for (int i = 0; i < queueArray.Length; i++)
-        {
-            if (queueArray[i] == IfStatementEnd || queueArray[i] == ElseStatement)
-            {
-                nextControlBlockIndex = i;
-                Debug.Log("ElseIfStatement found next IfStatementEnd or ElseStatement. " + nextControlBlockIndex);
-                break;
-            }
-            else if (queueArray[i] == ElseIfStatement)
-            {
-                nextControlBlockIndex = i - 1;
-                Debug.Log("ElseIfStatement found next ElseIfStatement. " + nextControlBlockIndex);
-            }
-        }
-
-        if(!conditionFunction())
-        {
-            for (int i = 0; i < nextControlBlockIndex; i++)
-            {
-                queue.Dequeue();
-            }
-            Debug.Log("IfElse condition not satisfied. Skipping to next control block.");
-        }
-
-
-        StartNextAction();
-    }
-
-    public void EnqueueWhileStatementBegin()
-    {
-        queue.Enqueue(WhileStatementBegin);
-    }
-
-    private List<Action>? loopList;
-    private Queue<Action>? swapQueue;
-
-    private void WhileStatementBegin()
-    {
-        Debug.Log("WhileStatementBegin called.");
-        List<Action> queueList = new(queue);
-
-        int EndIndex = 0;
-        for (int i = 0; i < queueList.Count; i++)
-        {
-            Debug.Log(queueList[i]);
-            if (queueList[i] == WhileStatementEnd)
-            {
-                EndIndex = i;
-                Debug.Log("WhileStatement found its end. " + EndIndex);
-            }
-        }
-        if (EndIndex == 0)
-        {
-            Debug.Log("No WhileStatementEnd found");
-            failureDialog.text += "Incomplete While Statement! (No WhileEnd Block)";
-            Fail();
-            return;
-        }
-
-        loopList = queueList.GetRange(0, EndIndex + 1);
-        Debug.Log("size of while loop: " + loopList.Count);
-        // 1. save segment of queue from WhileStatementBegin to WhileStatementEnd.
-
-        for (int i = 0; i < EndIndex + 1; i++)
-        {
-            queue.Dequeue();
-        }
-
-        // 2. remove saved segment from queue.
-
-        swapQueue = new Queue<Action>(queue);
-        queue = new Queue<Action>(loopList);
-        //3. swap main queue with segment
-
-        StartNextAction();
-        // 4. execute
-    }
-
-    public void EnqueueWhileStatementEnd()
-    {
-        queue.Enqueue(WhileStatementEnd);
-    }
-
-    private void WhileStatementEnd()
-    {
-        Debug.Log("WhileStatementEnd called.");
-
-        if (loopList == null || swapQueue == null)
-        {
-            Debug.LogError("WhileStatementEnd called without a loopList or swapQueue");
-            return;
-        }
-
-        // 5. When the end is reached, WhileStatementEnd should
-        if (conditionFunction())
-        {
-            queue = new Queue<Action>(loopList);
-        }
-        else
-        {
-            queue = swapQueue;
-        }
-        //     5a. check if the statement should repeat
-        //     5b. if it should, place a the segment in the queue again.
-        //     5c. if not, swap back in the queue and resume execution
-        StartNextAction();
-    }
-
-    public void WalkForward()
-    {
-        queue.Enqueue(PerformWalkForward);
-    }
-
-    public void RotateLeft()
-    {
-        queue.Enqueue(() => PerformRotate(-90));
-    }
-
-    public void RotateRight()
-    {
-        queue.Enqueue(() => PerformRotate(90));
-    }
-
-    public void Jump()
-    {
-        queue.Enqueue(HandleJump);
-    }
 
     public void Reset()
     {
@@ -463,7 +177,7 @@ public class TurtleMovement : MonoBehaviour
         canFail = false;
 
         SetIsWalking(false);
-        queue.Clear();
+        //queue.Clear();
         tween?.reset();
 
         rb.velocity = Vector3.zero;
@@ -473,30 +187,30 @@ public class TurtleMovement : MonoBehaviour
         rb.constraints = resetConstraints;
     }
 
-    private void StartNextAction()
-    {
-        if (queue.Count > 0)
-        {
-            queue.Dequeue().Invoke();
-        }
-        else
-        {
-            Fail(() =>
-            {
-                AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
-            });
-        }
-    }
+    // private void StartNextAction()
+    // {
+    //     if (queue.Count > 0)
+    //     {
+    //         queue.Dequeue().Invoke();
+    //     }
+    //     else
+    //     {
+    //         Fail(() =>
+    //         {
+    //             AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
+    //         });
+    //     }
+    // }
 
     private void EndMovement()
     {
         SetIsWalking(false);
-        StartNextAction();
+        //StartNextAction();
 
         EndOfMovementEvent.Invoke();
     }
 
-    private void PerformWalkForward()
+    public void PerformWalkForward()
     {
         SetIsWalking(true);
 
@@ -513,6 +227,16 @@ public class TurtleMovement : MonoBehaviour
         }
 
         tween.setEase(LeanTweenType.easeInOutQuad).setOnComplete(EndMovement);
+    }
+
+    public void PerformRotateRight()
+    {
+        PerformRotate(90.0f);
+    }
+
+    public void PerformRotateLeft()
+    {
+        PerformRotate(-90.0f);
     }
 
     private void PerformRotate(float angle)
@@ -543,7 +267,8 @@ public class TurtleMovement : MonoBehaviour
         float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * Mathf.Abs(Physics.gravity.y)); // h = (µsin(θ))^2 / 2g with 50% more height
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
-        StartNextAction();
+
+        afterJumpAction();
     }
 
     private void FailOnHitBack()
@@ -580,9 +305,11 @@ public class TurtleMovement : MonoBehaviour
         }
         canFail = false;
 
+        FailEvent.Invoke();
+
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
-        queue.Clear();
+        //queue.Clear();
         tween?.reset();
 
         failAction?.Invoke();

@@ -1,23 +1,28 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.Events;
 
 public class BlockSnapping : MonoBehaviour
 {
+    // blockSnapEvent is a static (global) event that objects can use to respond to changes in the block queue.
+    public static UnityEvent blockSnapEvent = new UnityEvent();
+
     public bool hasSnapped = false; // Flag to prevent repeated snapping
-    private QueueReading? queueReading;
+    //private QueueReading? queueReading;
 
     public AudioClip snapSound;
     private AudioSource audio;
 
+
+
     private void Awake()
     {
-        // Automatic detection of QueueReading component
-        queueReading = FindObjectOfType<QueueReading>();
-        if (queueReading == null)
-        {
-            Debug.LogWarning("QueueReading component not found in the scene. Ensure there is one active in the hierarchy.");
-        }
+        // queueReading = FindObjectOfType<QueueReading>();
+        // if (queueReading == null)
+        // {
+        //     Debug.LogWarning("QueueReading component not found in the scene. Ensure there is one active in the hierarchy.");
+        // }
 
         // Collision Forwarding active
         Transform snapTriggerTop = transform.Find("SnapTriggerTop");
@@ -232,7 +237,8 @@ public class BlockSnapping : MonoBehaviour
         }
 
         CheckColumnSize();
-        queueReading?.ReadQueue();
+        blockSnapEvent.Invoke();
+        //queueReading?.ReadQueue();
     }
 
     private void ResetSnapStatusOnOtherBlock(GameObject otherBlock)
@@ -263,8 +269,10 @@ public class BlockSnapping : MonoBehaviour
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds (change as needed)
-        queueReading?.ReadQueue(); // Update Block Queue on unsnap.
+        //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
+
+        blockSnapEvent.Invoke();
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
 

@@ -17,7 +17,6 @@ public class ConditionSelectorBlock : MonoBehaviour
 
     public Dropdown dropdown;
     TurtleCommand turtleCommand;
-    TurtleMovement turtleMovement;
 
     void Start()
     {
@@ -29,16 +28,14 @@ public class ConditionSelectorBlock : MonoBehaviour
     void DropdownValueChanged(Dropdown dd)
     {
         Debug.Log($"Block (Condition): Dropdown Value Changed ({dd.value})");
-        turtleMovement = turtleCommand.turtleMovement;
-        turtleCommand.onMove.RemoveAllListeners();
-        turtleCommand.onMove.AddListener(dd.value switch {
-            0 => turtleMovement.ConditionFacingWall,
-            1 => turtleMovement.ConditionFacingCliff,
-            2 => turtleMovement.ConditionFacingStepDown,
-            3 => turtleMovement.setConditionTrue,
-            4 => turtleMovement.setConditionFalse,
-            _ => () => {}
-        });
+        turtleCommand.commandEnum = dd.value switch {
+            0 => TurtleCommand.Command.ConditionFacingWall,
+            1 => TurtleCommand.Command.ConditionFacingCliff,
+            2 => TurtleCommand.Command.ConditionFacingStepDown,
+            3 => TurtleCommand.Command.ConditionTrue,
+            4 => TurtleCommand.Command.ConditionFalse,
+            _ => TurtleCommand.Command.CommandError
+        };
     }
 
 }

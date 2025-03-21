@@ -14,7 +14,7 @@ public class FunctionBlock : MonoBehaviour
     public Vector3 spawnOffset;
     public int FunctionID;
 
-    private QueueReading queueReading;
+    //private QueueReading queueReading;
     private bool isHovered = false;
     // Start is called before the first frame update
     void Start()
@@ -22,13 +22,13 @@ public class FunctionBlock : MonoBehaviour
       //controllerModels = GameObject.Find("XR Origin (XR Rig)").GetComponent<ControllerModels>();
       primaryButtonRight.action.started += onPrimaryButton;
       primaryButtonLeft.action.started += onPrimaryButton;
-      queueReading = gameObject.GetComponent<QueueReading>();
+      //queueReading = gameObject.GetComponent<QueueReading>();
       FunctionID = gameObject.GetInstanceID();
     }
 
-    void onActivation(){
-        Queue<UnityEvent> blockQueue = queueReading.GetBlockQueueOfUnityEvents();
-    }
+    // void onActivation(){
+    //     Queue<UnityEvent> blockQueue = queueReading.GetBlockQueueOfUnityEvents();
+    // }
 
     public void OnHoverEntered(){
       isHovered = true;
