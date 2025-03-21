@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class MiniMapBlockSpawner : MonoBehaviour
 {
     public GameObject mapBlock;
-    public GameObject goalSphere;
+    public GameObject goalObject;
     public TurtleMovement turtle;
     public MapBlockScriptableObject mapValues;
     public GameObject disableLeftHandModelOnGrab;
@@ -89,10 +89,11 @@ public class MiniMapBlockSpawner : MonoBehaviour
 
         // Goal Sphere
         Vector3 goalCoords = startPositionOffset + Vector3.Scale(mapValues.goalSpawnPoint, mapValues.blockScale);
-        GameObject generatedGoalSphere = Instantiate(goalSphere, goalCoords, Quaternion.identity);
-        generatedGoalSphere.transform.SetParent(gameObject.transform, false);
-        generatedGoalSphere.transform.localScale = mapValues.goalScale;
-        generatedGoalSphere.name = mapValues.goalPrefabName;
+        GameObject generatedGoalObject = Instantiate(goalObject, goalCoords, Quaternion.Euler(mapValues.goalRotation));
+        generatedGoalObject.transform.SetParent(gameObject.transform, false);
+        generatedGoalObject.transform.localScale = mapValues.goalScale;
+        generatedGoalObject.transform.position += mapValues.goalPositionOffset * miniMapScale;
+        generatedGoalObject.name = mapValues.goalPrefabName;
 
         // Turtle
         Vector3 turtlePositionOffset = new Vector3(0, -0.2f, 0);

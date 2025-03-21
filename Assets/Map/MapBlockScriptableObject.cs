@@ -16,6 +16,8 @@ public class MapBlockScriptableObject : ScriptableObject
     public string goalPrefabName;
     public Vector3 goalSpawnPoint;
     public Vector3 goalScale;
+    public Vector3 goalPositionOffset = new Vector3(0.0f, -0.35f, 0.0f);
+    public Vector3 goalRotation = new Vector3(0.0f, -90.0f, 0.0f);
 
     public Vector3[] spawnPoints;
 }
