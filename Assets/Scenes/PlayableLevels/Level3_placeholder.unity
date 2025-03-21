@@ -5444,6 +5444,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811633355}
   m_CullTransparentMesh: 1
+--- !u!1 &820166778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 820166780}
+  - component: {fileID: 820166779}
+  m_Layer: 0
+  m_Name: LevelStatesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &820166779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820166778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc1535de194c62d89a1b8c5faf23890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &820166780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820166778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.920226, y: -5.5386243, z: 14.318532}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &843667532
 GameObject:
   m_ObjectHideFlags: 0
@@ -9867,32 +9911,27 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -7090487941168480486, guid: c348712bda248c246b8c49b3db54643f, type: 3}
-  UIContainer: {fileID: 1800728134}
   pauseMenu: {fileID: 624942952}
-  mainMenuConfirmWindow: {fileID: 1168421192}
+  returnToMenuConfirmWindow: {fileID: 0}
   optionsMenu: {fileID: 1772792703}
   blockMenu: {fileID: 322346270}
   endScreen: {fileID: 2119423241}
+  animationSpeed: 0.3
   resumeGameButton: {fileID: 1066664392}
-  optionsMenuButton: {fileID: 432157311}
-  pauseMenuReturnButtons:
-  - {fileID: 364966468}
-  returnToMenuButtons:
-  - {fileID: 732188050}
-  - {fileID: 1347495954}
-  - {fileID: 1627834283}
-  returnToMenuYButton: {fileID: 1986660746}
-  returnToMenuNButton: {fileID: 1431689334}
-  nextLevelButton: {fileID: 75273661}
-  endScreenReturnToMenu: {fileID: 1347495954}
-  endScreenReturnToMenuAlt: {fileID: 1627834283}
+  openPauseMenuButtons: []
+  returnToMenuWithConfirmationButtons: []
+  returnToMenuConfirmButton: {fileID: 0}
+  returnToMenuDenyButton: {fileID: 0}
+  openOptionsMenuButtons: []
   movementPanel: {fileID: 1141028522}
   controlPanel: {fileID: 406132683}
   functionPanel: {fileID: 1578197183}
   movementTab: {fileID: 1477697068}
   controlTab: {fileID: 1620032609}
   functionTab: {fileID: 1186813356}
-  animationSpeed: 0.3
+  nextLevelButton: {fileID: 75273661}
+  endScreenReturnToMenu: {fileID: 1347495954}
+  endScreenReturnToMenuAlt: {fileID: 1627834283}
 --- !u!4 &1800728136
 Transform:
   m_ObjectHideFlags: 0
@@ -12598,6 +12637,7 @@ SceneRoots:
   - {fileID: 2092101391}
   - {fileID: 63617551}
   - {fileID: 640325580}
+  - {fileID: 820166780}
   - {fileID: 1272007912}
   - {fileID: 1423768469}
   - {fileID: 68495275}

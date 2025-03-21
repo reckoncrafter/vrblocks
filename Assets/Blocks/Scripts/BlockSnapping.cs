@@ -7,6 +7,9 @@ public class BlockSnapping : MonoBehaviour
     public bool hasSnapped = false; // Flag to prevent repeated snapping
     private QueueReading? queueReading;
 
+    public AudioClip snapSound;
+    private AudioSource audio;
+
     private void Awake()
     {
         // Automatic detection of QueueReading component
@@ -26,6 +29,12 @@ public class BlockSnapping : MonoBehaviour
         {
             grabInteractable.selectEntered.AddListener(OnGrab);
             grabInteractable.selectExited.AddListener(OnRelease);
+        }
+
+        audio = GetComponent<AudioSource>();
+        if (audio == null)
+        {
+            audio = gameObject.AddComponent<AudioSource>(); // Add if not found
         }
     }
 
@@ -62,6 +71,7 @@ public class BlockSnapping : MonoBehaviour
                 if (parentObject != null)
                 {
                     Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
+                    PlaySnapSound();
                     SnapToBlock(this.gameObject, parentObject);
 
                     hasSnapped = true;
@@ -127,6 +137,18 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
+    }
+
+    private void PlaySnapSound()
+    {
+        if (audio != null && snapSound != null)
+        {
+            audio.PlayOneShot(snapSound);
+        }
+        else
+        {
+            Debug.LogError("Audio source or sound is null.");
+        }
     }
 
     private Coroutine? resetSnapStatusCoroutine;
