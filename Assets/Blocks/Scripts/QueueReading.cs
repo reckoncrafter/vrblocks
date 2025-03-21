@@ -100,6 +100,7 @@ public class QueueReading : MonoBehaviour
         CheckEnds("Block (IfEnd)", "Block (IfBegin)", false);
         CheckEnds("Block (WhileEnd)", "Block (WhileBegin)", false);
         CheckEnds("Block (Else)", "Block (IfBegin)", true);
+        CheckEnds("Block (ElseIf)", "Block (IfBegin)", true);
 
         // if block is function, get function contents
         if (blockType == "Block (FunctionCall)")

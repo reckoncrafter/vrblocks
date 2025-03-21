@@ -1,7 +1,6 @@
 /*
  Handle level-to-level Player UI + animations
 */
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.VisualScripting;
@@ -193,6 +192,9 @@ public class PlayerUIManager : MonoBehaviour
         {
             endScreenReturnToMenuAlt.GameObject().LeanScale(Vector3.zero, 0f);
         }
+
+        // Unlock all other levels that require this one as a prerequisite
+        LevelStates.triggerPrerequisiteLevelUnlock(SceneTransitionStates.GetSelectedLevel());
 
         //TODO: If we want the option to allow players to play around in the level after completing, these need to go
         pauseMenuAction.action.Disable();

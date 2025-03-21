@@ -973,32 +973,27 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -7090487941168480486, guid: c348712bda248c246b8c49b3db54643f, type: 3}
-  UIContainer: {fileID: 80865214}
   pauseMenu: {fileID: 945975709}
-  mainMenuConfirmWindow: {fileID: 162828514}
+  returnToMenuConfirmWindow: {fileID: 0}
   optionsMenu: {fileID: 1892213998}
   blockMenu: {fileID: 77756972}
   endScreen: {fileID: 2052679646}
+  animationSpeed: 0.3
   resumeGameButton: {fileID: 135019297}
-  optionsMenuButton: {fileID: 1243461881}
-  pauseMenuReturnButtons:
-  - {fileID: 1848169604}
-  returnToMenuButtons:
-  - {fileID: 179498247}
-  - {fileID: 488808168}
-  - {fileID: 1435406291}
-  returnToMenuYButton: {fileID: 342054022}
-  returnToMenuNButton: {fileID: 1421399323}
-  nextLevelButton: {fileID: 1696669552}
-  endScreenReturnToMenu: {fileID: 488808168}
-  endScreenReturnToMenuAlt: {fileID: 1435406291}
+  openPauseMenuButtons: []
+  returnToMenuWithConfirmationButtons: []
+  returnToMenuConfirmButton: {fileID: 0}
+  returnToMenuDenyButton: {fileID: 0}
+  openOptionsMenuButtons: []
   movementPanel: {fileID: 1955210886}
   controlPanel: {fileID: 480388004}
   functionPanel: {fileID: 1983476543}
   movementTab: {fileID: 533637095}
   controlTab: {fileID: 1109722546}
   functionTab: {fileID: 906809865}
-  animationSpeed: 0.3
+  nextLevelButton: {fileID: 1696669552}
+  endScreenReturnToMenu: {fileID: 488808168}
+  endScreenReturnToMenuAlt: {fileID: 1435406291}
 --- !u!4 &80865216
 Transform:
   m_ObjectHideFlags: 0
@@ -4869,6 +4864,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2fd3e07afe5b461490fb8e314976b1b0, type: 3}
+--- !u!1 &711966381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 711966383}
+  - component: {fileID: 711966382}
+  m_Layer: 0
+  m_Name: LevelStatesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &711966382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711966381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc1535de194c62d89a1b8c5faf23890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &711966383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711966381}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.920226, y: -5.5386243, z: 14.318532}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &713587168
 GameObject:
   m_ObjectHideFlags: 0
@@ -12598,6 +12637,7 @@ SceneRoots:
   - {fileID: 2092101391}
   - {fileID: 63617551}
   - {fileID: 1937587914}
+  - {fileID: 711966383}
   - {fileID: 1272007912}
   - {fileID: 1423768469}
   - {fileID: 68495275}
