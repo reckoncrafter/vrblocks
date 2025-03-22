@@ -3,8 +3,8 @@ using UnityEngine;
 public class DetectTurtle
 {
     private PlayerUIManager? playerUIManager;
-    private GameObject? GoalSphere;
-    private GameObject? Turtle;
+    public GameObject? Goal;
+    public GameObject? Turtle;
     public AudioClip? TurtleSuccessAudio { get; set; }
     private readonly float distanceActivationThreshold = 0.25f;
     private bool isNearby;
@@ -32,13 +32,13 @@ public class DetectTurtle
         RemoveTurtleListener();
 
         Turtle = GameObject.Find("/MapSpawner/Turtle");
-        GoalSphere = GameObject.Find("/MapSpawner/GoalSphere");
+        Goal = GameObject.Find("/MapSpawner/GoalFlag");
 
         Turtle.GetComponent<TurtleMovement>().EndOfMovementEvent.AddListener(CheckDistance);
 
-        if (Turtle == null || GoalSphere == null)
+        if (Turtle == null || Goal == null)
         {
-            Debug.LogError("Turtle or GoalSphere not found");
+            Debug.LogError("Turtle or Goal not found");
             return;
         }
 
@@ -50,25 +50,26 @@ public class DetectTurtle
         RemoveTurtleListener();
 
         Turtle = tempTurtle.gameObject;
-        GoalSphere = goal;
+        Goal = goal;
 
         AddTurtleListener();
     }
 
     void CheckDistance()
     {
-        if (Turtle == null || GoalSphere == null || playerUIManager == null)
+        if (Turtle == null || Goal == null || playerUIManager == null)
         {
-            Debug.LogError("Turtle, GoalSphere, or PlayerUIManager is null for CheckDistance");
+            Debug.LogError("Turtle, Goal, or PlayerUIManager is null for CheckDistance");
             return;
         }
 
-        float distance = Vector3.Distance(GoalSphere.transform.position, Turtle.transform.position);
+        float distance = Vector3.Distance(Goal.transform.position, Turtle.transform.position);
 
         if (distance <= distanceActivationThreshold)
         {
             if (!isNearby)
             {
+                Debug.Log("Goal reached!");
                 AudioSource.PlayClipAtPoint(TurtleSuccessAudio, Turtle.transform.position);
                 playerUIManager.EnableEndScreen();
             }

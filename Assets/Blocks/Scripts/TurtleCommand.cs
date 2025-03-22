@@ -17,7 +17,8 @@ public class TurtleCommand : MonoBehaviour
         WhileBegin,
         WhileEnd,
         ConditionTrue,
-        ConditionFalse
+        ConditionFalse,
+        Other
     };
 
 
@@ -41,6 +42,7 @@ public class TurtleCommand : MonoBehaviour
             Command.WhileEnd => turtleMovement.EnqueueWhileStatementEnd,
             Command.ConditionTrue => turtleMovement.setConditionTrue,
             Command.ConditionFalse => turtleMovement.setConditionFalse,
+            Command.Other => () => { },
             _ => () => { }
             ,
         };
