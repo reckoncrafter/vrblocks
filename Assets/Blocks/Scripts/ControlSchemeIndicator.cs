@@ -30,10 +30,11 @@ public class ControlSchemeIndicator : MonoBehaviour
     public List<GameObject> XRControllerSubmeshesToIndicate;
     public List<Renderer> submeshRenderers;
 
-    void Start(){
+    public void Initialize(ControllerModels cm){
        //indicationMaterial = Resources.Load("Assets/Materials/Red", typeof(Material)) as Material;
        //submeshDefaultMaterial = Resources.Load("Assets/Samples/XR Interaction Toolkit/2.6.3/Starter Assets/Models/XRControllerRight.fbx/No Name", typeof(Material)) as Material;
-        controllerModels = GameObject.Find("XR Origin (XR Rig)").GetComponent<ControllerModels>();
+       //controllerModels = GameObject.Find("XR Origin (XR Rig)").GetComponent<ControllerModels>();
+        controllerModels = cm;
         Transform leftControllerTransform = controllerModels.XRControllerLeft.GetComponent<Transform>();
         Transform rightControllerTransform = controllerModels.XRControllerRight.GetComponent<Transform>();
 
