@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+
+using Command = TurtleCommand.Command;
 
 public class ExecutionDirector : MonoBehaviour
 {
@@ -35,6 +38,8 @@ public class ExecutionDirector : MonoBehaviour
         Execute(mainBlockList);
     }
 
+
+
     public void Execute(List<GameObject> blockList)
     {
         /*
@@ -56,6 +61,117 @@ public class ExecutionDirector : MonoBehaviour
          * If Jump is followed with another movement instruction, pass it as as an Action to TurtleMovement.PerformJump(Action), and then skip it.
          * Otherwise, pass it an empty function.
          */
+
+        Action<Command> InstructTurtle = (Command cmd) =>
+        {
+            switch(cmd)
+            {
+                case Command.MoveForward:
+                    turtleMovement.PerformWalkForward();
+                    break;
+                case Command.RotateRight:
+                    turtleMovement.PerformRotateRight();
+                    break;
+                case Command.RotateLeft:
+                    turtleMovement.PerformRotateLeft();
+                    break;
+                case Command.Jump:
+                    turtleMovement.shouldJump = true;
+                    turtleMovement.afterJumpAction = () => {}; // PUT SOMETHING HERE!
+                    turtleMovement.FixedUpdate();
+                    break;
+            }
+        };
+
+        Func<Command, bool> EvaluateCondition = (Command cmd) =>
+        {
+            return cmd switch {
+                Command.ConditionFacingWall => turtleMovement.ConditionFacingWall(),
+                Command.ConditionFacingCliff => turtleMovement.ConditionFacingCliff(),
+                Command.ConditionFacingStepDown => turtleMovement.ConditionFacingStepDown(),
+                Command.ConditionTrue => turtleMovement.ConditionTrue(),
+                Command.ConditionFalse => turtleMovement.ConditionFalse(),
+                _ => false
+            };
+        };
+
+        Func<int, int, Command, int> FindNextBlockOfType = (int StartIndex, int EndIndex, Command cmd) =>
+        {
+            int index = StartIndex;
+            while(index <= EndIndex)
+            {
+                if(blockList[index].GetComponent<TurtleCommand>().commandEnum == cmd){
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        };
+
+        int index = 0;
+
+        bool statusInIf = false;
+        bool statusInWhile = false;
+        bool statusCurrentCondition = false;
+
+        while(index <= blockList.Count)
+        {
+            TurtleCommand currentBlockTurtleCommand = blockList[index].GetComponent<TurtleCommand>();
+            if(currentBlockTurtleCommand == null)
+            {
+                Debug.Log("ExecutionDirector.Execute(): TurtleCommand not found on block.");
+            }
+            Command instruction = currentBlockTurtleCommand.commandEnum;
+
+            if(instruction == Command.IfBegin)
+            {
+                GameObject conditionBlock = blockList[index + 1];
+                bool condition = EvaluateCondition(conditionBlock.GetComponent<TurtleCommand>().commandEnum);
+                statusInIf = true;
+                statusCurrentCondition = condition;
+
+                int EndIfIndex = FindNextBlockOfType(index, blockList.Count, Command.IfEnd);
+                if(EndIfIndex != -1)
+                {
+                    if(!condition)
+                    {
+                        int ElseIfIndex = FindNextBlockOfType(index, EndIfIndex, Command.ElseIf);
+                        int ElseIndex = FindNextBlockOfType(index, EndIfIndex, Command.Else);
+                        if (ElseIfIndex != -1)
+                        {
+                            index = ElseIfIndex;
+                        }
+                        else if (ElseIndex != -1)
+                        {
+                            index = ElseIfIndex;
+                        }
+                        else
+                        {
+                            index = EndIfIndex;
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("ExecutionDirector.Execute(): No EndIfStatement.");
+                }
+
+
+            }
+
+            else if(instruction == Command.IfEnd)
+            {
+                statusInIf = false;
+            }
+
+            if(instruction == Command.Else)
+            {
+                if(statusCurrentCondition)
+                {
+                    index = FindNextBlockOfType(index, blockList.Count, Command.IfEnd);
+                }
+            }
+        }
 
 
     }
