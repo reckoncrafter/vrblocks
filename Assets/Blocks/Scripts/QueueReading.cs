@@ -5,6 +5,8 @@ using UnityEngine.Events;
 
 public class QueueReading : MonoBehaviour
 {
+    public event Action OnQueueUpdated;
+
     // Queue to hold the block types (FIFO order)
 
     private readonly Queue<string> blockQueue = new();
@@ -46,6 +48,8 @@ public class QueueReading : MonoBehaviour
                 Debug.Log(blockType);
             }
         }
+
+        OnQueueUpdated?.Invoke();
     }
 
     private void ReadBlocks(GameObject currentBlock)
