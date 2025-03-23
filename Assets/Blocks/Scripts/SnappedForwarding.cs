@@ -187,15 +187,28 @@ public class SnappedForwarding : MonoBehaviour
                 // Ignore wires
                 if (!otherRbParent.name.Contains("Wire"))
                 {
+                    // Temporarily disable rotation constraints to allow realignment
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
+
                     // Update position to match the X and Z of the parent block
                     Vector3 parentPosition = otherRbParent.transform.position;
                     rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
+
                     // Reset rotation to 0
                     rb.transform.rotation = Quaternion.Euler(0, 0, 0);
                     Debug.Log($"Physics Update: Position/Rotation reset");
+
+                    // Re-enable the rotation constraints after alignment
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationY;
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+
                     break;
                 }
             }
         }
     }
+
 }
