@@ -195,7 +195,12 @@ public class BlockSnapping : MonoBehaviour
             }
 
             Destroy(joint);
-            //UpdatePhysics(otherRb);
+
+            SnappedForwarding sf = otherRb.GetComponentInChildren<SnappedForwarding>();
+            if (sf != null)
+            {
+                sf.UpdatePhysics(otherRb);
+            }
         }
 
         // Start the coroutine and store reference for OnRelease()

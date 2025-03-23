@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class QueueReading : MonoBehaviour
 {
-    public event Action OnQueueUpdated;
+    public event Action OnQueueUpdated; // To update Block Count
 
     // Queue to hold the block types (FIFO order)
 

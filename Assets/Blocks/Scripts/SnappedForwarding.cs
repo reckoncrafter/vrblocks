@@ -134,7 +134,7 @@ public class SnappedForwarding : MonoBehaviour
         return null;
     }
 
-    private void UpdatePhysics(Rigidbody rb)
+    public void UpdatePhysics(Rigidbody rb)
     {
         SnappedForwarding snappedForwarding = rb.GetComponentInChildren<SnappedForwarding>();
         BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
