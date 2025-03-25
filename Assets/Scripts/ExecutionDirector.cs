@@ -13,6 +13,7 @@ using Command = TurtleCommand.Command;
 Notes:
 - Blocks set to OffendingState will not be reset if they are removed from the stack.
 - Because AssembleScopes() is run upon a function call, syntax errors in functions will only be detected when they are called.
+- Jumps followed by another action do not cross control flow boundaries.
 - This is hard :(
 */
 public class ExecutionDirector : MonoBehaviour
