@@ -12,11 +12,22 @@ public class BlockSnapping : MonoBehaviour
 
     private void Awake()
     {
-        // Automatic detection of QueueReading component
-        queueReading = FindObjectOfType<QueueReading>();
+        // Automatic detection of QueueReading component (Specifically, the StartQueue block's QueueReading component)
+        QueueReading[] queueReadings = FindObjectsOfType<QueueReading>();
+
+        // Iterate through queueReading components to find the StartQueue Block.
+        foreach (var qr in queueReadings)
+        {
+            if (qr.gameObject.name.Contains("StartQueue"))
+            {
+                queueReading = qr;
+                break;
+            }
+        }
+
         if (queueReading == null)
         {
-            Debug.LogWarning("QueueReading component not found in the scene. Ensure there is one active in the hierarchy.");
+            Debug.LogWarning("QueueReading component with a block name containing 'StartQueue' not found in the scene. Ensure there is one active in the hierarchy.");
         }
 
         // Collision Forwarding active
@@ -184,7 +195,12 @@ public class BlockSnapping : MonoBehaviour
             }
 
             Destroy(joint);
-            //UpdatePhysics(otherRb);
+
+            SnappedForwarding sf = otherRb.GetComponentInChildren<SnappedForwarding>();
+            if (sf != null)
+            {
+                sf.UpdatePhysics(otherRb);
+            }
         }
 
         // Start the coroutine and store reference for OnRelease()
