@@ -10,6 +10,7 @@ public class TurtleMovement : MonoBehaviour
     public AudioClip turtleCollisionAudio;
     public AudioClip turtleFallAudio;
     public AudioClip turtleJumpAudio;
+    public AudioClip turtleSuccessAudio;
 
 
     public float movementDuration = 2.0f;
@@ -36,6 +37,7 @@ public class TurtleMovement : MonoBehaviour
 
     public UnityEvent EndOfMovementEvent;
     public UnityEvent FailEvent = new UnityEvent();
+    public UnityEvent SuccessEvent = new UnityEvent();
 
     public Action afterJumpAction;
 
@@ -312,12 +314,21 @@ public class TurtleMovement : MonoBehaviour
 
         rb.constraints = RigidbodyConstraints.None;
         turtleCollider.material.bounciness = failBounciness;
-        //queue.Clear();
         tween?.reset();
 
         failAction?.Invoke();
 
         canReset = true;
         StartCoroutine(WaitAndReset());
+    }
+
+    public void Success()
+    {
+        canFail = false;
+        canReset = false;
+        tween?.reset();
+        SetIsWalking(false);
+        AudioSource.PlayClipAtPoint(turtleSuccessAudio, transform.position);
+        SuccessEvent.Invoke();
     }
 }

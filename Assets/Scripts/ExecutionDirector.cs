@@ -34,7 +34,7 @@ public class ExecutionDirector : MonoBehaviour
 
         GrabFunctionsInScene();
         turtleMovement.FailEvent.AddListener(FailHandler);
-        DetectTurtle.SuccessEvent.AddListener(SuccessHandler);
+        turtleMovement.SuccessEvent.AddListener(SuccessHandler);
     }
 
     public int GetMainListLength(){
