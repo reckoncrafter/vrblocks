@@ -62,7 +62,7 @@ public class TurtleMovement : MonoBehaviour
         resetConstraints = rb.constraints;
 
         SetAnimSpeed(animationSpeed);
-        afterJumpAction = EndMovement;
+        afterJumpAction = () => {};
     }
 
 
@@ -88,6 +88,7 @@ public class TurtleMovement : MonoBehaviour
     private IEnumerator WaitAndCanBeGrounded()
     {
         yield return new WaitForSeconds(0.5f);
+        EndMovement();
         canBeGrounded = true;
     }
 
@@ -270,7 +271,7 @@ public class TurtleMovement : MonoBehaviour
         isGrounded = false;
 
         afterJumpAction();
-        afterJumpAction = EndMovement;
+        afterJumpAction = () => {};
     }
 
     private void FailOnHitBack()
@@ -316,6 +317,7 @@ public class TurtleMovement : MonoBehaviour
 
         failAction?.Invoke();
 
+        canReset = true;
         StartCoroutine(WaitAndReset());
     }
 }

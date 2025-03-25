@@ -13,10 +13,12 @@ public class MovementMenu : Editor
 
         if (GUILayout.Button("Reset"))
         {
+            turtleMovement.canReset = true;
             turtleMovement.Reset();
         }
         if (GUILayout.Button("Move Forward"))
         {
+            turtleMovement.canFail = true;
             turtleMovement.PerformWalkForward();
         }
         if (GUILayout.Button("Turn Left"))

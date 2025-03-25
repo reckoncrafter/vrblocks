@@ -1,11 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection.Emit;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
 using Command = TurtleCommand.Command;
 
+/*
+Notes:
+- Blocks set to OffendingState will not be reset if they are removed from the stack.
+- Because AssembleScopes() is run upon a function call, syntax errors in functions will only be detected when they are called.
+- This is hard :(
+*/
 public class ExecutionDirector : MonoBehaviour
 {
     public TurtleMovement turtleMovement;
@@ -17,8 +26,6 @@ public class ExecutionDirector : MonoBehaviour
 
     // Function IDs map to separate lists of blocks under their respective Function Definition blocks.
     private Dictionary<int, List<GameObject>> functionBlockLists = new Dictionary<int, List<GameObject>>();
-
-
     void Start()
     {
         // The execution director must begin execution (StartButtonPressed), and maintain an internal representation of the list of blocks (OnSnapEvent)
@@ -26,6 +33,8 @@ public class ExecutionDirector : MonoBehaviour
         BlockSnapping.blockSnapEvent.AddListener(OnSnapEvent);
 
         GrabFunctionsInScene();
+        turtleMovement.FailEvent.AddListener(FailHandler);
+        DetectTurtle.SuccessEvent.AddListener(SuccessHandler);
     }
 
     public int GetMainListLength(){
@@ -35,9 +44,37 @@ public class ExecutionDirector : MonoBehaviour
 
     public void StartButtonPressed()
     {
-        Execute(mainBlockList);
+        //blockList = mainBlockList;
+        CallStack.Clear();
+        FunctionData mainFunction = new FunctionData();
+        mainFunction.blockList = mainBlockList;
+        mainFunction.instructionPointer = 0;
+        mainFunction.scopeDict = new Dictionary<int, ScopeData>();
+        mainFunction.scopes = new Stack<ScopeData>();
+
+        AssembleScopes(mainFunction);
+        CallStack.Push(mainFunction);
+
+        turtleMovement.EndOfMovementEvent.AddListener(MainLoop);
+        ContinueLoopEvent.AddListener(MainLoop);
+
+        StartCoroutine(RepeatLoop());
     }
 
+    private UnityEvent ContinueLoopEvent = new UnityEvent();
+    private IEnumerator RepeatLoop(){
+        yield return new WaitForSeconds(1.0f);
+        ContinueLoopEvent.Invoke();
+    }
+
+    private IEnumerator IlluminateBlock(GameObject block){
+        Renderer r = block.GetComponent<Renderer>();
+        r.material.EnableKeyword("_EMISSION");
+
+        yield return new WaitForSeconds(1.0f);
+
+        r.material.DisableKeyword("_EMISSION");
+    }
 
     private void InstructTurtle(Command cmd)
     {
@@ -74,13 +111,16 @@ public class ExecutionDirector : MonoBehaviour
 
     private bool EvaluateCondition(Command cmd)
     {
+        bool error(){
+            throw new TurtleRuntimeError("Block is not a condition!", CallStack.Peek().blockList[CallStack.Peek().instructionPointer]);
+        }
         return cmd switch {
             Command.ConditionFacingWall => turtleMovement.ConditionFacingWall(),
             Command.ConditionFacingCliff => turtleMovement.ConditionFacingCliff(),
             Command.ConditionFacingStepDown => turtleMovement.ConditionFacingStepDown(),
             Command.ConditionTrue => turtleMovement.ConditionTrue(),
             Command.ConditionFalse => turtleMovement.ConditionFalse(),
-            _ => false
+            _ => error()
         };
     }
 
@@ -106,14 +146,41 @@ public class ExecutionDirector : MonoBehaviour
         public bool hasExecuted;
     };
 
+    private struct FunctionData
+    {
+        public List<GameObject> blockList;
+        public int instructionPointer;
+        public Dictionary<int, ScopeData> scopeDict;
+        public Stack<ScopeData> scopes;
+
+    }
+
     private class TurtleSyntaxError : Exception{
-        public TurtleSyntaxError(string message, int offendingBlockIndex) : base(message)
+        public TurtleSyntaxError(string message, GameObject offendingBlock) : base(message)
         {
-            Debug.LogError($"Syntax Error at Block: {offendingBlockIndex}");
+            TurtleCommand tc;
+            if(offendingBlock.TryGetComponent<TurtleCommand>(out tc))
+            {
+                tc.SetOffendingState(true);
+            }
+            Debug.LogError($"Syntax Error at {offendingBlock.name}");
         }
     };
 
-    public void Execute(List<GameObject> blockList)
+    private class TurtleRuntimeError : Exception{
+        public TurtleRuntimeError(string message, GameObject offendingBlock): base(message)
+        {
+            TurtleCommand tc;
+            if(offendingBlock.TryGetComponent<TurtleCommand>(out tc))
+            {
+                tc.SetOffendingState(true);
+            }
+            Debug.LogError($"Runtime Error at Block: {offendingBlock.name}");
+        }
+    }
+
+    private Stack<FunctionData> CallStack = new Stack<FunctionData>();
+    private void AssembleScopes(FunctionData function)
     {
         /*
          * Handling Control Flow:
@@ -164,9 +231,13 @@ public class ExecutionDirector : MonoBehaviour
          *      - Pop currentScope
          */
 
-        // assemble scopes.
+        function.scopeDict.Clear();
+        function.instructionPointer = 0;
+        function.scopes.Clear();
+
+        var blockList = function.blockList;
+
         Stack<ScopeData> scopeBuilding = new Stack<ScopeData>();
-        Dictionary<int, ScopeData> scopeDict = new Dictionary<int, ScopeData>();
         int sb_index = 0;
         while(sb_index < blockList.Count)
         {
@@ -175,6 +246,7 @@ public class ExecutionDirector : MonoBehaviour
             if(isCommandOrFlowControl)
             {
                 Command instruction = blockTurtleCommand.commandEnum;
+                blockTurtleCommand.SetOffendingState(false);
                 if(instruction == Command.IfBegin)
                 {
                     ScopeData sd = new ScopeData();
@@ -192,33 +264,40 @@ public class ExecutionDirector : MonoBehaviour
                 }
                 else if(instruction == Command.Else || instruction == Command.ElseIf)
                 {
+                    if(scopeBuilding.Count == 0)
+                        throw new TurtleSyntaxError("Cannot have Else or ElseIf blocks without a preceeding IfBegin", blockList[sb_index]);
+
                     ScopeData sd = scopeBuilding.Pop();
                     if(sd.ScopeType == Command.WhileBegin)
-                        throw new TurtleSyntaxError("Cannot include else or else if blocks in a While loop", sb_index);
+                        throw new TurtleSyntaxError("Cannot include Else or ElseIf blocks in a While loop", blockList[sb_index]);
 
                     sd.IntermediateBlocks.Add(sb_index);
                     scopeBuilding.Push(sd);
                 }
                 else if (instruction == Command.IfEnd)
                 {
+                    if(scopeBuilding.Count == 0)
+                        throw new TurtleSyntaxError("Cannot have an IfEnd block without IfBegin", blockList[sb_index]);
                     ScopeData sd = scopeBuilding.Pop();
                     if(sd.ScopeType == Command.WhileBegin)
-                        throw new TurtleSyntaxError("Cannot end a while loop with an IfEnd", sb_index);
+                        throw new TurtleSyntaxError("Cannot end a while loop with an IfEnd", blockList[sb_index]);
                     sd.EndBlock = sb_index;
                     sd.hasExecuted = false;
-                    scopeDict.Add(sd.BeginBlock, sd);
+                    function.scopeDict.Add(sd.BeginBlock, sd);
 
                     Debug.Log($"ExecutionDirector.Execute() [assemble scopes]: begin {sd.BeginBlock}, end {sd.EndBlock}, intermediates: {sd.IntermediateBlocks.Count}");
                 }
                 else if (instruction == Command.WhileEnd)
                 {
+                    if(scopeBuilding.Count == 0)
+                        throw new TurtleSyntaxError("Cannot have a WhileEnd block without WhileBegin", blockList[sb_index]);
                     ScopeData sd = scopeBuilding.Pop();
                     if(sd.ScopeType == Command.IfBegin)
-                        throw new TurtleSyntaxError("Cannot end an if statement with a WhileEnd", sb_index);
+                        throw new TurtleSyntaxError("Cannot end an if statement with a WhileEnd", blockList[sb_index]);
 
                     sd.EndBlock = sb_index;
                     sd.hasExecuted = false;
-                    scopeDict.Add(sd.BeginBlock, sd);
+                    function.scopeDict.Add(sd.BeginBlock, sd);
 
                     Debug.Log($"ExecutionDirector.Execute() [assemble scopes]: while loop begin {sd.BeginBlock}, end {sd.EndBlock}");
                 }
@@ -226,204 +305,283 @@ public class ExecutionDirector : MonoBehaviour
             sb_index++;
         }
 
+        if(scopeBuilding.Count > 0)
+        {
+            throw new TurtleSyntaxError("Incomplete conditional statement detected!", blockList[scopeBuilding.Peek().BeginBlock]);
+        }
+
         // if anything is left in scopeBuilding, we have incomplete If Statements!
+    }
 
 
-        int index = 0;
+    public void SuccessHandler()
+    {
+        Debug.Log("ExecutionDirector: Success! Halting..");
+        turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+        ContinueLoopEvent.RemoveAllListeners();
+    }
+    public void FailHandler()
+    {
+        Debug.Log("ExecutionDirector: Failure! Halting..");
+        turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+        ContinueLoopEvent.RemoveAllListeners();
+    }
+
+    public void MainLoop()
+    {
+        var function = CallStack.Pop();
+
+        if(function.instructionPointer >= function.blockList.Count)
+        {
+            if(CallStack.Count > 0)
+            {
+                // function return
+                ContinueLoopEvent.Invoke();
+            }
+            else
+            {
+                turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+                ContinueLoopEvent.RemoveAllListeners();
+            }
+            return;
+        }
+
         turtleMovement.canReset = true;
         turtleMovement.canFail = true;
 
-        Stack<ScopeData> scopes = new Stack<ScopeData>();
+        TurtleCommand blockTurtleCommand;
+        bool isCommandOrFlowControl = function.blockList[function.instructionPointer].TryGetComponent<TurtleCommand>(out blockTurtleCommand);
 
-        while(index < blockList.Count)
+        FunctionCallBlock functionCallBlock;
+        bool isFunctionCall = function.blockList[function.instructionPointer].TryGetComponent<FunctionCallBlock>(out functionCallBlock);
+
+        StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer]));
+        if (isCommandOrFlowControl)
         {
-            TurtleCommand blockTurtleCommand;
-            bool isCommandOrFlowControl = blockList[index].TryGetComponent<TurtleCommand>(out blockTurtleCommand);
+            Command instruction = blockTurtleCommand.commandEnum;
+            Debug.Log($"ExecutionDirector.Execute: {function.instructionPointer} {instruction}");
 
-            FunctionCallBlock functionCallBlock;
-            bool isFunctionCall = blockList[index].TryGetComponent<FunctionCallBlock>(out functionCallBlock);
 
-            if (isCommandOrFlowControl)
+            if(instruction == Command.IfBegin)
             {
-                Command instruction = blockTurtleCommand.commandEnum;
-                Debug.Log($"ExecutionDirector.Execute: instruction = {instruction}");
-
-
-                if(instruction == Command.IfBegin)
+                TurtleCommand tc;
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
-                    TurtleCommand tc;
-                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
+                    bool condition = EvaluateCondition(tc.commandEnum);
+                    Debug.Log($"ExecutionDirector.Execute(): IfBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
+                    ScopeData sd = function.scopeDict[function.instructionPointer];
+                    if(condition)
                     {
-                        bool condition = EvaluateCondition(tc.commandEnum);
-                        Debug.Log($"ExecutionDirector.Execute(): IfBegin at {index}: {tc.commandEnum} is {condition}.");
-                        ScopeData sd = scopeDict[index];
-                        if(condition)
-                        {
-                            sd.hasExecuted = true;
-                            scopes.Push(sd);
-                        }
-                        else
-                        {
-                            if(sd.IntermediateBlocks.Count > 0)
-                            {
-                                Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to intermediate block at {sd.IntermediateBlocks[0]}");
-
-                                index = sd.IntermediateBlocks[0];
-                                scopes.Push(sd);
-                                continue; // do not increment index!
-                            }
-                            else
-                            {
-                                Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to EndBlock at {sd.EndBlock}");
-
-                                index = sd.EndBlock;
-                                scopes.Push(sd);
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                else if(instruction == Command.IfEnd)
-                {
-                    scopes.Pop();
-                }
-
-                else if(instruction == Command.Else)
-                {
-                    ScopeData sd = scopes.Pop();
-                    if(sd.hasExecuted)
-                    {
-                        scopes.Push(sd);
-                        index = sd.EndBlock;
-                        continue;
+                        sd.hasExecuted = true;
+                        function.instructionPointer += 1; // skip condition block
+                        function.scopes.Push(sd);
                     }
                     else
                     {
-                        sd.hasExecuted = true;
-                        scopes.Push(sd);
-                    }
-                }
-
-                else if(instruction == Command.ElseIf)
-                {
-                    TurtleCommand tc = null;
-                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
-                    {
-                        bool condition = EvaluateCondition(tc.commandEnum);
-                        Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {condition}.");
-                        ScopeData sd = scopes.Pop();
-                        if(condition)
+                        if(sd.IntermediateBlocks.Count > 0)
                         {
-                            if(sd.hasExecuted)
-                            {
-                                scopes.Push(sd);
-                                index = sd.EndBlock;
-                                continue;
-                            }
-                            else
-                            {
-                                sd.hasExecuted = true;
-                                scopes.Push(sd);
-                            }
+                            Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to intermediate block at {sd.IntermediateBlocks[0]}");
+
+                            function.instructionPointer = sd.IntermediateBlocks[0];
+                            function.scopes.Push(sd);
+
+                            StartCoroutine(RepeatLoop());
+                            goto skip; // do not increment function.instructionPointer!
                         }
                         else
                         {
-                            int nextIntermediate = -1;
-                            for(int i = 0; i < sd.IntermediateBlocks.Count; i++)
-                            {
-                                if(sd.IntermediateBlocks[i] == index)
-                                {
-                                    if(i+1 < sd.IntermediateBlocks.Count)
-                                    {
-                                        nextIntermediate = sd.IntermediateBlocks[i+1];
-                                    }
-                                }
-                            }
-                            if(nextIntermediate != -1)
-                            {
-                                index = nextIntermediate;
-                                scopes.Push(sd);
-                                continue;
-                            }
-                            else
-                            {
-                                index = sd.EndBlock;
-                                scopes.Push(sd);
-                                continue;
-                            }
+                            Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to EndBlock at {sd.EndBlock}");
+
+                            function.instructionPointer = sd.EndBlock;
+                            function.scopes.Push(sd);
+
+                            goto skip;
                         }
                     }
                 }
+                StartCoroutine(RepeatLoop());
+            }
 
-                else if(instruction == Command.WhileBegin)
+            else if(instruction == Command.IfEnd)
+            {
+                function.scopes.Pop();
+                StartCoroutine(RepeatLoop());
+            }
+
+            else if(instruction == Command.Else)
+            {
+                ScopeData sd = function.scopes.Pop();
+                if(sd.hasExecuted)
                 {
-                    TurtleCommand tc;
-                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
-                    {
-                        bool condition = EvaluateCondition(tc.commandEnum);
-                        Debug.Log($"ExecutionDirector.Execute(): WhileBegin at {index}: {tc.commandEnum} is {condition}.");
-                        ScopeData sd = scopeDict[index];
-                        sd.hasExecuted = true;
-                        if(!condition)
-                        {
-                            sd.hasExecuted = false;
-                            index = sd.EndBlock;
-                            scopes.Push(sd);
-                            continue;
-                        }
-                        scopes.Push(sd);
-                    }
-                }
+                    function.scopes.Push(sd);
+                    function.instructionPointer = sd.EndBlock;
 
-                else if(instruction == Command.WhileEnd)
-                {
-                    ScopeData sd = scopes.Pop();
-                    if(sd.hasExecuted)
-                    {
-                        index = sd.BeginBlock;
-                        continue;
-                    }
+                    goto skip;
                 }
-
                 else
                 {
-                    // must be a move instruction
-                    if(instruction == Command.Jump)
+                    sd.hasExecuted = true;
+                    function.scopes.Push(sd);
+                }
+                StartCoroutine(RepeatLoop());
+            }
+
+            else if(instruction == Command.ElseIf)
+            {
+                TurtleCommand tc = null;
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
+                {
+                    bool condition = EvaluateCondition(tc.commandEnum);
+                    Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {condition}.");
+                    ScopeData sd = function.scopes.Pop();
+                    if(condition)
                     {
-                        TurtleCommand tc;
-                        if(index + 1 < blockList.Count &&
-                           blockList[index+1].TryGetComponent<TurtleCommand>(out tc) &&
-                           (tc.commandEnum == Command.MoveForward || tc.commandEnum == Command.RotateRight || tc.commandEnum == Command.RotateLeft)
-                          )
-                          {
-                              CombinedJump(tc.commandEnum);
-                              index += 1;
-                          }
-                          else
-                          {
-                              InstructTurtle(instruction);
-                          }
+                        if(sd.hasExecuted)
+                        {
+                            function.scopes.Push(sd);
+                            function.instructionPointer = sd.EndBlock;
+
+                            StartCoroutine(RepeatLoop());
+                            
+                            goto skip;
+                        }
+                        else
+                        {
+                            sd.hasExecuted = true;
+                            function.scopes.Push(sd);
+                        }
                     }
                     else
                     {
-                        InstructTurtle(instruction);
+                        int nextIntermediate = -1;
+                        for(int i = 0; i < sd.IntermediateBlocks.Count; i++)
+                        {
+                            if(sd.IntermediateBlocks[i] == function.instructionPointer)
+                            {
+                                if(i+1 < sd.IntermediateBlocks.Count)
+                                {
+                                    nextIntermediate = sd.IntermediateBlocks[i+1];
+                                }
+                            }
+                        }
+                        if(nextIntermediate != -1)
+                        {
+                            function.instructionPointer = nextIntermediate;
+                            function.scopes.Push(sd);
+
+                            goto skip;
+                        }
+                        else
+                        {
+                            function.instructionPointer = sd.EndBlock;
+                            function.scopes.Push(sd);
+
+                            goto skip;
+                        }
                     }
+                }
+                StartCoroutine(RepeatLoop());
+            }
+
+            else if(instruction == Command.WhileBegin)
+            {
+                TurtleCommand tc;
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
+                {
+                    bool condition = EvaluateCondition(tc.commandEnum);
+                    Debug.Log($"ExecutionDirector.Execute(): WhileBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
+                    ScopeData sd = function.scopeDict[function.instructionPointer];
+                    sd.hasExecuted = true;
+                    if(!condition)
+                    {
+                        sd.hasExecuted = false;
+                        function.instructionPointer = sd.EndBlock;
+                        function.scopes.Push(sd);
+
+                        goto skip;
+                    }
+                    function.instructionPointer += 1; // skip condition block
+                    function.scopes.Push(sd);
+                }
+                StartCoroutine(RepeatLoop());
+            }
+
+            else if(instruction == Command.WhileEnd)
+            {
+                ScopeData sd = function.scopes.Pop();
+                if(sd.hasExecuted)
+                {
+                    function.instructionPointer = sd.BeginBlock;
+
+                    goto skip;
+                }
+
+                StartCoroutine(RepeatLoop());
+            }
+
+            else if(
+                instruction == Command.MoveForward ||
+                instruction == Command.RotateRight ||
+                instruction == Command.RotateLeft ||
+                instruction == Command.Jump
+            )
+            {
+                if(instruction == Command.Jump)
+                {
+                    TurtleCommand tc;
+                    if(function.instructionPointer + 1 < function.blockList.Count &&
+                        function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc) &&
+                        (tc.commandEnum == Command.MoveForward || tc.commandEnum == Command.RotateRight || tc.commandEnum == Command.RotateLeft)
+                        )
+                        {
+                            CombinedJump(tc.commandEnum);
+                            function.instructionPointer += 1;
+                        }
+                        else
+                        {
+                            InstructTurtle(instruction);
+                        }
+                }
+                else
+                {
+                    InstructTurtle(instruction);
                 }
             }
 
-            else if (isFunctionCall)
-            {
-
+            else{
+                // must be a condition check
+                InstructTurtle(instruction);
+                StartCoroutine(RepeatLoop());
             }
-
-
-            index++;
         }
 
-        //turtleMovement.Fail();
+        else if (isFunctionCall)
+        {
+            GameObject fd = functionCallBlock.functionDefinition;
+            FunctionData nextFunctionData = new FunctionData();
+            nextFunctionData.blockList = functionBlockLists[functionCallBlock.FunctionID];
+            nextFunctionData.instructionPointer = 0;
+            nextFunctionData.scopeDict = new Dictionary<int, ScopeData>();
+            nextFunctionData.scopes = new Stack<ScopeData>();
+            
+            AssembleScopes(nextFunctionData);
+
+            function.instructionPointer++;
+            CallStack.Push(function);
+            CallStack.Push(nextFunctionData);
+            StartCoroutine(RepeatLoop());
+            return;
+        }
 
 
+        function.instructionPointer++;
+        CallStack.Push(function);
+        return;
+
+        skip:
+        StartCoroutine(RepeatLoop());
+        CallStack.Push(function);
+        return;
     }
 
     public void OnSnapEvent()

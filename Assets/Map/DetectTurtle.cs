@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DetectTurtle
 {
@@ -8,6 +10,8 @@ public class DetectTurtle
     public AudioClip? TurtleSuccessAudio { get; set; }
     private readonly float distanceActivationThreshold = 0.25f;
     private bool isNearby;
+
+    public static UnityEvent SuccessEvent = new UnityEvent();
 
     void AddTurtleListener()
     {
@@ -70,6 +74,7 @@ public class DetectTurtle
             if (!isNearby)
             {
                 Debug.Log("Goal reached!");
+                SuccessEvent.Invoke();
                 AudioSource.PlayClipAtPoint(TurtleSuccessAudio, Turtle.transform.position);
                 playerUIManager.EnableEndScreen();
             }

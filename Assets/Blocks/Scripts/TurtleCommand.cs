@@ -24,6 +24,30 @@ public class TurtleCommand : MonoBehaviour
         CommandError
     };
 
+    private Renderer renderer;
+    public Material defaultMaterial;
+    public Material? offendingStateMaterial;
+
+    public void Start()
+    {
+        renderer = GetComponent<Renderer>();
+        renderer.material.SetColor("_EmissionColor", renderer.material.GetColor("_Color"));
+        defaultMaterial = renderer.material;
+        offendingStateMaterial = Resources.Load("Materials/OffendingState") as Material;
+    }
+
+    public void SetOffendingState(bool state)
+    {
+        if(state)
+        {
+            renderer.material = offendingStateMaterial;
+        }
+        else
+        {
+            renderer.material = defaultMaterial;
+        }
+    }
+
 
     // public UnityEvent onMove;
     // public TurtleMovement turtleMovement;
