@@ -39,8 +39,6 @@ public class ExecutionDirector : MonoBehaviour
     }
 
 
-
-
     private void InstructTurtle(Command cmd)
     {
         switch(cmd)
@@ -56,10 +54,22 @@ public class ExecutionDirector : MonoBehaviour
                 break;
             case Command.Jump:
                 turtleMovement.shouldJump = true;
-                turtleMovement.afterJumpAction = () => {}; // PUT SOMETHING HERE!
                 turtleMovement.FixedUpdate();
                 break;
         }
+    }
+
+    private void CombinedJump(Command afterJump)
+    {
+        Debug.Log($"ExecutionDirector.CombinedJump: Jump -> {afterJump}");
+        Action func = afterJump switch {
+            Command.MoveForward => turtleMovement.PerformWalkForward,
+            Command.RotateRight => turtleMovement.PerformRotateRight,
+            Command.RotateLeft  => turtleMovement.PerformRotateLeft
+        };
+        turtleMovement.shouldJump = true;
+        turtleMovement.afterJumpAction = func;
+        turtleMovement.FixedUpdate();
     }
 
     private bool EvaluateCondition(Command cmd)
@@ -87,85 +97,331 @@ public class ExecutionDirector : MonoBehaviour
         return -1;
     }
 
+    private struct ScopeData
+    {
+        public Command ScopeType;
+        public int BeginBlock;
+        public List<int> IntermediateBlocks;
+        public int EndBlock;
+        public bool hasExecuted;
+    };
 
+    private class TurtleSyntaxError : Exception{
+        public TurtleSyntaxError(string message, int offendingBlockIndex) : base(message)
+        {
+            Debug.LogError($"Syntax Error at Block: {offendingBlockIndex}");
+        }
+    };
 
     public void Execute(List<GameObject> blockList)
     {
         /*
-         * Proceed through the mainBlockList and take the following paths:
-         * - If the block is a movement instruction, like Move Forward, Rotate Left, etc, send the command to the turtle.
+         * Handling Control Flow:
+         * I've been trying and iterating on different solutions, and here's what I believe is the answer:
          *
-         * Control flow blocks must be dealt with carefully, fortunately with the list, the implementation is simpler
-         * - If, no else. Proceed normally on true. | Move index to next IfStatementEnd on false. (If no IfStatementEnd, trigger warning)
-         * - If, with else. On true, proceed until Else, then move index to IfStatementEnd. | On false, move index to Else, proceed normally.
-         * - If, with else if(s), no else. On true, proceed until **first** ElseIf, then skip to IfStatementEnd. | On False, skip to **first** ElseIf.
-         * - Else If. On true, proceed to next ElseIf, otherwise to IfStatementEnd. | On false, skip to next ElseIf, otherwise to Else, otherwise to IfStatementEnd.
+         * Before execution begins, all control flow scopes need to be identified and enclosed.
+         * the logic is as follows:
+         * We begin walking through the blockList, looking for control flow statements: IfBegin, Else, ElseIf, IfEnd, WhileBegin, WhileEnd.
          *
-         * - While. Evaluate condition, proceed if true, then repeat. Otherwise, move index to WhileStatementEnd. (If no WhileStatementEnd, trigger warning)
+         * We will maintain a stack that keeps a data structure that represents the current scope.
+         * * int BeginBlock;
+         * * List<int> IntermediateBlocks; (Else and ElseIf)s
+         * * int EndBlock;
          *
-         * Function blocks also have special behavior. When a function call is encountered, recurse the execution function using the associated list in functionBlockLists.
-         * This means that the Execution function should take a List<GameObject> as an argument, beginning with Execute(mainBlockList);
+         * - Whenever a *Begin is encountered, a new data structure is created, and the block's index is referenced in BeginBlock.
+         * - Whenever an Else or ElseIf is encountered, their indexes will be added to the IntermediateBlocks list.
+         *      - If the BeginBlock is a WhileBegin, Raise an error.
+         * - Whenever a *End is encountered, put its index in EndBlock, then Pop the struct from the stack, and append it to a Dictionary
+         * that uses the BeginBlock's index as a key to get the full struct.
+         * i.e. Dictionary<GameObject, ScopeStruct>;
          *
-         * !!!! Jumping requires special consideration as it can be combined with the next action (e.g. Move Forward) or stand alone.
-         * If Jump is followed with another movement instruction, pass it as as an Action to TurtleMovement.PerformJump(Action), and then skip it.
-         * Otherwise, pass it an empty function.
+         *
+         * This done, during normal execution, we can use the struct to implement the following behavior:
+         * - Whenever a *Begin is encountered, we can fetch the struct, and get references to the other control blocks that make up its scope.
+         * - bool hasExecuted
+         * - Stack<ScopeStruct> currentScope
+         * - IfBegin(True):
+         *     - set hasExecuted true
+         *     - proceed normally
+         * - IfBegin(False):
+         *     - skip index to first IntermediateBlock, or EndIf if none exists.
+         * - ElseIf(true):
+         *     - if hasExecuted
+         *          - skip index to currentScope.EndBlock
+         *     - if not hasExecuted
+         *          - set hasExecuted true
+         *          - proceed normally
+         * - ElseIf(false):
+         *     - find own index in currentScope.IntermediateBlocks
+         *     - skip index to the following IntermediateBlock, or EndIf if none exists.
+         * - Else:
+         *     - if hasExecuted
+         *          - skip index to currentScope.EndBlock
+         *     - if not hasExecuted
+         *          - set hasExecuted true
+         *          - proceed normally
+         * - IfEnd:
+         *      - Pop currentScope
          */
-        int index = 0;
 
-        while(index <= blockList.Count)
+        // assemble scopes.
+        Stack<ScopeData> scopeBuilding = new Stack<ScopeData>();
+        Dictionary<int, ScopeData> scopeDict = new Dictionary<int, ScopeData>();
+        int sb_index = 0;
+        while(sb_index < blockList.Count)
         {
-            TurtleCommand currentBlockTurtleCommand = blockList[index].GetComponent<TurtleCommand>();
-            if(currentBlockTurtleCommand == null)
+            TurtleCommand blockTurtleCommand;
+            bool isCommandOrFlowControl = blockList[sb_index].TryGetComponent<TurtleCommand>(out blockTurtleCommand);
+            if(isCommandOrFlowControl)
             {
-                Debug.Log("ExecutionDirector.Execute(): TurtleCommand not found on block.");
-            }
-            Command instruction = currentBlockTurtleCommand.commandEnum;
+                Command instruction = blockTurtleCommand.commandEnum;
+                if(instruction == Command.IfBegin)
+                {
+                    ScopeData sd = new ScopeData();
+                    sd.IntermediateBlocks = new List<int>();
+                    sd.BeginBlock = sb_index;
+                    sd.ScopeType = Command.IfBegin;
+                    scopeBuilding.Push(sd);
+                }
+                else if(instruction == Command.WhileBegin)
+                {
+                    ScopeData sd = new ScopeData();
+                    sd.BeginBlock = sb_index;
+                    sd.ScopeType = Command.WhileBegin;
+                    scopeBuilding.Push(sd);
+                }
+                else if(instruction == Command.Else || instruction == Command.ElseIf)
+                {
+                    ScopeData sd = scopeBuilding.Pop();
+                    if(sd.ScopeType == Command.WhileBegin)
+                        throw new TurtleSyntaxError("Cannot include else or else if blocks in a While loop", sb_index);
 
-            if(instruction == Command.IfBegin)
-            {
-                // Introduce new scope
-                // if true
-                    // execute
-                    // try skip elseif, try skip else, go to endif
-                // if false
-                    // try go to elseif, try go to else, go to endif
-            }
+                    sd.IntermediateBlocks.Add(sb_index);
+                    scopeBuilding.Push(sd);
+                }
+                else if (instruction == Command.IfEnd)
+                {
+                    ScopeData sd = scopeBuilding.Pop();
+                    if(sd.ScopeType == Command.WhileBegin)
+                        throw new TurtleSyntaxError("Cannot end a while loop with an IfEnd", sb_index);
+                    sd.EndBlock = sb_index;
+                    sd.hasExecuted = false;
+                    scopeDict.Add(sd.BeginBlock, sd);
 
-            else if(instruction == Command.IfEnd)
-            {
-                // exit scope
-            }
+                    Debug.Log($"ExecutionDirector.Execute() [assemble scopes]: begin {sd.BeginBlock}, end {sd.EndBlock}, intermediates: {sd.IntermediateBlocks.Count}");
+                }
+                else if (instruction == Command.WhileEnd)
+                {
+                    ScopeData sd = scopeBuilding.Pop();
+                    if(sd.ScopeType == Command.IfBegin)
+                        throw new TurtleSyntaxError("Cannot end an if statement with a WhileEnd", sb_index);
 
-            else if(instruction == Command.Else)
-            {
-                // execute
-            }
+                    sd.EndBlock = sb_index;
+                    sd.hasExecuted = false;
+                    scopeDict.Add(sd.BeginBlock, sd);
 
-            else if(instruction == Command.ElseIf)
-            {
-                // introduce new scope
-                // copy ifbegin
+                    Debug.Log($"ExecutionDirector.Execute() [assemble scopes]: while loop begin {sd.BeginBlock}, end {sd.EndBlock}");
+                }
             }
-
-            else if(instruction == Command.WhileBegin)
-            {
-                // introduce new scope
-                // if true
-                    // execute
-                // if false
-                    // skip to whileend
-                // repeat
-            }
-
-            else if(instruction == Command.WhileEnd)
-            {
-                // exit scope
-            }
-
-            // move conditional statments to their own enum
-            // find a way to catch move instructions
-            // catch function calls
+            sb_index++;
         }
+
+        // if anything is left in scopeBuilding, we have incomplete If Statements!
+
+
+        int index = 0;
+        turtleMovement.canReset = true;
+        turtleMovement.canFail = true;
+
+        Stack<ScopeData> scopes = new Stack<ScopeData>();
+
+        while(index < blockList.Count)
+        {
+            TurtleCommand blockTurtleCommand;
+            bool isCommandOrFlowControl = blockList[index].TryGetComponent<TurtleCommand>(out blockTurtleCommand);
+
+            FunctionCallBlock functionCallBlock;
+            bool isFunctionCall = blockList[index].TryGetComponent<FunctionCallBlock>(out functionCallBlock);
+
+            if (isCommandOrFlowControl)
+            {
+                Command instruction = blockTurtleCommand.commandEnum;
+                Debug.Log($"ExecutionDirector.Execute: instruction = {instruction}");
+
+
+                if(instruction == Command.IfBegin)
+                {
+                    TurtleCommand tc;
+                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
+                    {
+                        bool condition = EvaluateCondition(tc.commandEnum);
+                        Debug.Log($"ExecutionDirector.Execute(): IfBegin at {index}: {tc.commandEnum} is {condition}.");
+                        ScopeData sd = scopeDict[index];
+                        if(condition)
+                        {
+                            sd.hasExecuted = true;
+                            scopes.Push(sd);
+                        }
+                        else
+                        {
+                            if(sd.IntermediateBlocks.Count > 0)
+                            {
+                                Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to intermediate block at {sd.IntermediateBlocks[0]}");
+
+                                index = sd.IntermediateBlocks[0];
+                                scopes.Push(sd);
+                                continue; // do not increment index!
+                            }
+                            else
+                            {
+                                Debug.Log($"ExecutionDirector.Execute(): IfBegin(False): Skipping to EndBlock at {sd.EndBlock}");
+
+                                index = sd.EndBlock;
+                                scopes.Push(sd);
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                else if(instruction == Command.IfEnd)
+                {
+                    scopes.Pop();
+                }
+
+                else if(instruction == Command.Else)
+                {
+                    ScopeData sd = scopes.Pop();
+                    if(sd.hasExecuted)
+                    {
+                        scopes.Push(sd);
+                        index = sd.EndBlock;
+                        continue;
+                    }
+                    else
+                    {
+                        sd.hasExecuted = true;
+                        scopes.Push(sd);
+                    }
+                }
+
+                else if(instruction == Command.ElseIf)
+                {
+                    TurtleCommand tc = null;
+                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
+                    {
+                        bool condition = EvaluateCondition(tc.commandEnum);
+                        Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {condition}.");
+                        ScopeData sd = scopes.Pop();
+                        if(condition)
+                        {
+                            if(sd.hasExecuted)
+                            {
+                                scopes.Push(sd);
+                                index = sd.EndBlock;
+                                continue;
+                            }
+                            else
+                            {
+                                sd.hasExecuted = true;
+                                scopes.Push(sd);
+                            }
+                        }
+                        else
+                        {
+                            int nextIntermediate = -1;
+                            for(int i = 0; i < sd.IntermediateBlocks.Count; i++)
+                            {
+                                if(sd.IntermediateBlocks[i] == index)
+                                {
+                                    if(i+1 < sd.IntermediateBlocks.Count)
+                                    {
+                                        nextIntermediate = sd.IntermediateBlocks[i+1];
+                                    }
+                                }
+                            }
+                            if(nextIntermediate != -1)
+                            {
+                                index = nextIntermediate;
+                                scopes.Push(sd);
+                                continue;
+                            }
+                            else
+                            {
+                                index = sd.EndBlock;
+                                scopes.Push(sd);
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                else if(instruction == Command.WhileBegin)
+                {
+                    TurtleCommand tc;
+                    if(blockList[index+1].TryGetComponent<TurtleCommand>(out tc))
+                    {
+                        bool condition = EvaluateCondition(tc.commandEnum);
+                        Debug.Log($"ExecutionDirector.Execute(): WhileBegin at {index}: {tc.commandEnum} is {condition}.");
+                        ScopeData sd = scopeDict[index];
+                        sd.hasExecuted = true;
+                        if(!condition)
+                        {
+                            sd.hasExecuted = false;
+                            index = sd.EndBlock;
+                            scopes.Push(sd);
+                            continue;
+                        }
+                        scopes.Push(sd);
+                    }
+                }
+
+                else if(instruction == Command.WhileEnd)
+                {
+                    ScopeData sd = scopes.Pop();
+                    if(sd.hasExecuted)
+                    {
+                        index = sd.BeginBlock;
+                        continue;
+                    }
+                }
+
+                else
+                {
+                    // must be a move instruction
+                    if(instruction == Command.Jump)
+                    {
+                        TurtleCommand tc;
+                        if(index + 1 < blockList.Count &&
+                           blockList[index+1].TryGetComponent<TurtleCommand>(out tc) &&
+                           (tc.commandEnum == Command.MoveForward || tc.commandEnum == Command.RotateRight || tc.commandEnum == Command.RotateLeft)
+                          )
+                          {
+                              CombinedJump(tc.commandEnum);
+                              index += 1;
+                          }
+                          else
+                          {
+                              InstructTurtle(instruction);
+                          }
+                    }
+                    else
+                    {
+                        InstructTurtle(instruction);
+                    }
+                }
+            }
+
+            else if (isFunctionCall)
+            {
+
+            }
+
+
+            index++;
+        }
+
+        //turtleMovement.Fail();
 
 
     }
@@ -177,6 +433,7 @@ public class ExecutionDirector : MonoBehaviour
     }
 
     void GrabFunctionsInScene(){
+        functionBlockLists.Clear();
         FunctionBlock[] functionBlocks = FindObjectsOfType(typeof(FunctionBlock)) as FunctionBlock[];
         foreach(FunctionBlock fb in functionBlocks)
         {
@@ -189,6 +446,7 @@ public class ExecutionDirector : MonoBehaviour
     void ReadMainBlocks()
     {
         Debug.Log("ExecutionDirector.ReadMainBlocks()");
+        mainBlockList.Clear();
         SnappedForwarding snappedForwarding = startBlock.GetComponentInChildren<SnappedForwarding>();
         if(snappedForwarding == null)
         {

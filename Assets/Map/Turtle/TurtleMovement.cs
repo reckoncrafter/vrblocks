@@ -17,8 +17,8 @@ public class TurtleMovement : MonoBehaviour
     public float failBounciness = 0.3f;
     public Vector3 moveDistance = Vector3.zero;
 
-    private bool canReset = false; // separate from fail because external things can call reset
-    private bool canFail = false;
+    public bool canReset = false; // separate from fail because external things can call reset
+    public bool canFail = false;
     private Vector3 resetPosition = Vector3.zero;
     private Quaternion resetRotation = Quaternion.identity;
     private float resetBounciness = 0.0f;
@@ -37,7 +37,7 @@ public class TurtleMovement : MonoBehaviour
     public UnityEvent EndOfMovementEvent;
     public UnityEvent FailEvent = new UnityEvent();
 
-    public Action afterJumpAction = () => {};
+    public Action afterJumpAction;
 
 
     private void SetIsWalking(bool value)
@@ -62,6 +62,7 @@ public class TurtleMovement : MonoBehaviour
         resetConstraints = rb.constraints;
 
         SetAnimSpeed(animationSpeed);
+        afterJumpAction = EndMovement;
     }
 
 
@@ -269,6 +270,7 @@ public class TurtleMovement : MonoBehaviour
         isGrounded = false;
 
         afterJumpAction();
+        afterJumpAction = EndMovement;
     }
 
     private void FailOnHitBack()
@@ -297,7 +299,7 @@ public class TurtleMovement : MonoBehaviour
         Reset();
     }
 
-    private void Fail(Action? failAction = null)
+    public void Fail(Action? failAction = null)
     {
         if (!canFail)
         {
