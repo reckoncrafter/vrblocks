@@ -45,6 +45,7 @@ public class ExecutionDirector : MonoBehaviour
     public void StartButtonPressed()
     {
         //blockList = mainBlockList;
+        executionInterrupted = false;
         CallStack.Clear();
         FunctionData mainFunction = new FunctionData();
         mainFunction.blockList = mainBlockList;
@@ -69,6 +70,7 @@ public class ExecutionDirector : MonoBehaviour
 
     private IEnumerator IlluminateBlock(GameObject block){
         Renderer r = block.GetComponent<Renderer>();
+        r.material.SetColor("_EmissionColor", r.material.GetColor("_Color"));
         r.material.EnableKeyword("_EMISSION");
 
         yield return new WaitForSeconds(1.0f);
@@ -313,12 +315,13 @@ public class ExecutionDirector : MonoBehaviour
         // if anything is left in scopeBuilding, we have incomplete If Statements!
     }
 
-
+    private bool executionInterrupted = false;
     public void SuccessHandler()
     {
         Debug.Log("ExecutionDirector: Success! Halting..");
         turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
         ContinueLoopEvent.RemoveAllListeners();
+        executionInterrupted = true;
     }
     public void FailHandler()
     {
@@ -329,6 +332,8 @@ public class ExecutionDirector : MonoBehaviour
 
     public void MainLoop()
     {
+        if (executionInterrupted) return;
+
         var function = CallStack.Pop();
 
         if(function.instructionPointer >= function.blockList.Count)
@@ -340,8 +345,10 @@ public class ExecutionDirector : MonoBehaviour
             }
             else
             {
+                // no more code
                 turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
                 ContinueLoopEvent.RemoveAllListeners();
+                turtleMovement.Fail();
             }
             return;
         }
