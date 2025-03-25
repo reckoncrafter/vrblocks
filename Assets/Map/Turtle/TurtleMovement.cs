@@ -10,6 +10,7 @@ public class TurtleMovement : MonoBehaviour
     public AudioClip turtleCollisionAudio;
     public AudioClip turtleFallAudio;
     public AudioClip turtleJumpAudio;
+    public AudioClip turtleSuccessAudio;
 
 
     public float movementDuration = 2.0f;
@@ -134,9 +135,10 @@ public class TurtleMovement : MonoBehaviour
             {
                 RaycastHit hit;
                 Debug.DrawRay(transform.position, transform.forward, Color.red, 10);
-                if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
+                if (Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
                 {
-                    if(hit.transform.parent.gameObject.name == "MapSpawner"){
+                    if (hit.transform.parent.gameObject.name == "MapSpawner")
+                    {
                         return true;
                     }
                 }
@@ -150,18 +152,18 @@ public class TurtleMovement : MonoBehaviour
     {
         queue.Enqueue(() =>
         {
-          conditionFunction = () =>
-          {
-              RaycastHit hit;
-              Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
-              if(!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
-              {
-                  Debug.Log("ConditionFacingMapEdge: Cliff detected!");
-                  return true;
-              }
-              return false;
-          };
-          StartNextAction();
+            conditionFunction = () =>
+            {
+                RaycastHit hit;
+                Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
+                if (!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
+                {
+                    Debug.Log("ConditionFacingMapEdge: Cliff detected!");
+                    return true;
+                }
+                return false;
+            };
+            StartNextAction();
         });
     }
 
@@ -176,7 +178,7 @@ public class TurtleMovement : MonoBehaviour
                 bool aheadLevel = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 0.05f);
                 bool aheadNotEmpty = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f);
 
-                if(!aheadLevel && aheadNotEmpty)
+                if (!aheadLevel && aheadNotEmpty)
                 {
                     Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
                     return true;
@@ -238,16 +240,16 @@ public class TurtleMovement : MonoBehaviour
             return;
         }
 
-        for(int i = 0; i < queueArray.Length; i++)
+        for (int i = 0; i < queueArray.Length; i++)
         {
-            if(queueArray[i] == ElseStatement)
+            if (queueArray[i] == ElseStatement)
             {
                 nextControlBlockIndex = i;
                 isElse = true;
                 Debug.Log("IfStatementBegin found ElseStatement");
                 break;
             }
-            else if(queueArray[i] == ElseIfStatement)
+            else if (queueArray[i] == ElseIfStatement)
             {
                 nextControlBlockIndex = i - 1;
                 isElse = true;
@@ -284,7 +286,7 @@ public class TurtleMovement : MonoBehaviour
             if (isElse)
             {
                 var toList = new List<Action>(queue);
-                for (int i = nextControlBlockIndex + (isElseIf? 2 : 1); i < EndIndex; i++)
+                for (int i = nextControlBlockIndex + (isElseIf ? 2 : 1); i < EndIndex; i++)
                 {
                     toList.RemoveAt(i);
                     Debug.Log(toList[i].ToString());
@@ -340,7 +342,7 @@ public class TurtleMovement : MonoBehaviour
             }
         }
 
-        if(!conditionFunction())
+        if (!conditionFunction())
         {
             for (int i = 0; i < nextControlBlockIndex; i++)
             {
@@ -588,5 +590,16 @@ public class TurtleMovement : MonoBehaviour
         failAction?.Invoke();
 
         StartCoroutine(WaitAndReset());
+    }
+
+    public void Success()
+    {
+        canFail = false;
+        canReset = false;
+        queue.Clear();
+        tween?.reset();
+        SetIsWalking(false);
+
+        AudioSource.PlayClipAtPoint(turtleSuccessAudio, transform.position);
     }
 }

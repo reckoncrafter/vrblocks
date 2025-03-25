@@ -5,7 +5,6 @@ public class DetectTurtle
     private PlayerUIManager? playerUIManager;
     public GameObject? Goal;
     public GameObject? Turtle;
-    public AudioClip? TurtleSuccessAudio { get; set; }
     private readonly float distanceActivationThreshold = 0.25f;
     private bool isNearby;
 
@@ -70,7 +69,7 @@ public class DetectTurtle
             if (!isNearby)
             {
                 Debug.Log("Goal reached!");
-                AudioSource.PlayClipAtPoint(TurtleSuccessAudio, Turtle.transform.position);
+                Turtle.GetComponent<TurtleMovement>().Success();
                 playerUIManager.EnableEndScreen();
             }
 
