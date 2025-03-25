@@ -18,32 +18,6 @@ public class BlockSnapping : MonoBehaviour
 
     private void Awake()
     {
-<<<<<<< HEAD
-        // queueReading = FindObjectOfType<QueueReading>();
-        // if (queueReading == null)
-        // {
-        //     Debug.LogWarning("QueueReading component not found in the scene. Ensure there is one active in the hierarchy.");
-        // }
-=======
-        // Automatic detection of QueueReading component (Specifically, the StartQueue block's QueueReading component)
-        QueueReading[] queueReadings = FindObjectsOfType<QueueReading>();
-
-        // Iterate through queueReading components to find the StartQueue Block.
-        foreach (var qr in queueReadings)
-        {
-            if (qr.gameObject.name.Contains("StartQueue"))
-            {
-                queueReading = qr;
-                break;
-            }
-        }
-
-        if (queueReading == null)
-        {
-            Debug.LogWarning("QueueReading component with a block name containing 'StartQueue' not found in the scene. Ensure there is one active in the hierarchy.");
-        }
->>>>>>> main
-
         // Collision Forwarding active
         Transform snapTriggerTop = transform.Find("SnapTriggerTop");
         AttachCollisionForwarding(snapTriggerTop);
