@@ -1928,7 +1928,13 @@ MonoBehaviour:
   animationSpeed: 4
   failBounciness: 0.3
   moveDistance: {x: 0.5, y: 0.5, z: 0.5}
+  canReset: 0
+  canFail: 0
+  shouldJump: 0
   EndOfMovementEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  FailEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &75894331
@@ -12724,8 +12730,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839e8ec8ed89e713a9c7cbec41e8e73e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turtleMovement: {fileID: 0}
-  queueReading: {fileID: 1694751830}
 --- !u!114 &1059108141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19912,17 +19916,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1694751830 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5354081781134567555, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
-  m_PrefabInstance: {fileID: 1694751826}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1694751828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1698257134
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20506,6 +20499,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6189354538098044173, guid: 2fd3e07afe5b461490fb8e314976b1b0, type: 3}
   m_PrefabInstance: {fileID: 1738129897}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1743075288
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1743075290}
+  - component: {fileID: 1743075289}
+  m_Layer: 0
+  m_Name: ExecutionDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1743075289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743075288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c021ad426592221b35df0cdab6ffa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turtleMovement: {fileID: 75894330}
+  startBlock: {fileID: 1694751828}
+  startButton: {fileID: 1059108139}
+--- !u!4 &1743075290
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743075288}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.016686764, y: 1.114046, z: 1.9891195}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1746174264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25287,3 +25327,4 @@ SceneRoots:
   - {fileID: 2067140031}
   - {fileID: 144103164}
   - {fileID: 567931306}
+  - {fileID: 1743075290}
