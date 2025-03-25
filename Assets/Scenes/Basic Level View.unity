@@ -412,7 +412,16 @@ MonoBehaviour:
   animationSpeed: 4
   failBounciness: 0.3
   moveDistance: {x: 0.5, y: 0.5, z: 0.5}
+  canReset: 0
+  canFail: 0
+  shouldJump: 0
   EndOfMovementEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  FailEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SuccessEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &16984052
@@ -4831,6 +4840,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 23f69f763336f67488996af0a5d95f78, type: 3}
   m_PrefabInstance: {fileID: 418739506}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &431602177
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 431602179}
+  - component: {fileID: 431602178}
+  m_Layer: 0
+  m_Name: ExecutionDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &431602178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431602177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c021ad426592221b35df0cdab6ffa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turtleMovement: {fileID: 16984051}
+  startBlock: {fileID: 1554614508}
+  startButton: {fileID: 1846371468}
+--- !u!4 &431602179
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431602177}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.758871, y: 0.5668478, z: 2.761901}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &431793945
 GameObject:
   m_ObjectHideFlags: 0
@@ -8240,12 +8296,12 @@ MonoBehaviour:
   m_margin: {x: -0.03583335, y: -28.862024, z: -9.593889, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  _SortingLayer: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 740480789}
   m_maskType: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
 --- !u!23 &740480789
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -13360,7 +13416,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1243595404207406716, guid: bcb0937908c3b486488044df38fbe28c, type: 3}
   m_PrefabInstance: {fileID: 842696042}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1846371468}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20c01e0ed98aeff95bb97a9eefaa852b, type: 3}
@@ -18433,6 +18489,11 @@ Transform:
   - {fileID: 108084940}
   m_Father: {fileID: 118832887}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1554614508 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6122732868338158301, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
+  m_PrefabInstance: {fileID: 1821506446}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1564972809
 GameObject:
   m_ObjectHideFlags: 0
@@ -21895,6 +21956,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1840940157}
   m_CullTransparentMesh: 1
+--- !u!1 &1846371468 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4431401968804370781, guid: bcb0937908c3b486488044df38fbe28c, type: 3}
+  m_PrefabInstance: {fileID: 842696042}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1855139096
 GameObject:
   m_ObjectHideFlags: 0
@@ -22057,7 +22123,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5354081781134567555, guid: 5619ccd8f57d4ae9eadafa60b02da6cd, type: 3}
   m_PrefabInstance: {fileID: 1821506446}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1554614508}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
@@ -25790,3 +25856,4 @@ SceneRoots:
   - {fileID: 2007226454}
   - {fileID: 325242605}
   - {fileID: 1107197726269526062}
+  - {fileID: 431602179}

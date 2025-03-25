@@ -191,25 +191,9 @@ public class TurtleMovement : MonoBehaviour
         rb.constraints = resetConstraints;
     }
 
-    // private void StartNextAction()
-    // {
-    //     if (queue.Count > 0)
-    //     {
-    //         queue.Dequeue().Invoke();
-    //     }
-    //     else
-    //     {
-    //         Fail(() =>
-    //         {
-    //             AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
-    //         });
-    //     }
-    // }
-
     private void EndMovement()
     {
         SetIsWalking(false);
-        //StartNextAction();
 
         EndOfMovementEvent.Invoke();
     }
