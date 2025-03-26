@@ -11,7 +11,8 @@ public class BlockCount : MonoBehaviour
     void Start()
     {
         //queueReading = GameObject.Find("Block (StartQueue)").GetComponent<QueueReading>();
-        executionDirector = GameObject.Find("ExecutionDirector").GetComponent<ExecutionDirector>();
+        executionDirector = GameObject.Find("/ExecutionDirector").GetComponent<ExecutionDirector>();
+        BlockSnapping.blockSnapEvent.AddListener(UpdateBlockCount);
     }
     private void UpdateBlockCount()
     {

@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
 using Command = TurtleCommand.Command;
@@ -57,24 +58,24 @@ public class ExecutionDirector : MonoBehaviour
         AssembleScopes(mainFunction);
         CallStack.Push(mainFunction);
 
-        turtleMovement.EndOfMovementEvent.AddListener(MainLoop);
+        //turtleMovement.EndOfMovementEvent.AddListener(MainLoop);
         ContinueLoopEvent.AddListener(MainLoop);
 
-        StartCoroutine(RepeatLoop());
+        StartCoroutine(RepeatLoop(0.5f));
     }
 
     private UnityEvent ContinueLoopEvent = new UnityEvent();
-    private IEnumerator RepeatLoop(){
-        yield return new WaitForSeconds(1.0f);
+    private IEnumerator RepeatLoop(float time){
+        yield return new WaitForSeconds(time);
         ContinueLoopEvent.Invoke();
     }
 
-    private IEnumerator IlluminateBlock(GameObject block){
+    private IEnumerator IlluminateBlock(GameObject block, float time){
         Renderer r = block.GetComponent<Renderer>();
         r.material.SetColor("_EmissionColor", r.material.GetColor("_Color"));
         r.material.EnableKeyword("_EMISSION");
 
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(time);
 
         r.material.DisableKeyword("_EMISSION");
     }
@@ -228,6 +229,7 @@ public class ExecutionDirector : MonoBehaviour
 
         Stack<ScopeData> scopeBuilding = new Stack<ScopeData>();
         int sb_index = 0;
+
         while(sb_index < blockList.Count)
         {
             TurtleCommand blockTurtleCommand;
@@ -306,16 +308,20 @@ public class ExecutionDirector : MonoBehaviour
     public void SuccessHandler()
     {
         Debug.Log("ExecutionDirector: Success! Halting..");
-        turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+        //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
         ContinueLoopEvent.RemoveAllListeners();
         executionInterrupted = true;
     }
     public void FailHandler()
     {
         Debug.Log("ExecutionDirector: Failure! Halting..");
-        turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+        //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
         ContinueLoopEvent.RemoveAllListeners();
     }
+
+    readonly float defaultWait = 1.0f;
+    readonly float moveWait = 1.8f;
+    readonly float jumpWait = 1.5f;
 
     public void MainLoop()
     {
@@ -333,7 +339,7 @@ public class ExecutionDirector : MonoBehaviour
             else
             {
                 // no more code
-                turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
+                //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
                 ContinueLoopEvent.RemoveAllListeners();
                 turtleMovement.Fail();
             }
@@ -349,7 +355,6 @@ public class ExecutionDirector : MonoBehaviour
         FunctionCallBlock functionCallBlock;
         bool isFunctionCall = function.blockList[function.instructionPointer].TryGetComponent<FunctionCallBlock>(out functionCallBlock);
 
-        StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer]));
         if (isCommandOrFlowControl)
         {
             Command instruction = blockTurtleCommand.commandEnum;
@@ -358,9 +363,12 @@ public class ExecutionDirector : MonoBehaviour
 
             if(instruction == Command.IfBegin)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
+
                 TurtleCommand tc;
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
+                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
                     bool condition = EvaluateCondition(tc.commandEnum);
                     Debug.Log($"ExecutionDirector.Execute(): IfBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
                     ScopeData sd = function.scopeDict[function.instructionPointer];
@@ -379,7 +387,6 @@ public class ExecutionDirector : MonoBehaviour
                             function.instructionPointer = sd.IntermediateBlocks[0];
                             function.scopes.Push(sd);
 
-                            StartCoroutine(RepeatLoop());
                             goto skip; // do not increment function.instructionPointer!
                         }
                         else
@@ -393,17 +400,20 @@ public class ExecutionDirector : MonoBehaviour
                         }
                     }
                 }
-                StartCoroutine(RepeatLoop());
+
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(instruction == Command.IfEnd)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
                 function.scopes.Pop();
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(instruction == Command.Else)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
                 ScopeData sd = function.scopes.Pop();
                 if(sd.hasExecuted)
                 {
@@ -417,14 +427,17 @@ public class ExecutionDirector : MonoBehaviour
                     sd.hasExecuted = true;
                     function.scopes.Push(sd);
                 }
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(instruction == Command.ElseIf)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
+
                 TurtleCommand tc = null;
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
+                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
                     bool condition = EvaluateCondition(tc.commandEnum);
                     Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {condition}.");
                     ScopeData sd = function.scopes.Pop();
@@ -434,8 +447,6 @@ public class ExecutionDirector : MonoBehaviour
                         {
                             function.scopes.Push(sd);
                             function.instructionPointer = sd.EndBlock;
-
-                            StartCoroutine(RepeatLoop());
                             
                             goto skip;
                         }
@@ -474,14 +485,17 @@ public class ExecutionDirector : MonoBehaviour
                         }
                     }
                 }
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(instruction == Command.WhileBegin)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
+
                 TurtleCommand tc;
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
+                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
                     bool condition = EvaluateCondition(tc.commandEnum);
                     Debug.Log($"ExecutionDirector.Execute(): WhileBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
                     ScopeData sd = function.scopeDict[function.instructionPointer];
@@ -497,11 +511,13 @@ public class ExecutionDirector : MonoBehaviour
                     function.instructionPointer += 1; // skip condition block
                     function.scopes.Push(sd);
                 }
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(instruction == Command.WhileEnd)
             {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
+
                 ScopeData sd = function.scopes.Pop();
                 if(sd.hasExecuted)
                 {
@@ -510,7 +526,7 @@ public class ExecutionDirector : MonoBehaviour
                     goto skip;
                 }
 
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
 
             else if(
@@ -522,30 +538,37 @@ public class ExecutionDirector : MonoBehaviour
             {
                 if(instruction == Command.Jump)
                 {
+                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], jumpWait));
                     TurtleCommand tc;
                     if(function.instructionPointer + 1 < function.blockList.Count &&
                         function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc) &&
                         (tc.commandEnum == Command.MoveForward || tc.commandEnum == Command.RotateRight || tc.commandEnum == Command.RotateLeft)
                         )
                         {
+                            StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], jumpWait));
                             CombinedJump(tc.commandEnum);
                             function.instructionPointer += 1;
+                            StartCoroutine(RepeatLoop(jumpWait));
                         }
                         else
                         {
                             InstructTurtle(instruction);
+                            StartCoroutine(RepeatLoop(jumpWait));
                         }
                 }
                 else
                 {
+                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], moveWait));
                     InstructTurtle(instruction);
+                    StartCoroutine(RepeatLoop(moveWait));
                 }
             }
 
             else{
                 // must be a condition check
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
                 InstructTurtle(instruction);
-                StartCoroutine(RepeatLoop());
+                StartCoroutine(RepeatLoop(defaultWait));
             }
         }
 
@@ -563,7 +586,7 @@ public class ExecutionDirector : MonoBehaviour
             function.instructionPointer++;
             CallStack.Push(function);
             CallStack.Push(nextFunctionData);
-            StartCoroutine(RepeatLoop());
+            StartCoroutine(RepeatLoop(defaultWait));
             return;
         }
 
@@ -573,7 +596,7 @@ public class ExecutionDirector : MonoBehaviour
         return;
 
         skip:
-        StartCoroutine(RepeatLoop());
+        StartCoroutine(RepeatLoop(defaultWait));
         CallStack.Push(function);
         return;
     }
