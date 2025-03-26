@@ -114,16 +114,14 @@ public class ExecutionDirector : MonoBehaviour
 
     private bool EvaluateCondition(Command cmd)
     {
-        bool error(){
-            throw new TurtleRuntimeError("Block is not a condition!", CallStack.Peek().blockList[CallStack.Peek().instructionPointer]);
-        }
+        // Note: Should create error on non-conditional Command
         return cmd switch {
             Command.ConditionFacingWall => turtleMovement.ConditionFacingWall(),
             Command.ConditionFacingCliff => turtleMovement.ConditionFacingCliff(),
             Command.ConditionFacingStepDown => turtleMovement.ConditionFacingStepDown(),
             Command.ConditionTrue => turtleMovement.ConditionTrue(),
             Command.ConditionFalse => turtleMovement.ConditionFalse(),
-            _ => error()
+            _ => false
         };
     }
 
@@ -169,18 +167,6 @@ public class ExecutionDirector : MonoBehaviour
             Debug.LogError($"Syntax Error at {offendingBlock.name}");
         }
     };
-
-    private class TurtleRuntimeError : Exception{
-        public TurtleRuntimeError(string message, GameObject offendingBlock): base(message)
-        {
-            TurtleCommand tc;
-            if(offendingBlock.TryGetComponent<TurtleCommand>(out tc))
-            {
-                tc.SetOffendingState(true);
-            }
-            Debug.LogError($"Runtime Error at Block: {offendingBlock.name}");
-        }
-    }
 
     private Stack<FunctionData> CallStack = new Stack<FunctionData>();
     private void AssembleScopes(FunctionData function)
