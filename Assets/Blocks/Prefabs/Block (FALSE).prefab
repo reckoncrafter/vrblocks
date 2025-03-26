@@ -736,10 +736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls: []
-  turtleMovement: {fileID: 0}
+  defaultMaterial: {fileID: 0}
+  offendingStateMaterial: {fileID: 0}
   commandEnum: 11
 --- !u!1 &8666319159274101146
 GameObject:
@@ -806,7 +804,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Set False
+  m_text: FALSE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
