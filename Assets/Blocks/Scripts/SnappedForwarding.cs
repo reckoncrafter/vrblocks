@@ -187,10 +187,12 @@ public class SnappedForwarding : MonoBehaviour
                 // Ignore wires
                 if (!otherRbParent.name.Contains("Wire"))
                 {
-                    // Temporarily disable rotation constraints to allow realignment
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
+                    // Destroy the connecting joint to allow block realignment while retaining physics reactivity
+                    FixedJoint existingJoint = rb.GetComponent<FixedJoint>();
+                    if (existingJoint != null)
+                    {
+                        Destroy(existingJoint);
+                    }
 
                     // Update position to match the X and Z of the parent block
                     Vector3 parentPosition = otherRbParent.transform.position;
@@ -198,12 +200,13 @@ public class SnappedForwarding : MonoBehaviour
 
                     // Reset rotation to 0
                     rb.transform.rotation = Quaternion.Euler(0, 0, 0);
-                    Debug.Log($"Physics Update: Position/Rotation reset");
+                    //Debug.Log($"Physics Update: Position/Rotation reset");
 
-                    // Re-enable the rotation constraints after alignment
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationX;
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationY;
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+                    // Create new joint to reconnect the blocks
+                    FixedJoint newJoint = rb.gameObject.AddComponent<FixedJoint>();
+                    newJoint.connectedBody = otherRbParent.GetComponent<Rigidbody>();
+                    newJoint.breakForce = Mathf.Infinity;
+                    newJoint.breakTorque = Mathf.Infinity;
 
                     break;
                 }
