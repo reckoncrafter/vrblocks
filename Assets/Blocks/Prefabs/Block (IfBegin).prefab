@@ -354,7 +354,6 @@ GameObject:
   - component: {fileID: 7252318290548244527}
   - component: {fileID: 5405742046879034240}
   - component: {fileID: -114807343237902717}
-  - component: {fileID: 3383383998406115282}
   m_Layer: 0
   m_Name: Block (IfBegin)
   m_TagString: Block
@@ -675,24 +674,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls: []
-  turtleMovement: {fileID: 0}
+  defaultMaterial: {fileID: 0}
+  offendingStateMaterial: {fileID: 0}
   commandEnum: 4
---- !u!114 &3383383998406115282
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6713015538121544575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f969e19a52c3f5321b98425afe3c4fae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offendingStateMaterial: {fileID: 2100000, guid: 4d134f4fa3cb560a685b5095152b3ef1, type: 2}
 --- !u!1 &8621670510736045226
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,7 +773,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: if True
+  m_text: if
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
