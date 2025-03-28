@@ -15,7 +15,9 @@ public class ConditionSelectorBlock : MonoBehaviour
         "Literal False",
     };
 
+    public bool isInverted = false;
     public Dropdown dropdown;
+    public Toggle textToggle;
     TurtleCommand turtleCommand;
 
     void Start()
@@ -23,6 +25,12 @@ public class ConditionSelectorBlock : MonoBehaviour
         turtleCommand = GetComponent<TurtleCommand>();
         dropdown.AddOptions(new List<string>(dropdownOptions) );
         dropdown.onValueChanged.AddListener(delegate {DropdownValueChanged(dropdown);});
+        textToggle.onValueChanged.AddListener(delegate {ToggleValueChanged(textToggle);});
+    }
+
+    void ToggleValueChanged(Toggle toggle)
+    {
+        isInverted = toggle.isOn;
     }
 
     void DropdownValueChanged(Dropdown dd)
@@ -37,5 +45,4 @@ public class ConditionSelectorBlock : MonoBehaviour
             _ => TurtleCommand.Command.CommandError
         };
     }
-
 }
