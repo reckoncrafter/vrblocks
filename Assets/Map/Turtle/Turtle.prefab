@@ -677,7 +677,16 @@ MonoBehaviour:
   animationSpeed: 4
   failBounciness: 0.3
   moveDistance: {x: 0.5, y: 0.5, z: 0.5}
+  canReset: 0
+  canFail: 0
+  shouldJump: 0
   EndOfMovementEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  FailEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SuccessEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!54 &3128291793120707304
