@@ -22,6 +22,7 @@ public class ExecutionDirector : MonoBehaviour
     public TurtleMovement turtleMovement;
     public GameObject startBlock;
     public GameObject startButton;
+    public BlockCount blockCount;
 
     // maintains a list of the blocks under Block (StartQueue)
     private List<GameObject> mainBlockList = new List<GameObject>();
@@ -38,12 +39,6 @@ public class ExecutionDirector : MonoBehaviour
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
     }
-
-    public int GetMainListLength(){
-        return mainBlockList.Count;
-    }
-
-
     public void StartButtonPressed()
     {
         //blockList = mainBlockList;
@@ -605,6 +600,13 @@ public class ExecutionDirector : MonoBehaviour
     {
         ReadMainBlocks();
         GrabFunctionsInScene();
+
+        int blocksAllQueues = mainBlockList.Count;
+        foreach(var fbl in functionBlockLists)
+        {
+            blocksAllQueues += fbl.Value.Count;
+        }
+        blockCount.SetBlockCount(blocksAllQueues);
     }
 
     void GrabFunctionsInScene(){
@@ -644,6 +646,7 @@ public class ExecutionDirector : MonoBehaviour
         {
             Debug.Log($"ExecutionDirector.ReadMainBlocks: {block.name}");
         }
+
     }
 
     List<GameObject> ReadFunctionBlocks(GameObject functionDefinition)
