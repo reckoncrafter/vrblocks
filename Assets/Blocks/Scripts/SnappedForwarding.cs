@@ -194,13 +194,21 @@ public class SnappedForwarding : MonoBehaviour
                         Destroy(existingJoint);
                     }
 
-                    // Update position to match the X and Z of the parent block
-                    Vector3 parentPosition = otherRbParent.transform.position;
-                    rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
-
                     // Reset rotation to 0
                     rb.transform.rotation = Quaternion.Euler(0, 0, 0);
                     //Debug.Log($"Physics Update: Position/Rotation reset");
+
+                    // Update position to match the X and Z of the parent block, realign SnapPointTop with SnapPointBottom
+                    Transform snapPointTop = rb.transform.Find("SnapPointTop");
+                    Transform snapPointBottom = otherRbParent.transform.Find("SnapPointBottom");
+
+                    if (snapPointTop != null && snapPointBottom != null)
+                    {
+                        Vector3 parentPosition = otherRbParent.transform.position;
+                        Vector3 offset = snapPointTop.position - rb.transform.position;
+                        Vector3 realignPosition = snapPointBottom.position - offset;
+                        rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
+                    }
 
                     // Create new joint to reconnect the blocks
                     FixedJoint newJoint = rb.gameObject.AddComponent<FixedJoint>();
