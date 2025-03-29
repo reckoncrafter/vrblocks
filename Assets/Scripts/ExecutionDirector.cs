@@ -22,6 +22,7 @@ public class ExecutionDirector : MonoBehaviour
     public TurtleMovement turtleMovement;
     public GameObject startBlock;
     public GameObject startButton;
+    public BlockCount blockCount;
 
     // maintains a list of the blocks under Block (StartQueue)
     private List<GameObject> mainBlockList = new List<GameObject>();
@@ -38,12 +39,6 @@ public class ExecutionDirector : MonoBehaviour
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
     }
-
-    public int GetMainListLength(){
-        return mainBlockList.Count;
-    }
-
-
     public void StartButtonPressed()
     {
         //blockList = mainBlockList;
@@ -113,10 +108,10 @@ public class ExecutionDirector : MonoBehaviour
         turtleMovement.FixedUpdate();
     }
 
-    private bool EvaluateCondition(Command cmd)
+    private bool EvaluateCondition(Command cmd, bool isInverted)
     {
         // Note: Should create error on non-conditional Command
-        return cmd switch {
+        bool status = cmd switch {
             Command.ConditionFacingWall => turtleMovement.ConditionFacingWall(),
             Command.ConditionFacingCliff => turtleMovement.ConditionFacingCliff(),
             Command.ConditionFacingStepDown => turtleMovement.ConditionFacingStepDown(),
@@ -124,6 +119,7 @@ public class ExecutionDirector : MonoBehaviour
             Command.ConditionFalse => turtleMovement.ConditionFalse(),
             _ => false
         };
+        return isInverted ? status : !status;
     }
 
     private int FindNextBlockOfType(List<GameObject> blockList, int StartIndex, int EndIndex, Command cmd)
@@ -366,10 +362,18 @@ public class ExecutionDirector : MonoBehaviour
                 StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
 
                 TurtleCommand tc;
+                ConditionSelectorBlock csb;
+                bool invertedStatus = false;
+
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<ConditionSelectorBlock>(out csb))
+                {
+                    invertedStatus = csb.isInverted;
+                }
+
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
                     StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
-                    bool condition = EvaluateCondition(tc.commandEnum);
+                    bool condition = EvaluateCondition(tc.commandEnum, invertedStatus);
                     Debug.Log($"ExecutionDirector.Execute(): IfBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
                     ScopeData sd = function.scopeDict[function.instructionPointer];
                     if(condition)
@@ -434,12 +438,20 @@ public class ExecutionDirector : MonoBehaviour
             {
                 StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
 
-                TurtleCommand tc = null;
+                TurtleCommand tc;
+                ConditionSelectorBlock csb;
+                bool invertedStatus = false;
+
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<ConditionSelectorBlock>(out csb))
+                {
+                    invertedStatus = csb.isInverted;
+                }
+
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
                     StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
-                    bool condition = EvaluateCondition(tc.commandEnum);
-                    Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {condition}.");
+                    bool condition = EvaluateCondition(tc.commandEnum, invertedStatus);
+                    Debug.Log($"ExecutionDirector.Execute(): ElseIf {tc.commandEnum} is {(invertedStatus ? "not" : "")} {condition}.");
                     ScopeData sd = function.scopes.Pop();
                     if(condition)
                     {
@@ -493,10 +505,18 @@ public class ExecutionDirector : MonoBehaviour
                 StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
 
                 TurtleCommand tc;
+                ConditionSelectorBlock csb;
+                bool invertedStatus = false;
+
+                if(function.blockList[function.instructionPointer+1].TryGetComponent<ConditionSelectorBlock>(out csb))
+                {
+                    invertedStatus = csb.isInverted;
+                }
+
                 if(function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc))
                 {
                     StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], defaultWait));
-                    bool condition = EvaluateCondition(tc.commandEnum);
+                    bool condition = EvaluateCondition(tc.commandEnum, invertedStatus);
                     Debug.Log($"ExecutionDirector.Execute(): WhileBegin at {function.instructionPointer}: {tc.commandEnum} is {condition}.");
                     ScopeData sd = function.scopeDict[function.instructionPointer];
                     sd.hasExecuted = true;
@@ -605,6 +625,13 @@ public class ExecutionDirector : MonoBehaviour
     {
         ReadMainBlocks();
         GrabFunctionsInScene();
+
+        int blocksAllQueues = mainBlockList.Count;
+        foreach(var fbl in functionBlockLists)
+        {
+            blocksAllQueues += fbl.Value.Count;
+        }
+        blockCount.SetBlockCount(blocksAllQueues);
     }
 
     void GrabFunctionsInScene(){
@@ -644,6 +671,7 @@ public class ExecutionDirector : MonoBehaviour
         {
             Debug.Log($"ExecutionDirector.ReadMainBlocks: {block.name}");
         }
+
     }
 
     List<GameObject> ReadFunctionBlocks(GameObject functionDefinition)
