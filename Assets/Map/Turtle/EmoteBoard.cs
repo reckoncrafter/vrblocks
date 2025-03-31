@@ -68,6 +68,8 @@ public class EmoteBoard : MonoBehaviour
 
     public float emoteLifeTime = 2.0f;
 
+    public GameObject forwardArrow;
+
     public void Emote(Emotes em)
     {
         StartCoroutine(InsertEmote(em));
@@ -77,9 +79,11 @@ public class EmoteBoard : MonoBehaviour
     {
         board.Enqueue(emoteSprites[em]);
         UpdateBoard();
+        if (em == Emotes.MoveForward){ forwardArrow.SetActive(true); }
         yield return new WaitForSeconds(emoteLifeTime);
         board.Dequeue();
         UpdateBoard();
+        if (em == Emotes.MoveForward){ forwardArrow.SetActive(false); }
     }
 
     void Update()
@@ -119,8 +123,10 @@ public class EmoteBoard : MonoBehaviour
             GameObject emoteContainer = new GameObject(s.name);
             SpriteRenderer spriteRenderer = emoteContainer.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = s;
-            GameObject newObject = Instantiate(emoteContainer, transform.position + offset, transform.rotation, transform);
-            newObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            emoteContainer.transform.parent = transform;
+            emoteContainer.transform.position = transform.position + offset;
+            emoteContainer.transform.rotation = transform.rotation;
+            emoteContainer.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             offset = offset + new Vector3(0.25f, 0.0f, 0.0f);
         }
     }
