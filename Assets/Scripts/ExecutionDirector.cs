@@ -692,8 +692,4 @@ public class ExecutionDirector : MonoBehaviour
 
         return functionList;
     }
-
-
-
-
 }
