@@ -539,6 +539,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waitDuration: 1
+  levelMetadataScriptables: []
 --- !u!4 &231684126
 Transform:
   m_ObjectHideFlags: 0
@@ -1742,7 +1743,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2583,7 +2584,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 994881666}
-  - component: {fileID: 994881665}
+  - component: {fileID: 994881667}
   m_Layer: 0
   m_Name: LevelStatesManager
   m_TagString: Untagged
@@ -2591,18 +2592,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &994881665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 994881664}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecc1535de194c62d89a1b8c5faf23890, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &994881666
 Transform:
   m_ObjectHideFlags: 0
@@ -2618,6 +2607,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &994881667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994881664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61ffa460ae8226a449e085134fda18d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelMetadataScriptables:
+  - {fileID: 11400000, guid: bd47bb387ab4cdb6eb0a91e72d026dae, type: 2}
+  - {fileID: 11400000, guid: 2fd2c8f5e96284ec0894b2ac0301c537, type: 2}
+  - {fileID: 11400000, guid: 8f6266ce3c1eb33e4875e64f789bec24, type: 2}
+  - {fileID: 11400000, guid: 85cf979bcd1aec33092f614218595556, type: 2}
 --- !u!1 &1011742837
 GameObject:
   m_ObjectHideFlags: 0
@@ -4315,11 +4321,6 @@ MonoBehaviour:
   middleLevelView: {fileID: 282266609}
   leftLevelView: {fileID: 413289342}
   rightLevelView: {fileID: 2104979130}
-  levelMetadataScriptables:
-  - {fileID: 11400000, guid: bd47bb387ab4cdb6eb0a91e72d026dae, type: 2}
-  - {fileID: 11400000, guid: 2fd2c8f5e96284ec0894b2ac0301c537, type: 2}
-  - {fileID: 11400000, guid: 8f6266ce3c1eb33e4875e64f789bec24, type: 2}
-  - {fileID: 11400000, guid: 85cf979bcd1aec33092f614218595556, type: 2}
 --- !u!1 &1620565657
 GameObject:
   m_ObjectHideFlags: 0
@@ -4959,8 +4960,7 @@ Transform:
   m_LocalPosition: {x: -4.4052854, y: -5.230321, z: 10.936094}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1965819278}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1860171386 stripped
@@ -5327,12 +5327,12 @@ Transform:
   m_GameObject: {fileID: 1965819275}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.4052854, y: 5.230321, z: -10.936094}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1828088530}
-  m_Father: {fileID: 1850122190}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2064898091
 GameObject:
@@ -5634,6 +5634,7 @@ SceneRoots:
   - {fileID: 1050561326}
   - {fileID: 1620565661}
   - {fileID: 534281612}
+  - {fileID: 1965819278}
   - {fileID: 1850122190}
   - {fileID: 2108290993}
   - {fileID: 1051434122}
