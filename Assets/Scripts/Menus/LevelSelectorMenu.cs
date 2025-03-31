@@ -90,7 +90,7 @@ public class LevelSelectorMenu : MonoBehaviour
 
     public void GoToLevel()
     {
-        SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.AssetDirectoryOrder);
+        SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.LevelStatesManagerArrayOrder);
         // SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.BuildSettingsOrder);
         SceneTransitionStates.SetSelectedLevel(selectedLevelIndex);
     }

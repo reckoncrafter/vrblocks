@@ -148,7 +148,7 @@ public class PlayerUIManager : MonoBehaviour
         blockMenuAction.action.Enable();
         int nextLevel = SceneTransitionStates.GetSelectedLevel() + 1;
         SceneTransitionStates.SetSelectedLevel(nextLevel);
-        SceneTransitionManager.singleton.GoToSceneAsync(nextLevel, LoadSceneBy.AssetDirectoryOrder);
+        SceneTransitionManager.singleton.GoToSceneAsync(nextLevel, LoadSceneBy.LevelStatesManagerArrayOrder);
     }
 
     public void ToggleBlockMenu()
@@ -182,9 +182,10 @@ public class PlayerUIManager : MonoBehaviour
         toggleBlockMenu = false;
 
         // Show "Next Level" Button only if the current level is not the last playable level
-        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
-        FileInfo[] fin = thumbnailDir.GetFiles("*.png");
-        if(SceneTransitionStates.GetSelectedLevel() + 1 >= fin.Length){
+        // DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
+        LevelMetadataScriptableObject[] levelMetadataScriptables = GameObject.Find("/LevelStatesManager").GetComponent<LevelStatesManager>().levelMetadataScriptables;
+        // FileInfo[] fin = thumbnailDir.GetFiles("*.png");
+        if(SceneTransitionStates.GetSelectedLevel() + 1 >= levelMetadataScriptables.Length){
             nextLevelButton.GameObject().LeanScale(Vector3.zero, 0f);
             endScreenReturnToMenu.GameObject().LeanScale(Vector3.zero, 0f);
         }
