@@ -33,6 +33,20 @@ public class LevelSelectorMenu : MonoBehaviour
     private Vector2 leftLevelViewScale;
     private Vector2 rightLevelViewScale;
 
+    /*
+    * Okay, this may be a little weird and hard to justify.
+    * I set out to remove the dependency on AssetDatabase by LevelStates.
+    * I considered moving the LevelMetadataScriptableObject(s) to Resources, and using Resources.Load().
+    * Ultimately, I wanted to disrupt the current functioning of LevelStates as little as possible.
+    * What I really needed was a way to configure LevelStates with hardcoded references to the LevelMetadataScriptableObject(s).
+    * This way, it wouldn't need to load them at runtime via AssetDatabase.
+    * I can't do this unfortunately, but I figured that this object is the first object in the whole game that needs LevelStates
+    * to be complete, so why not give it hardcoded references to the ScriptableObjects in the Editor, and then have it load up LevelStates itself.
+    * All the other objects that reference it, like PlayerUIManager, should find it in a ready state when they are initialized.
+    */
+
+    public LevelMetadataScriptableObject[] levelMetadataScriptables;
+
     void Awake()
     {
         // Animations
@@ -50,6 +64,13 @@ public class LevelSelectorMenu : MonoBehaviour
 
     void Start()
     {
+        // Initializing LevelStates...
+        for(int i = 0; i < levelMetadataScriptables.Length; i++)
+        {
+            LevelStates.setMetadataReference(i, levelMetadataScriptables[i]);
+        }
+        LevelStates.triggerPrerequisiteLevelUnlock("");
+
         // Long winded way of grabbing the thumbnails. Wished Resource.LoadAll worked
         DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
