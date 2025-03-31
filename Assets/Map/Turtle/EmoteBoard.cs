@@ -68,6 +68,11 @@ public class EmoteBoard : MonoBehaviour
 
     public float emoteLifeTime = 2.0f;
 
+    public void Emote(Emotes em)
+    {
+        StartCoroutine(InsertEmote(em));
+    }
+
     public IEnumerator InsertEmote(Emotes em)
     {
         board.Enqueue(emoteSprites[em]);
@@ -75,6 +80,11 @@ public class EmoteBoard : MonoBehaviour
         yield return new WaitForSeconds(emoteLifeTime);
         board.Dequeue();
         UpdateBoard();
+    }
+
+    void Update()
+    {
+        transform.LookAt(Camera.main.transform);   
     }
 
     void Start()

@@ -40,6 +40,8 @@ public class TurtleMovement : MonoBehaviour
 
     public Action afterJumpAction;
 
+    private EmoteBoard emoteBoard;
+
 
     private void SetIsWalking(bool value)
     {
@@ -64,6 +66,8 @@ public class TurtleMovement : MonoBehaviour
 
         SetAnimSpeed(animationSpeed);
         afterJumpAction = () => { };
+
+        emoteBoard = GetComponentInChildren<EmoteBoard>();
     }
 
 
@@ -200,6 +204,7 @@ public class TurtleMovement : MonoBehaviour
 
     public void PerformWalkForward()
     {
+        emoteBoard.Emote(EmoteBoard.Emotes.MoveForward);
         SetIsWalking(true);
 
         Vector3 targetPosition = transform.position + Vector3.Scale(transform.forward, moveDistance);
@@ -219,11 +224,13 @@ public class TurtleMovement : MonoBehaviour
 
     public void PerformRotateRight()
     {
+        emoteBoard.Emote(EmoteBoard.Emotes.RotateRight);
         PerformRotate(90.0f);
     }
 
     public void PerformRotateLeft()
     {
+        emoteBoard.Emote(EmoteBoard.Emotes.RotateLeft);
         PerformRotate(-90.0f);
     }
 
@@ -249,6 +256,7 @@ public class TurtleMovement : MonoBehaviour
 
     private void PerformJump()
     {
+        emoteBoard.Emote(EmoteBoard.Emotes.Jump);
         animator.SetTrigger("Jump");
     }
 
@@ -296,6 +304,7 @@ public class TurtleMovement : MonoBehaviour
         {
             return;
         }
+        emoteBoard.Emote(EmoteBoard.Emotes.Failure);
         canFail = false;
 
         FailEvent.Invoke();
@@ -312,6 +321,7 @@ public class TurtleMovement : MonoBehaviour
 
     public void Success()
     {
+        emoteBoard.Emote(EmoteBoard.Emotes.Success);
         canFail = false;
         canReset = false;
         tween?.reset();
