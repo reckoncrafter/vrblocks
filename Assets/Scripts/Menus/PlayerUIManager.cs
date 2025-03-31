@@ -194,6 +194,7 @@ public class PlayerUIManager : MonoBehaviour
         }
 
         // Unlock all other levels that require this one as a prerequisite
+        Debug.Log($"PlayerUIManager.EnableEndScreen: unlocking prerequisites for {SceneTransitionStates.GetSelectedLevel()}");
         LevelStates.triggerPrerequisiteLevelUnlock(SceneTransitionStates.GetSelectedLevel());
 
         //TODO: If we want the option to allow players to play around in the level after completing, these need to go
