@@ -51,18 +51,24 @@ public class LevelSelectorMenu : MonoBehaviour
     void Start()
     {
         // Long winded way of grabbing the thumbnails. Wished Resource.LoadAll worked
-        DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
-        FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
-        levelThumbnails = new Sprite[thumbnailFiles.Length];
-        for (int i = 0; i < thumbnailFiles.Length; i++)
+        // DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
+        // FileInfo[] thumbnailFiles = thumbnailDir.GetFiles("*.png");
+        // levelThumbnails = new Sprite[thumbnailFiles.Length];
+        // for (int i = 0; i < thumbnailFiles.Length; i++)
+        // {
+        //     Texture2D tex = new Texture2D(2, 2);                                // Texture size should not matter (https://discussions.unity.com/t/how-to-load-a-texture2d-from-path-without-resources-load/796449/6)
+        //     tex.LoadImage(File.ReadAllBytes(thumbnailFiles[i].FullName));
+        //     levelThumbnails[i] = Sprite.Create(
+        //         tex,
+        //         new Rect(0.0f, 0.0f, tex.width, tex.height),
+        //         new Vector2(0.5f, 0.5f)
+        //     );
+        // }
+        LevelMetadataScriptableObject[] levelMetadataScriptables = GameObject.Find("/LevelStatesManager").GetComponent<LevelStatesManager>().levelMetadataScriptables;
+        levelThumbnails = new Sprite[levelMetadataScriptables.Length];
+        for(int i = 0; i < levelMetadataScriptables.Length; i++)
         {
-            Texture2D tex = new Texture2D(2, 2);                                // Texture size should not matter (https://discussions.unity.com/t/how-to-load-a-texture2d-from-path-without-resources-load/796449/6)
-            tex.LoadImage(File.ReadAllBytes(thumbnailFiles[i].FullName));
-            levelThumbnails[i] = Sprite.Create(
-                tex,
-                new Rect(0.0f, 0.0f, tex.width, tex.height),
-                new Vector2(0.5f, 0.5f)
-            );
+            levelThumbnails[i] = levelMetadataScriptables[i].levelThumbnail;
         }
 
         playLevelButton.onClick.AddListener(GoToLevel);
@@ -84,7 +90,7 @@ public class LevelSelectorMenu : MonoBehaviour
 
     public void GoToLevel()
     {
-        SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.AssetDirectoryOrder);
+        SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.LevelStatesManagerArrayOrder);
         // SceneTransitionManager.singleton.GoToSceneAsync(selectedLevelIndex, LoadSceneBy.BuildSettingsOrder);
         SceneTransitionStates.SetSelectedLevel(selectedLevelIndex);
     }

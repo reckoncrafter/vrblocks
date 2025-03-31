@@ -63,7 +63,7 @@ public class TurtleMovement : MonoBehaviour
         resetConstraints = rb.constraints;
 
         SetAnimSpeed(animationSpeed);
-        afterJumpAction = () => {};
+        afterJumpAction = () => { };
     }
 
 
@@ -121,9 +121,10 @@ public class TurtleMovement : MonoBehaviour
     {
         RaycastHit hit;
         Debug.DrawRay(transform.position, transform.forward, Color.red, 10);
-        if(Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 0.25f))
         {
-            if(hit.transform.parent.gameObject.name == "MapSpawner"){
+            if (hit.transform.parent.gameObject.name == "MapSpawner")
+            {
                 return true;
             }
         }
@@ -134,7 +135,7 @@ public class TurtleMovement : MonoBehaviour
     {
         RaycastHit hit;
         Debug.DrawRay(transform.position + transform.forward * 0.5f, -transform.up, Color.red, 10);
-        if(!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
+        if (!Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f))
         {
             Debug.Log("ConditionFacingMapEdge: Cliff detected!");
             return true;
@@ -150,7 +151,7 @@ public class TurtleMovement : MonoBehaviour
         bool aheadLevel = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 0.05f);
         bool aheadNotEmpty = Physics.Raycast(transform.position + transform.forward * 0.5f, -transform.up, out hit, 1.00f);
 
-        if(!aheadLevel && aheadNotEmpty)
+        if (!aheadLevel && aheadNotEmpty)
         {
             Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
             return true;
@@ -248,15 +249,19 @@ public class TurtleMovement : MonoBehaviour
 
     private void PerformJump()
     {
+        animator.SetTrigger("Jump");
+    }
+
+    private void AddJumpForce()
+    { // to be called by the jump animation
         AudioSource.PlayClipAtPoint(turtleJumpAudio, transform.position);
-        // animator.SetTrigger("jump");
 
         float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * Mathf.Abs(Physics.gravity.y)); // h = (µsin(θ))^2 / 2g with 50% more height
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
 
         afterJumpAction();
-        afterJumpAction = () => {};
+        afterJumpAction = () => { };
     }
 
     private void FailOnHitBack()
