@@ -6232,12 +6232,12 @@ MonoBehaviour:
   m_margin: {x: -0.03583335, y: -28.862024, z: -9.593889, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 559511463}
-  m_maskType: 0
   _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
+  m_hasFontAssetChanged: 0
+  m_renderer: {fileID: 559511463}
+  m_maskType: 0
 --- !u!23 &559511463
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6934,6 +6934,7 @@ GameObject:
   - component: {fileID: 655840830}
   - component: {fileID: 655840829}
   - component: {fileID: 655840828}
+  - component: {fileID: 655840831}
   m_Layer: 5
   m_Name: BlockMenu
   m_TagString: Untagged
@@ -7029,6 +7030,21 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &655840831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655840826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee9a855ec97cfd4f981babb8186b74d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementTab: {fileID: 365996346}
+  controlTab: {fileID: 1069206171}
+  functionTab: {fileID: 1749114233}
 --- !u!1 &664811107
 GameObject:
   m_ObjectHideFlags: 0
