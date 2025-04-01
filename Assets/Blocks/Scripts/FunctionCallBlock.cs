@@ -13,9 +13,9 @@ public class FunctionCallBlock : MonoBehaviour
         FunctionID = functionDefinition.GetInstanceID();
     }
 
-    public Queue<UnityEvent> getFunction(){
-        QueueReading functionDefinitionQueueReading = functionDefinition.GetComponent<QueueReading>();
-        functionDefinitionQueueReading.ReadQueue();
-        return functionDefinitionQueueReading.GetBlockQueueOfUnityEvents();
-    }
+    // public Queue<UnityEvent> getFunction(){
+    //     QueueReading functionDefinitionQueueReading = functionDefinition.GetComponent<QueueReading>();
+    //     functionDefinitionQueueReading.ReadQueue();
+    //     return functionDefinitionQueueReading.GetBlockQueueOfUnityEvents();
+    // }
 }

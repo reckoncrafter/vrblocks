@@ -1,19 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class StartButton : MonoBehaviour
 {
-    public TurtleMovement turtleMovement;
-    public QueueReading queueReading;
-
-    public void Start(){
-        turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
-        queueReading = GameObject.Find("Block (StartQueue)").GetComponent<QueueReading>();
-    }
-
-
     public void SetGlowEffect(bool isGlow){
         Renderer renderer = GetComponent<Renderer>();
         if(renderer != null){
@@ -31,14 +19,5 @@ public class StartButton : MonoBehaviour
         else{
             Debug.LogWarning("Renderer not found on GameObject");
         }
-    }
-
-    public void CaptureQueueAndExecute(){
-        queueReading.ReadQueue();
-        Queue<UnityEvent> eventQueue = queueReading.GetBlockQueueOfUnityEvents();
-        foreach(var unityEvent in eventQueue) {
-            unityEvent.Invoke();
-        }
-        turtleMovement.StartQueue();
     }
 }

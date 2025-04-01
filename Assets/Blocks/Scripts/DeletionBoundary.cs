@@ -10,7 +10,7 @@ public class DeletionBoundary : MonoBehaviour
         // turtle cannot be destroyed
         if (other.gameObject.CompareTag("Player"))
         {
-            other.gameObject.GetComponent<TurtleMovement>().Reset();
+            //other.gameObject.GetComponent<TurtleMovement>().Reset();
             return;
         }
 

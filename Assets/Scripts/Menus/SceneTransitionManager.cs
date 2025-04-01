@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public enum LoadSceneBy
 {
-    AssetDirectoryOrder = 0,
+    LevelStatesManagerArrayOrder = 0,
     BuildSettingsOrder = 1
 }
 public class SceneTransitionManager : MonoBehaviour
@@ -16,12 +16,15 @@ public class SceneTransitionManager : MonoBehaviour
     public int waitDuration;
     public static SceneTransitionManager singleton;
 
-    public static FileInfo[] scenes;
+    // public static FileInfo[] scenes;
+
+    public LevelMetadataScriptableObject[] levelMetadataScriptables;
 
     public void Start()
     {
-        DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Scenes/PlayableLevels");
-        scenes = dir.GetFiles("*.unity");
+        // DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Scenes/PlayableLevels");
+        // scenes = dir.GetFiles("*.unity");
+        levelMetadataScriptables = GameObject.Find("/LevelStatesManager").GetComponent<LevelStatesManager>().levelMetadataScriptables;
     }
 
     private void Awake()
@@ -33,8 +36,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         singleton = this;
     }
-
-    public void GoToScene(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder)
+    public void GoToScene(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.LevelStatesManagerArrayOrder)
     {
         StartCoroutine(GoToSceneRoutine(sceneIndex, loadOption));
     }
@@ -46,9 +48,9 @@ public class SceneTransitionManager : MonoBehaviour
     IEnumerator GoToSceneRoutine(int sceneIndex, LoadSceneBy loadOption)
     {
         yield return new WaitForSeconds(waitDuration);
-        if (loadOption == LoadSceneBy.AssetDirectoryOrder)
+        if (loadOption == LoadSceneBy.LevelStatesManagerArrayOrder)
         {
-            SceneManager.LoadScene(scenes[sceneIndex].Name.Replace(".unity", ""));
+            SceneManager.LoadScene(levelMetadataScriptables[sceneIndex].levelName);
         }
         else if (loadOption == LoadSceneBy.BuildSettingsOrder)
         {
@@ -61,7 +63,7 @@ public class SceneTransitionManager : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    public void GoToSceneAsync(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.AssetDirectoryOrder)
+    public void GoToSceneAsync(int sceneIndex, LoadSceneBy loadOption = LoadSceneBy.LevelStatesManagerArrayOrder)
     {
         StartCoroutine(GoToSceneAsyncRoutine(sceneIndex, loadOption));
     }
@@ -73,9 +75,14 @@ public class SceneTransitionManager : MonoBehaviour
     IEnumerator GoToSceneAsyncRoutine(int sceneIndex, LoadSceneBy loadOption)
     {
         AsyncOperation operation;
-        if (loadOption == LoadSceneBy.AssetDirectoryOrder)
+        if (loadOption == LoadSceneBy.LevelStatesManagerArrayOrder)
         {
-            operation = SceneManager.LoadSceneAsync(scenes[sceneIndex].Name.Replace(".unity", ""));
+            Debug.Log($"SceneTransitionManager.GoToSceneAsyncRoutine: sceneIndex:{sceneIndex}");
+            foreach(LevelMetadataScriptableObject lmso in levelMetadataScriptables)
+            {
+                Debug.Log(lmso.levelName);
+            }
+            operation = SceneManager.LoadSceneAsync(levelMetadataScriptables[sceneIndex].levelName);
         }
         else // LoadSceneBy.BuildSettingsOrder
         {

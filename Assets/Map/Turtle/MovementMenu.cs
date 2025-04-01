@@ -10,74 +10,48 @@ public class MovementMenu : Editor
         base.OnInspectorGUI();
         TurtleMovement turtleMovement = (TurtleMovement)target;
 
-        if (GUILayout.Button("Start Queue"))
-        {
-            turtleMovement.StartQueue();
-        }
+
         if (GUILayout.Button("Reset"))
         {
+            turtleMovement.canReset = true;
             turtleMovement.Reset();
         }
         if (GUILayout.Button("Move Forward"))
         {
-            turtleMovement.WalkForward();
+            turtleMovement.canFail = true;
+            turtleMovement.PerformWalkForward();
         }
         if (GUILayout.Button("Turn Left"))
         {
-            turtleMovement.RotateLeft();
+            turtleMovement.PerformRotateLeft();
         }
         if (GUILayout.Button("Turn Right"))
         {
-            turtleMovement.RotateRight();
+            turtleMovement.PerformRotateRight();
         }
         if (GUILayout.Button("Jump"))
         {
-            turtleMovement.Jump();
+            turtleMovement.shouldJump = true;
+            turtleMovement.FixedUpdate();
         }
 
-        if (GUILayout.Button("Insert IfStatementBegin"))
+        if (GUILayout.Button("Jump + Move Forward"))
         {
-            turtleMovement.EnqueueIfStatementBegin();
+            turtleMovement.shouldJump = true;
+            turtleMovement.afterJumpAction = turtleMovement.PerformWalkForward;
+            turtleMovement.FixedUpdate();
         }
-        if (GUILayout.Button("Insert ElseIfStatement"))
+        if (GUILayout.Button("Jump + Turn Left"))
         {
-            turtleMovement.EnqueueElseIfStatement();
+            turtleMovement.shouldJump = true;
+            turtleMovement.afterJumpAction = turtleMovement.PerformRotateLeft;
+            turtleMovement.FixedUpdate();
         }
-        if (GUILayout.Button("Insert ElseStatement"))
+        if (GUILayout.Button("Jump + Turn Right"))
         {
-            turtleMovement.EnqueueElseStatement();
-        }
-        if (GUILayout.Button("Insert IfStatementEnd"))
-        {
-            turtleMovement.EnqueueIfStatementEnd();
-        }
-        if (GUILayout.Button("Insert setConditionTrue"))
-        {
-            turtleMovement.setConditionTrue();
-        }
-        if (GUILayout.Button("Insert setConditionFalse"))
-        {
-            turtleMovement.setConditionFalse();
-        }
-        if (GUILayout.Button("Insert WhileStatementBegin"))
-        {
-            turtleMovement.EnqueueWhileStatementBegin();
-        }
-        if (GUILayout.Button("Insert WhileStatementEnd"))
-        {
-            turtleMovement.EnqueueWhileStatementEnd();
-        }
-        if (GUILayout.Button("Insert ConditionFacingWall"))
-        {
-            turtleMovement.ConditionFacingWall();
-        }
-        if (GUILayout.Button("Insert ConditionFacingCliff"))
-        {
-            turtleMovement.ConditionFacingCliff();
-        }
-        if (GUILayout.Button("Insert ConditionFacingStepDown"))
-        {
-            turtleMovement.ConditionFacingStepDown();
+            turtleMovement.shouldJump = true;
+            turtleMovement.afterJumpAction = turtleMovement.PerformRotateRight;
+            turtleMovement.FixedUpdate();
         }
     }
 }

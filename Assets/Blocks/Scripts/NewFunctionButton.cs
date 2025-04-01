@@ -32,7 +32,7 @@ public class NewFunctionButton : MonoBehaviour
         newFunctionDefinitionInstance.name = "Block (Function)";
         newFunctionCallInstance.name = "Block (FunctionCall)";
 
-        newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
+        //newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
         FunctionCallBlock fcb = newFunctionCallInstance.AddComponent<FunctionCallBlock>();
         fcb.functionDefinition = newFunctionDefinitionInstance;
 
