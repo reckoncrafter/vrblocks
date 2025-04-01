@@ -119,7 +119,7 @@ public class ExecutionDirector : MonoBehaviour
             Command.ConditionFalse => turtleMovement.ConditionFalse(),
             _ => false
         };
-        return isInverted ? !status : status;
+        return isInverted ? status : !status;
     }
 
     private int FindNextBlockOfType(List<GameObject> blockList, int StartIndex, int EndIndex, Command cmd)
@@ -692,4 +692,8 @@ public class ExecutionDirector : MonoBehaviour
 
         return functionList;
     }
+
+
+
+
 }
