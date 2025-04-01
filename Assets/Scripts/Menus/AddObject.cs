@@ -16,7 +16,7 @@ public class AddObject : MonoBehaviour
         }
         else
         {
-            Debug.LogError("AddObject script must be attached to a UI Button.");
+            Debug.LogError($"{gameObject.name}: AddObject script must be attached to a UI Button.");
         }
     }
 

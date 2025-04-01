@@ -8239,9 +8239,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 180557533655662575, guid: 930b7a19d446f4b4c9c810e37e84e625, type: 3}
       insertIndex: -1
       addedObject: {fileID: 731207046}
-    - targetCorrespondingSourceObject: {fileID: 180557533655662575, guid: 930b7a19d446f4b4c9c810e37e84e625, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 731207045}
   m_SourcePrefab: {fileID: 100100000, guid: 930b7a19d446f4b4c9c810e37e84e625, type: 3}
 --- !u!4 &731207043 stripped
 Transform:
@@ -8253,21 +8250,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 180557533655662575, guid: 930b7a19d446f4b4c9c810e37e84e625, type: 3}
   m_PrefabInstance: {fileID: 731207042}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &731207045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731207044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 449357cc7bf292742ab21bb2065a516e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blockPrefab: {fileID: 0}
-  spawnParent: {fileID: 0}
-  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!114 &731207046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20110,8 +20092,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1925178040}
-  - component: {fileID: 1925178039}
-  - component: {fileID: 1925178038}
   m_Layer: 0
   m_Name: BlockEntity
   m_TagString: Untagged
@@ -20119,30 +20099,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1925178038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925178037}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b6e8cc39a9351e129691ca57019ae94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1925178039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925178037}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20545dac9a3d5e9449f8bff15a9bc263, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1925178040
 Transform:
   m_ObjectHideFlags: 0
