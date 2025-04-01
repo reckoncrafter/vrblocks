@@ -95,24 +95,35 @@ public class SnappedForwarding : MonoBehaviour
         // Loop until we find the root block
         while (currentBlock != null)
         {
-            FixedJoint joint = currentBlock.GetComponent<FixedJoint>();
+            // Find the jointObject child
+            Transform jointObject = currentBlock.transform.Find("FixedJointObject");
 
-            if (joint != null)
+            if (jointObject != null)
             {
-                Rigidbody connectedBody = joint.connectedBody;
-                if (connectedBody != null)
+                FixedJoint joint = jointObject.GetComponent<FixedJoint>();
+
+                if (joint != null)
                 {
-                    currentBlock = connectedBody.gameObject;  // Move to the connected block
+                    Rigidbody connectedBody = joint.connectedBody;
+                    if (connectedBody != null)
+                    {
+                        currentBlock = connectedBody.gameObject;  // Move to the connected block
+                    }
+                    else
+                    {
+                        Debug.Log($"No connected body found for {currentBlock.name}. Stopping traversal.");
+                        break;
+                    }
                 }
                 else
                 {
-                    Debug.Log($"No connected body found for {currentBlock.name}. Stopping traversal.");
+                    Debug.Log($"No FixedJoint found within FixedJointObject for {currentBlock.name}. Stopping traversal.");
                     break;
                 }
             }
             else
             {
-                Debug.Log($"No FixedJoint found for {currentBlock.name}. Stopping traversal.");
+                Debug.Log($"No FixedJointObject found for {currentBlock.name}. Stopping traversal.");
                 break;
             }
 
@@ -127,6 +138,7 @@ public class SnappedForwarding : MonoBehaviour
         Debug.Log($"No root block found starting from {startingBlock.name}");
         return null;
     }
+
 
     public void UpdatePhysics(Rigidbody rb)
     {
@@ -174,52 +186,64 @@ public class SnappedForwarding : MonoBehaviour
         // Rotation and position update based on parent block.
         if (snappedForwarding != null && !snappedForwarding.IsRootBlock)
         {
-            // Find parent block through the FixedJoint (as used in OnGrab())
-            FixedJoint[] joints = rb.GetComponents<FixedJoint>();
-            foreach (GameObject otherRbParent in joints.Select(j => j.connectedBody.gameObject))
+            // Find the FixedJointObject and destroy it to allow block realignment
+            Transform jointObject = rb.transform.Find("FixedJointObject");
+            Rigidbody parentRb = null;
+
+            if (jointObject != null)
             {
-                // Ignore wires
-                if (!otherRbParent.name.Contains("Wire"))
+                FixedJoint joint = jointObject.GetComponent<FixedJoint>();
+
+                if (joint != null && joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
                 {
-                    // Destroy the connecting joint to allow block realignment while retaining physics reactivity
-                    FixedJoint existingJoint = rb.GetComponent<FixedJoint>();
-                    if (existingJoint != null)
-                    {
-                        Destroy(existingJoint);
-                    }
-
-                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
-                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
-                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
-
-                    // Update position to match the X and Z of the parent block
-                    Vector3 parentPosition = otherRbParent.transform.position;
-                    rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
-
-                    // Reset rotation to 0
-                    rb.transform.rotation = Quaternion.Euler(0, 0, 0);
-                    //Debug.Log($"Physics Update: Position/Rotation reset");
-
-                    // Update position to match the X and Z of the parent block, realign SnapPointTop with SnapPointBottom
-                    Transform snapPointTop = rb.transform.Find("SnapPointTop");
-                    Transform snapPointBottom = otherRbParent.transform.Find("SnapPointBottom");
-
-                    if (snapPointTop != null && snapPointBottom != null)
-                    {
-                        Vector3 parentPosition = otherRbParent.transform.position;
-                        Vector3 offset = snapPointTop.position - rb.transform.position;
-                        Vector3 realignPosition = snapPointBottom.position - offset;
-                        rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
-                    }
-
-                    // Create new joint to reconnect the blocks
-                    FixedJoint newJoint = rb.gameObject.AddComponent<FixedJoint>();
-                    newJoint.connectedBody = otherRbParent.GetComponent<Rigidbody>();
-                    newJoint.breakForce = Mathf.Infinity;
-                    newJoint.breakTorque = Mathf.Infinity;
-
-                    break;
+                    parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint recreation
+                    Destroy(jointObject.gameObject); // Destroy the entire FixedJointObject
+                    Debug.Log("FixedJointObject destroyed, ready for realignment.");
                 }
+                else
+                {
+                    Debug.Log("No valid joint or parent found.");
+                }
+            }
+
+            // Get the parent position (you can adjust this as needed)
+            Vector3 parentPosition = parentRb.transform.position;
+
+            // Update position to match the X and Z of the parent block, leaving Y unchanged
+            rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
+
+            // Reset rotation to zero (you can adjust if needed)
+            rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+            // Realign the SnapPointTop with SnapPointBottom
+            Transform snapPointTop = rb.transform.Find("SnapPointTop");
+            Transform snapPointBottom = parentRb.transform.Find("SnapPointBottom");
+
+            if (snapPointTop != null && snapPointBottom != null)
+            {
+                Vector3 offset = snapPointTop.position - rb.transform.position;
+                Vector3 realignPosition = snapPointBottom.position - offset;
+                rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
+            }
+
+            // Create a new FixedJointObject to properly organize the joint
+            GameObject newJointObject = new GameObject("FixedJointObject");
+            newJointObject.transform.SetParent(rb.transform);
+            newJointObject.transform.localPosition = Vector3.zero;
+            newJointObject.transform.localRotation = Quaternion.identity;
+
+            // Create a new joint on the new joint holder object
+            if (parentRb != null)
+            {
+                FixedJoint newJoint = newJointObject.AddComponent<FixedJoint>();
+                newJoint.connectedBody = parentRb;
+                newJoint.breakForce = Mathf.Infinity;
+                newJoint.breakTorque = Mathf.Infinity;
+                Debug.Log("New joint created and connected to parent.");
+            }
+            else
+            {
+                Debug.Log("No parent Rigidbody found, no joint recreated.");
             }
         }
     }

@@ -97,7 +97,7 @@ public class BlockSnapping : MonoBehaviour
         }
     }
 
-    private void SnapToBlock(GameObject block1, GameObject block2) //block2 is top block, block1 is bottom block
+    private void SnapToBlock(GameObject block1, GameObject block2) // block2 is top block, block1 is bottom block
     {
         Transform snapPointTop = block1.transform.Find("SnapPointTop");
         Transform snapPointBottom = block2.transform.Find("SnapPointBottom");
@@ -110,6 +110,10 @@ public class BlockSnapping : MonoBehaviour
 
         Rigidbody topRb = block1.GetComponent<Rigidbody>();
         Rigidbody bottomRb = block2.GetComponent<Rigidbody>();
+
+        // Ensure both blocks are non-kinematic and not constrained (they should be able to move)
+        topRb.isKinematic = false;
+        bottomRb.isKinematic = false;
 
         // Allow both blocks to react to physics
         topRb.constraints = RigidbodyConstraints.None;
@@ -131,13 +135,24 @@ public class BlockSnapping : MonoBehaviour
             block2.transform.position = snapPointTop.position - (snapPointBottom.position - block2.transform.position);
         }
 
-        // Add FixedJoint to lock blocks together
+        // Create FixedJoint to lock blocks together
         if (bottomRb != null)
         {
-            FixedJoint joint = block1.AddComponent<FixedJoint>();
-            joint.connectedBody = bottomRb;
+            // Create a child GameObject to hold the joint
+            GameObject jointObject = new GameObject("FixedJointObject");
+            jointObject.transform.parent = block1.transform;  // Parent joint object to block1 (bottom block)
+            jointObject.transform.localPosition = Vector3.zero;
+            jointObject.transform.localRotation = Quaternion.identity;
+
+            // Add FixedJoint to the jointObject
+            FixedJoint joint = jointObject.AddComponent<FixedJoint>();
+            joint.connectedBody = bottomRb;  // Attach joint to bottom block's Rigidbody
             joint.breakForce = Mathf.Infinity;
             joint.breakTorque = Mathf.Infinity;
+
+            // Make sure block1 (bottom) is not constrained by physics
+            topRb.constraints = RigidbodyConstraints.None;
+            bottomRb.constraints = RigidbodyConstraints.None;
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
@@ -156,6 +171,7 @@ public class BlockSnapping : MonoBehaviour
             UpdateChildBlockPositions(block1);
         }
     }
+
 
     private void UpdateChildBlockPositions(GameObject parentBlock)
     {
@@ -212,10 +228,11 @@ public class BlockSnapping : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.None;
 
-        FixedJoint[] joints = GetComponents<FixedJoint>();
-        foreach (FixedJoint joint in joints)
+        Transform jointObject = transform.Find("FixedJointObject");
+        if (jointObject != null)
         {
-            Rigidbody otherRb = joint.connectedBody;
+            Rigidbody otherRb = jointObject.GetComponent<FixedJoint>()?.connectedBody;
+
             if (otherRb != null)
             {
                 GameObject otherObject = otherRb.gameObject;
@@ -233,15 +250,15 @@ public class BlockSnapping : MonoBehaviour
                 {
                     ResetSnapStatusOnOtherBlock(otherObject);
                 }
+
+                SnappedForwarding sf = otherRb.GetComponentInChildren<SnappedForwarding>();
+                if (sf != null)
+                {
+                    sf.UpdatePhysics(otherRb);
+                }
             }
 
-            Destroy(joint);
-
-            SnappedForwarding sf = otherRb.GetComponentInChildren<SnappedForwarding>();
-            if (sf != null)
-            {
-                sf.UpdatePhysics(otherRb);
-            }
+            Destroy(jointObject.gameObject);
         }
 
         // Start the coroutine and store reference for OnRelease()
@@ -261,6 +278,7 @@ public class BlockSnapping : MonoBehaviour
         // Update all child blocks recursively
         UpdateChildBlockPositions(gameObject);
     }
+
 
     private void OnRelease(SelectExitEventArgs args)
     {
@@ -331,7 +349,7 @@ public class BlockSnapping : MonoBehaviour
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds (change as needed)
-        //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
+                                               //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
 
         blockSnapEvent.Invoke();
@@ -490,33 +508,25 @@ public class BlockSnapping : MonoBehaviour
         float yBlockOffset = 0.25f; // Width (Y) of block, consider changing to reference global variable
         float xBlockOffset = 1.0f; // X Offset of columns, consider changing to reference global variable
 
-        // Find parent block through the FixedJoint and destroy the joint to allow block realignment
-        FixedJoint[] joints = currentRb.GetComponents<FixedJoint>();
+        // Find parent block through the FixedJointObject and destroy it to allow block realignment
+        Transform jointObject = currentRb.transform.Find("FixedJointObject");
         Rigidbody parentRb = null;
 
-        //Debug.Log("UpdateBlockPosition: Initial number of joints = " + joints.Length);
-
-        // Find the parent and destroy the joint
-        foreach (FixedJoint joint in joints)
+        if (jointObject != null)
         {
-            //Debug.Log("UpdateBlockPosition: Checking joint connected to " + joint.connectedBody?.name);
+            FixedJoint joint = jointObject.GetComponent<FixedJoint>();
 
-            if (joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
+            if (joint != null && joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
             {
-                parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
-                Destroy(joint); // Destroy the joint to allow repositioning
-                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
-                break;
+                parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint recreation
+                Destroy(jointObject.gameObject); // Destroy the entire FixedJointObject
+                Debug.Log("UpdateBlockPosition: Joint Destroyed!");
             }
             else
             {
-                //Debug.Log("UpdateBlockPosition: No parent found or joint connected to a wire.");
+                Debug.Log("UpdateBlockPosition: No valid joint or parent found.");
             }
         }
-
-        // Log the number of joints after the joint destruction
-        joints = currentRb.GetComponents<FixedJoint>();
-        //Debug.Log("UpdateBlockPosition: Number of joints after destruction = " + joints.Length);
 
         // Capture the initial position before making changes (for debug)
         Vector3 initialPosition = currentRb.transform.position;
@@ -533,24 +543,30 @@ public class BlockSnapping : MonoBehaviour
 
         // Apply the new position to the block
         currentRb.transform.position = adjustedPosition;
-        //Debug.Log("UpdateBlockPosition: Block Position Updated!");
+        Debug.Log("UpdateBlockPosition: Block Position Updated!");
 
         // Reset rotation (probably unnecessary)
         currentRb.transform.rotation = Quaternion.Euler(0, 0, 0);
-        //Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
+        Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
 
         // Recreate the joint to reattach the block to its parent
         if (parentRb != null)
         {
-            FixedJoint newJoint = currentRb.gameObject.AddComponent<FixedJoint>();
+            // Create a new GameObject to hold the FixedJoint
+            GameObject newJointObject = new GameObject("FixedJointObject");
+            newJointObject.transform.parent = currentRb.transform;
+            newJointObject.transform.localPosition = Vector3.zero;
+            newJointObject.transform.localRotation = Quaternion.identity;
+
+            FixedJoint newJoint = newJointObject.AddComponent<FixedJoint>();
             newJoint.connectedBody = parentRb;
             newJoint.breakForce = Mathf.Infinity;
             newJoint.breakTorque = Mathf.Infinity;
-            //Debug.Log("UpdateBlockPosition: New Joint Created and Connected to Parent.");
+            Debug.Log("UpdateBlockPosition: New Joint Created and Connected to Parent.");
         }
         else
         {
-            //Debug.Log("UpdateBlockPosition: No parent Rigidbody found, no joint recreated.");
+            Debug.Log("UpdateBlockPosition: No parent Rigidbody found, no joint recreated.");
         }
 
         // Debug to confirm position before/after update
@@ -558,7 +574,6 @@ public class BlockSnapping : MonoBehaviour
                   $"Position X: {initialPosition.x}, Y: {initialPosition.y}, Z: {initialPosition.z} " +
                   $"to New Position X: {currentRb.transform.position.x}, Y: {currentRb.transform.position.y}, Z: {currentRb.transform.position.z}.");
     }
-
 
     public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
     {
