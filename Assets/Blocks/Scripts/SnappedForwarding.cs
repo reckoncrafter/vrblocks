@@ -206,7 +206,6 @@ public class SnappedForwarding : MonoBehaviour
 
                     if (snapPointTop != null && snapPointBottom != null)
                     {
-                        Vector3 parentPosition = otherRbParent.transform.position;
                         Vector3 offset = snapPointTop.position - rb.transform.position;
                         Vector3 realignPosition = snapPointBottom.position - offset;
                         rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
