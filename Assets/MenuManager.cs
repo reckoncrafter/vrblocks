@@ -16,7 +16,7 @@ public class MenuManager : MonoBehaviour
     public void UpdateTabLocks(int level)
     {
         movementTab.interactable = true;
-        controlTab.interactable = level >= 2;
-        functionTab.interactable = level >= 4;
+        controlTab.interactable = level >= 1;
+        functionTab.interactable = level >= 3;
     }
 }
