@@ -17,6 +17,6 @@ public class MenuManager : MonoBehaviour
     {
         movementTab.interactable = true;
         controlTab.interactable = level >= 2;
-        functionTab.interactable = level >= 3;
+        functionTab.interactable = level >= 4;
     }
 }
