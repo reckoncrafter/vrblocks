@@ -35,7 +35,6 @@ public class MapBlockSpawnerMenu : Editor
 [ExecuteInEditMode]
 public class MapBlockSpawner : MonoBehaviour
 {
-    public AudioClip turtleSuccessAudio;
     public GameObject mapBlock;
     public GameObject goalObject;
     public TurtleMovement turtle;
@@ -45,8 +44,6 @@ public class MapBlockSpawner : MonoBehaviour
 
     void Start()
     {
-        detectTurtle.TurtleSuccessAudio = turtleSuccessAudio;
-
         // delete children to spawn again
         if (transform.childCount == 0)
         {

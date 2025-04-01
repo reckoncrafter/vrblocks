@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class TurtleCommand : MonoBehaviour
 {
@@ -18,49 +17,35 @@ public class TurtleCommand : MonoBehaviour
         WhileEnd,
         ConditionTrue,
         ConditionFalse,
-        Other
+        ConditionFacingWall,
+        ConditionFacingCliff,
+        ConditionFacingStepDown,
+        CommandError
     };
 
+    private Renderer renderer;
+    public Material defaultMaterial;
+    public Material? offendingStateMaterial;
 
-    public UnityEvent onMove;
-    public TurtleMovement turtleMovement;
-    public Command commandEnum;
-
-    UnityAction AssignCommand()
+    public void Start()
     {
-        return commandEnum switch
+        renderer = GetComponent<Renderer>();
+        defaultMaterial = renderer.material;
+        offendingStateMaterial = Resources.Load("Materials/OffendingState") as Material;
+    }
+
+    public void SetOffendingState(bool state)
+    {
+        if(state)
         {
-            Command.MoveForward => turtleMovement.WalkForward,
-            Command.RotateRight => turtleMovement.RotateRight,
-            Command.RotateLeft => turtleMovement.RotateLeft,
-            Command.Jump => turtleMovement.Jump,
-            Command.IfBegin => turtleMovement.EnqueueIfStatementBegin,
-            Command.ElseIf => turtleMovement.EnqueueElseIfStatement,
-            Command.Else => turtleMovement.EnqueueElseStatement,
-            Command.IfEnd => turtleMovement.EnqueueIfStatementEnd,
-            Command.WhileBegin => turtleMovement.EnqueueWhileStatementBegin,
-            Command.WhileEnd => turtleMovement.EnqueueWhileStatementEnd,
-            Command.ConditionTrue => turtleMovement.setConditionTrue,
-            Command.ConditionFalse => turtleMovement.setConditionFalse,
-            Command.Other => () => { },
-            _ => () => { }
-            ,
-        };
-    }
-
-    void Start(){
-        turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
-
-        if(turtleMovement != null){
-            onMove.AddListener(AssignCommand());
+            renderer.material = offendingStateMaterial;
         }
-        else{
-            Debug.Log("Block did not connect to Turtle.");
+        else
+        {
+            renderer.material = defaultMaterial;
         }
     }
-    // Start is called before the first frame update
-    public void onTrigger(){
-        onMove.Invoke();
-    }
+
+    public Command commandEnum;
 
 }
