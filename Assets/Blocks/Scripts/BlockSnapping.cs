@@ -439,12 +439,11 @@ public class BlockSnapping : MonoBehaviour
             if (rootColumnUpdate == false && targetPosition <= blockLimit)
             {
                 // Position updating logic
-                while (physicalPosition != targetPosition)
-                {
-                    physicalPosition = targetPosition;
+                physicalPosition = targetPosition;
 
-                    blockSnapping.physicalPosition = targetPosition;
-                }
+                blockSnapping.physicalPosition = targetPosition;
+
+                ResnapBlocks(currentRb);
 
                 Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
 
@@ -453,27 +452,24 @@ public class BlockSnapping : MonoBehaviour
             else
             {
                 // Position updating logic
-                while (physicalPosition != targetPosition)
+                int adjustPositionY = (physicalPosition - targetPosition) % blockLimit;
+                int adjustPositionX = targetColumn - currentColumn;
+
+                if (physicalPosition % blockLimit == 0)
                 {
-                    int adjustPositionY = (physicalPosition - targetPosition) % blockLimit;
-                    int adjustPositionX = targetColumn - currentColumn;
-
-                    if (physicalPosition % blockLimit == 0)
-                    {
-                        DestroyWire(); // Define this function later
-                    }
-
-                    UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
-
-                    physicalPosition = targetPosition;
-
-                    if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                    {
-                        //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
-                    }
-
-                    blockSnapping.physicalPosition = targetPosition;
+                    DestroyWire(); // Define this function later
                 }
+
+                UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
+
+                physicalPosition = targetPosition;
+
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                {
+                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
+                }
+
+                blockSnapping.physicalPosition = targetPosition;
 
                 Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
 
@@ -559,6 +555,45 @@ public class BlockSnapping : MonoBehaviour
                   $"to New Position X: {currentRb.transform.position.x}, Y: {currentRb.transform.position.y}, Z: {currentRb.transform.position.z}.");
     }
 
+    public void ResnapBlocks(Rigidbody currentRb)
+    {
+        // Find parent block through the FixedJoint and destroy the joint to allow block realignment
+        FixedJoint[] joints = currentRb.GetComponents<FixedJoint>();
+        Rigidbody parentRb = null;
+
+        //Debug.Log("UpdateBlockPosition: Initial number of joints = " + joints.Length);
+
+        // Find the parent and destroy the joint
+        foreach (FixedJoint joint in joints)
+        {
+            //Debug.Log("UpdateBlockPosition: Checking joint connected to " + joint.connectedBody?.name);
+
+            if (joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
+            {
+                parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
+                Destroy(joint); // Destroy the joint to allow repositioning
+                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                break;
+            }
+            else
+            {
+                //Debug.Log("UpdateBlockPosition: No parent found or joint connected to a wire.");
+            }
+        }
+        // Recreate the joint to reattach the block to its parent
+        if (parentRb != null)
+        {
+            FixedJoint newJoint = currentRb.gameObject.AddComponent<FixedJoint>();
+            newJoint.connectedBody = parentRb;
+            newJoint.breakForce = Mathf.Infinity;
+            newJoint.breakTorque = Mathf.Infinity;
+            //Debug.Log("UpdateBlockPosition: New Joint Created and Connected to Parent.");
+        }
+        else
+        {
+            //Debug.Log("UpdateBlockPosition: No parent Rigidbody found, no joint recreated.");
+        }
+    }
 
     public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
     {

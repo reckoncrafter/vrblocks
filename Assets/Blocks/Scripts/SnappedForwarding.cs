@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 public class SnappedForwarding : MonoBehaviour
@@ -176,17 +175,17 @@ public class SnappedForwarding : MonoBehaviour
         {
             // Find parent block through the FixedJoint (as used in OnGrab())
             FixedJoint[] joints = rb.GetComponents<FixedJoint>();
-            foreach (GameObject otherRbParent in joints.Select(j => j.connectedBody.gameObject))
+            foreach (FixedJoint joint in joints)
             {
+                GameObject otherRbParent = joint.connectedBody.gameObject;
                 // Ignore wires
                 if (!otherRbParent.name.Contains("Wire"))
                 {
+                    FixedJoint[] jointList1 = rb.GetComponents<FixedJoint>();
+                    Debug.Log($"UpdatePhysics: Initial number of joints on Block: {rb.name},  (BEFORE PHYSICS UPDATE) = {jointList1.Length}");
+
                     // Destroy the connecting joint to allow block realignment while retaining physics reactivity
-                    FixedJoint existingJoint = rb.GetComponent<FixedJoint>();
-                    if (existingJoint != null)
-                    {
-                        Destroy(existingJoint);
-                    }
+                    Destroy(joint);
 
                     //rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
                     //rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
@@ -211,11 +210,10 @@ public class SnappedForwarding : MonoBehaviour
                         rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
                     }
 
-                    // Create new joint to reconnect the blocks
-                    FixedJoint newJoint = rb.gameObject.AddComponent<FixedJoint>();
-                    newJoint.connectedBody = otherRbParent.GetComponent<Rigidbody>();
-                    newJoint.breakForce = Mathf.Infinity;
-                    newJoint.breakTorque = Mathf.Infinity;
+                    // DO NOT Create new joint to reconnect the blocks
+
+                    FixedJoint[] jointList2 = rb.GetComponents<FixedJoint>();
+                    Debug.Log($"UpdatePhysics: Initial number of joints on Block: {rb.name},  (AFTER PHYSICS UPDATE) = {jointList2.Length}");
 
                     break;
                 }
