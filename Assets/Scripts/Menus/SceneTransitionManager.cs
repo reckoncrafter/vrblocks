@@ -2,7 +2,6 @@
  Handle loading/transitioning scenes that are made available to the player.
 */
 using System.Collections;
-using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
