@@ -79,11 +79,11 @@ public class EmoteBoard : MonoBehaviour
     {
         board.Enqueue(emoteSprites[em]);
         UpdateBoard();
-        if (em == Emotes.MoveForward){ forwardArrow.SetActive(true); }
+        //if (em == Emotes.MoveForward){ forwardArrow.SetActive(true); }
         yield return new WaitForSeconds(emoteLifeTime);
         board.Dequeue();
         UpdateBoard();
-        if (em == Emotes.MoveForward){ forwardArrow.SetActive(false); }
+        //if (em == Emotes.MoveForward){ forwardArrow.SetActive(false); }
     }
 
     void Update()
