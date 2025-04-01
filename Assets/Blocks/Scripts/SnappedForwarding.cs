@@ -42,13 +42,7 @@ public class SnappedForwarding : MonoBehaviour
             return;
         }
 
-        // Stop at other root block
         SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
-        if (snappedForwarding != null && snappedForwarding.IsRootBlock && blockCount > 1)
-        {
-            Debug.Log($"Encountered another root block {currentBlock.name}. Stopping traversal.");
-            return;
-        }
 
         // Count the current block
         blockCount++;
@@ -187,39 +181,27 @@ public class SnappedForwarding : MonoBehaviour
                 // Ignore wires
                 if (!otherRbParent.name.Contains("Wire"))
                 {
-                    // Destroy the connecting joint to allow block realignment while retaining physics reactivity
-                    FixedJoint existingJoint = rb.GetComponent<FixedJoint>();
-                    if (existingJoint != null)
-                    {
-                        Destroy(existingJoint);
-                    }
+                    // Temporarily disable rotation constraints to allow realignment
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
+                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
+
+                    // Update position to match the X and Z of the parent block
+                    Vector3 parentPosition = otherRbParent.transform.position;
+                    rb.transform.position = new Vector3(parentPosition.x, rb.transform.position.y, parentPosition.z);
 
                     // Reset rotation to 0
                     rb.transform.rotation = Quaternion.Euler(0, 0, 0);
-                    //Debug.Log($"Physics Update: Position/Rotation reset");
+                    Debug.Log($"Physics Update: Position/Rotation reset");
 
-                    // Update position to match the X and Z of the parent block, realign SnapPointTop with SnapPointBottom
-                    Transform snapPointTop = rb.transform.Find("SnapPointTop");
-                    Transform snapPointBottom = otherRbParent.transform.Find("SnapPointBottom");
-
-                    if (snapPointTop != null && snapPointBottom != null)
-                    {
-                        Vector3 parentPosition = otherRbParent.transform.position;
-                        Vector3 offset = snapPointTop.position - rb.transform.position;
-                        Vector3 realignPosition = snapPointBottom.position - offset;
-                        rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
-                    }
-
-                    // Create new joint to reconnect the blocks
-                    FixedJoint newJoint = rb.gameObject.AddComponent<FixedJoint>();
-                    newJoint.connectedBody = otherRbParent.GetComponent<Rigidbody>();
-                    newJoint.breakForce = Mathf.Infinity;
-                    newJoint.breakTorque = Mathf.Infinity;
+                    // Re-enable the rotation constraints after alignment
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationY;
+                    rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
 
                     break;
                 }
             }
         }
     }
-
 }
