@@ -9,14 +9,16 @@ public class AllBlockSettings : MonoBehaviour
 {
 
     public bool KinematicInteraction;
-    public bool SmoothPostion;
+    public bool smoothPostion;
+    public bool throwOnDetach;
     void Awake()
     {
         XRGrabInteractable[] xRGrabInteractables = GetComponentsInChildren<XRGrabInteractable>();
         for(int i = 0; i < xRGrabInteractables.Length; i++)
         {
             xRGrabInteractables[i].movementType = KinematicInteraction? XRBaseInteractable.MovementType.Kinematic : XRBaseInteractable.MovementType.Instantaneous;
-            xRGrabInteractables[i].smoothPosition = SmoothPostion;
+            xRGrabInteractables[i].smoothPosition = smoothPostion;
+            xRGrabInteractables[i].throwOnDetach = throwOnDetach;
         }
     }
 }
