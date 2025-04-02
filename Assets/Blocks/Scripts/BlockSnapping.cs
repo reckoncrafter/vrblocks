@@ -159,36 +159,32 @@ public class BlockSnapping : MonoBehaviour
 
     private void UpdateChildBlockPositions(GameObject parentBlock)
     {
-        // Check if the parent block has a connected child
+        if (parentBlock == null) return;
+
+        // Attempt to get the SnappedForwarding component; proceed even if null
         SnappedForwarding parentForwarding = parentBlock.GetComponentInChildren<SnappedForwarding>();
-        if (parentForwarding == null || parentForwarding.ConnectedBlock == null)
+
+        if (parentForwarding?.ConnectedBlock == null)
         {
             Debug.LogWarning($"Parent block {parentBlock.name} has no connected child.");
             return;
         }
 
-        // Get components for the parent and child blocks
-        BlockSnapping parentSnapping = parentBlock.GetComponent<BlockSnapping>();
         GameObject childBlock = parentForwarding.ConnectedBlock;
-        SnappedForwarding childForwarding = childBlock.GetComponentInChildren<SnappedForwarding>();
+
+        // Attempt to get BlockSnapping components, but do not force them
+        BlockSnapping parentSnapping = parentBlock.GetComponent<BlockSnapping>();
         BlockSnapping childSnapping = childBlock.GetComponent<BlockSnapping>();
 
-        // Ensure both parent and child have BlockSnapping components
-        if (parentSnapping == null || childSnapping == null)
+        if (parentSnapping != null && childSnapping != null)
         {
-            Debug.LogWarning($"Either parent {parentBlock.name} or child {childBlock.name} is missing BlockSnapping component.");
-            return;
+            // Adjust child's position based on parent's position (Customize your logic as needed)
+            childSnapping.targetPosition = parentSnapping.targetPosition + 1;
+            Debug.Log($"Updated {childBlock.name} targetPosition to {childSnapping.targetPosition}");
         }
 
-        // Set targetPosition for the child to parent + 1
-        childSnapping.targetPosition = parentSnapping.targetPosition + 1;
-        Debug.Log($"{childBlock.name} targetPosition set to {childSnapping.targetPosition}");
-
-        // Recursively update connected child blocks if they exist
-        if (childForwarding != null && childForwarding.ConnectedBlock != null)
-        {
-            UpdateChildBlockPositions(childForwarding.ConnectedBlock);
-        }
+        // Continue recursively without enforcing BlockSnapping presence
+        UpdateChildBlockPositions(childBlock);
     }
 
     private void PlaySnapSound()
@@ -241,6 +237,7 @@ public class BlockSnapping : MonoBehaviour
             if (sf != null)
             {
                 sf.UpdatePhysics(otherRb);
+                ResnapBlocks(otherRb);
             }
         }
 
@@ -434,7 +431,8 @@ public class BlockSnapping : MonoBehaviour
             int targetPosition = blockSnapping.targetPosition;
             int currentColumn = blockSnapping.currentColumn;
             int targetColumn = (targetPosition - 1) / blockLimit;
-            Debug.Log($"UpdateBlockPosition: Physical Position = {physicalPosition}, Target Position = {targetPosition}.");
+
+            Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' at Physical Position = {physicalPosition}, Target Position = {targetPosition}.");
 
             if (rootColumnUpdate == false && targetPosition <= blockLimit)
             {
@@ -444,6 +442,12 @@ public class BlockSnapping : MonoBehaviour
                 blockSnapping.physicalPosition = targetPosition;
 
                 ResnapBlocks(currentRb);
+
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                {
+                    Debug.Log("SpawnWire called!");
+                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
+                }
 
                 Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
 
@@ -455,17 +459,19 @@ public class BlockSnapping : MonoBehaviour
                 int adjustPositionY = (physicalPosition - targetPosition) % blockLimit;
                 int adjustPositionX = targetColumn - currentColumn;
 
-                if (physicalPosition % blockLimit == 0)
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
                 {
-                    DestroyWire(); // Define this function later
+                    //DestroyWire(currentRb, connectedRb); // Define this function later
                 }
 
                 UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
 
                 physicalPosition = targetPosition;
+                Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
 
                 if (physicalPosition % blockLimit == 0 && connectedRb != null)
                 {
+                    Debug.Log("SpawnWire called!");
                     //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
                 }
 
@@ -480,8 +486,6 @@ public class BlockSnapping : MonoBehaviour
 
     private void UpdateBlockPosition(Rigidbody currentRb, Vector3 initialRootBlockPosition, int adjustPositionX, int adjustPositionY)
     {
-        Debug.Log("UpdateBlockPosition: Called!");
-
         // Define block offsets
         float yBlockOffset = 0.25f; // Width (Y) of block, consider changing to reference global variable
         float xBlockOffset = 1.0f; // X Offset of columns, consider changing to reference global variable
@@ -597,7 +601,6 @@ public class BlockSnapping : MonoBehaviour
 
     public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
     {
-        // Pretty much the same as the original SpawnWire function
         GameObject wirePrefab = Resources.Load<GameObject>("Prefabs/Wire2");
 
         if (wirePrefab == null || rb == null || connectedRb == null)
@@ -648,10 +651,103 @@ public class BlockSnapping : MonoBehaviour
             wireRb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             wireRb.interpolation = RigidbodyInterpolation.Interpolate;
         }
+
+        // Create joint connecting the wire to the original block (rb)
+        ConfigurableJoint jointToRb = newWire.AddComponent<ConfigurableJoint>();
+        jointToRb.connectedBody = rb;
+        jointToRb.anchor = wireSnapLeft.localPosition;
+        jointToRb.autoConfigureConnectedAnchor = false;
+        jointToRb.connectedAnchor = snapPointRight.localPosition;
+        jointToRb.xMotion = ConfigurableJointMotion.Locked;
+        jointToRb.yMotion = ConfigurableJointMotion.Locked;
+        jointToRb.zMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularXMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularYMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularZMotion = ConfigurableJointMotion.Locked;
+
+        // Create joint connecting the wire to the connected block (connectedRb)
+        ConfigurableJoint jointToConnectedRb = newWire.AddComponent<ConfigurableJoint>();
+        jointToConnectedRb.connectedBody = connectedRb;
+        jointToConnectedRb.anchor = wireSnapRight.localPosition;
+        jointToConnectedRb.autoConfigureConnectedAnchor = false;
+        jointToConnectedRb.connectedAnchor = snapPointLeft.localPosition;
+        jointToConnectedRb.xMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.yMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.zMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularXMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularYMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularZMotion = ConfigurableJointMotion.Locked;
+
+        Debug.Log("Wire successfully connected between blocks.");
     }
 
-    private void DestroyWire()
+    private void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
     {
-        Debug.Log("DestroyWire: called!");
+        if (rb == null || connectedRb == null)
+        {
+            Debug.LogError("DestroyWire: Provided Rigidbodies are null.");
+            return;
+        }
+
+        rb.constraints = RigidbodyConstraints.None;
+        connectedRb.constraints = RigidbodyConstraints.None;
+
+        // Collect all FixedJoints attached to the provided Rigidbodies
+        FixedJoint[] joints = rb.GetComponents<FixedJoint>();
+        FixedJoint[] connectedJoints = connectedRb.GetComponents<FixedJoint>();
+
+        foreach (FixedJoint joint in joints)
+        {
+            if (joint == null) continue;
+
+            Rigidbody otherRb = joint.connectedBody;
+
+            if (otherRb != null)
+            {
+                GameObject otherObject = otherRb.gameObject;
+
+                if (otherObject.name.Contains("Wire"))
+                {
+                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
+                    if (wireDespawn != null)
+                    {
+                        wireDespawn.Despawn();
+                    }
+                    else
+                    {
+                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
+                    }
+                }
+            }
+
+            Destroy(joint); // Destroy the joint itself
+        }
+
+        foreach (FixedJoint joint in connectedJoints)
+        {
+            if (joint == null) continue;
+
+            Rigidbody otherRb = joint.connectedBody;
+
+            if (otherRb != null)
+            {
+                GameObject otherObject = otherRb.gameObject;
+
+                if (otherObject.name.Contains("Wire"))
+                {
+                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
+                    if (wireDespawn != null)
+                    {
+                        wireDespawn.Despawn();
+                    }
+                    else
+                    {
+                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
+                    }
+                }
+            }
+
+            Destroy(joint); // Destroy the joint itself
+        }
     }
 }
