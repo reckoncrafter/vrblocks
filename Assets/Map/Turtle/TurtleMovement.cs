@@ -194,6 +194,7 @@ public class TurtleMovement : MonoBehaviour
         turtleCollider.material.bounciness = resetBounciness;
         transform.SetPositionAndRotation(resetPosition, resetRotation);
         rb.constraints = resetConstraints;
+        forwardArrow.SetActive(false);
     }
 
     private void EndMovement()
