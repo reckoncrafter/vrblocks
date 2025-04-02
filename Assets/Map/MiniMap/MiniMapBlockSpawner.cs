@@ -36,6 +36,10 @@ public class MiniMapBlockSpawner : MonoBehaviour
         XRGrabInteractable grabInteractable = GetComponent<XRGrabInteractable>();
         grabInteractable.selectEntered.AddListener(HideGrabbingHand);
         grabInteractable.selectExited.AddListener(ShowGrabbingHand);
+        
+        startPositionOffset = (mapValues.blockScale / 2) - CalculateCenterOfMass();
+        miniMapTurtle = transform.Find("Turtle").gameObject;
+        realTurtle = GameObject.Find("/MapSpawner/Turtle");
     }
     void Update()
     {
@@ -70,6 +74,17 @@ public class MiniMapBlockSpawner : MonoBehaviour
         com /= mapValues.spawnPoints.Length;
         return com;
     }
+
+    GameObject realTurtle;
+    GameObject miniMapTurtle;
+    Vector3 startPositionOffset;
+    Vector3 turtleUpdateOffset = new Vector3(-0.25f, -0.25f, -0.25f);
+    void FixedUpdate()
+    {
+        miniMapTurtle.transform.localPosition = turtleUpdateOffset + startPositionOffset + realTurtle.transform.localPosition;
+        miniMapTurtle.transform.localRotation = realTurtle.transform.localRotation;
+    }
+
     public void SpawnEntities()
     {
         // Calculate COM and justify the minimap model centered here (and rotate in player's hand properly)
