@@ -456,8 +456,11 @@ public class BlockSnapping : MonoBehaviour
             else
             {
                 // Position updating logic
-                int adjustPositionY = (physicalPosition - targetPosition) % blockLimit;
-                int adjustPositionX = targetColumn - currentColumn;
+                int positionDifference = 1 - targetPosition;
+                int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
+                if (positionDifference < 0) adjustPositionY = -adjustPositionY;
+
+                int adjustPositionX = targetColumn;
 
                 if (physicalPosition % blockLimit == 0 && connectedRb != null)
                 {
@@ -476,6 +479,7 @@ public class BlockSnapping : MonoBehaviour
                 }
 
                 blockSnapping.physicalPosition = targetPosition;
+                blockSnapping.currentColumn = targetColumn;
 
                 Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
 
@@ -601,6 +605,7 @@ public class BlockSnapping : MonoBehaviour
 
     public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
     {
+        Debug.Log("SpawnWire: Called!");
         GameObject wirePrefab = Resources.Load<GameObject>("Prefabs/Wire2");
 
         if (wirePrefab == null || rb == null || connectedRb == null)
@@ -683,6 +688,7 @@ public class BlockSnapping : MonoBehaviour
 
     private void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
     {
+        Debug.Log("DestroyWire: Called!");
         if (rb == null || connectedRb == null)
         {
             Debug.LogError("DestroyWire: Provided Rigidbodies are null.");
