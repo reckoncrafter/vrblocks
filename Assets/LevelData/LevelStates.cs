@@ -22,21 +22,21 @@ public class LevelState
     public string getName(){ return name; }
     public bool getIsLockedLevel()
     {
-        Debug.Log($"LevelState: PlayerPrefs GET {name + "_locked"}: {PlayerPrefs.GetInt(name + "_locked")} ");
+        //Debug.Log($"LevelState: PlayerPrefs GET {name + "_locked"}: {PlayerPrefs.GetInt(name + "_locked")} ");
         return PlayerPrefs.GetInt(name + "_locked", 1) == 1; // default locked;
     }
     public void setIsLockedLevel(bool isLocked)
     {
-        Debug.Log($"LevelState: PlayerPrefs SET {name + "_locked"}: {(isLocked? 1:0)} ");
+        //Debug.Log($"LevelState: PlayerPrefs SET {name + "_locked"}: {(isLocked? 1:0)} ");
         PlayerPrefs.SetInt(name + "_locked", isLocked? 1:0);
     }
     public int getStarCount()
     {
-        Debug.Log($"LevelState: PlayerPrefs GET {name + "_stars"}: {PlayerPrefs.GetInt(name + "_stars")} ");
+        //Debug.Log($"LevelState: PlayerPrefs GET {name + "_stars"}: {PlayerPrefs.GetInt(name + "_stars")} ");
         return PlayerPrefs.GetInt(name + "_stars", 0); // default 0 stars
     }
     public void setStartCount(int stars){
-        Debug.Log($"LevelState: PlayerPrefs GET {name + "_stars"}: {stars}");
+        //Debug.Log($"LevelState: PlayerPrefs GET {name + "_stars"}: {stars}");
         PlayerPrefs.SetInt(name + "_stars", stars);
     }
 }

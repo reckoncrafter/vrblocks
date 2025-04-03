@@ -317,7 +317,7 @@ public class ExecutionDirector : MonoBehaviour
 
     readonly float defaultWait = 1.0f;
     readonly float moveWait = 1.8f;
-    readonly float jumpWait = 1.5f;
+    readonly float jumpWait = 2.0f;
 
     public void MainLoop()
     {

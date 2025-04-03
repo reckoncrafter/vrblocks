@@ -77,10 +77,6 @@ public class SceneTransitionManager : MonoBehaviour
         if (loadOption == LoadSceneBy.LevelStatesManagerArrayOrder)
         {
             Debug.Log($"SceneTransitionManager.GoToSceneAsyncRoutine: sceneIndex:{sceneIndex}");
-            foreach(LevelMetadataScriptableObject lmso in levelMetadataScriptables)
-            {
-                Debug.Log(lmso.levelName);
-            }
             operation = SceneManager.LoadSceneAsync(levelMetadataScriptables[sceneIndex].levelName);
         }
         else // LoadSceneBy.BuildSettingsOrder
