@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 public class SnappedForwarding : MonoBehaviour
@@ -42,13 +41,7 @@ public class SnappedForwarding : MonoBehaviour
             return;
         }
 
-        // Stop at other root block
         SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
-        if (snappedForwarding != null && snappedForwarding.IsRootBlock && blockCount > 1)
-        {
-            Debug.Log($"Encountered another root block {currentBlock.name}. Stopping traversal.");
-            return;
-        }
 
         // Count the current block
         blockCount++;
@@ -182,15 +175,21 @@ public class SnappedForwarding : MonoBehaviour
         {
             // Find parent block through the FixedJoint (as used in OnGrab())
             FixedJoint[] joints = rb.GetComponents<FixedJoint>();
-            foreach (GameObject otherRbParent in joints.Select(j => j.connectedBody.gameObject))
+            foreach (FixedJoint joint in joints)
             {
+                GameObject otherRbParent = joint.connectedBody.gameObject;
                 // Ignore wires
                 if (!otherRbParent.name.Contains("Wire"))
                 {
-                    // Temporarily disable rotation constraints to allow realignment
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
-                    rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
+                    FixedJoint[] jointList1 = rb.GetComponents<FixedJoint>();
+                    Debug.Log($"UpdatePhysics: Initial number of joints on Block: {rb.name},  (BEFORE PHYSICS UPDATE) = {jointList1.Length}");
+
+                    // Destroy the connecting joint to allow block realignment while retaining physics reactivity
+                    Destroy(joint);
+
+                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
+                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
+                    //rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
 
                     // Update position to match the X and Z of the parent block
                     Vector3 parentPosition = otherRbParent.transform.position;
@@ -198,17 +197,27 @@ public class SnappedForwarding : MonoBehaviour
 
                     // Reset rotation to 0
                     rb.transform.rotation = Quaternion.Euler(0, 0, 0);
-                    Debug.Log($"Physics Update: Position/Rotation reset");
+                    //Debug.Log($"Physics Update: Position/Rotation reset");
 
-                    // Re-enable the rotation constraints after alignment
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationX;
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationY;
-                    rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+                    // Update position to match the X and Z of the parent block, realign SnapPointTop with SnapPointBottom
+                    Transform snapPointTop = rb.transform.Find("SnapPointTop");
+                    Transform snapPointBottom = otherRbParent.transform.Find("SnapPointBottom");
+
+                    if (snapPointTop != null && snapPointBottom != null)
+                    {
+                        Vector3 offset = snapPointTop.position - rb.transform.position;
+                        Vector3 realignPosition = snapPointBottom.position - offset;
+                        rb.transform.position = new Vector3(parentPosition.x, realignPosition.y, parentPosition.z);
+                    }
+
+                    // DO NOT Create new joint to reconnect the blocks
+
+                    FixedJoint[] jointList2 = rb.GetComponents<FixedJoint>();
+                    Debug.Log($"UpdatePhysics: Initial number of joints on Block: {rb.name},  (AFTER PHYSICS UPDATE) = {jointList2.Length}");
 
                     break;
                 }
             }
         }
     }
-
 }

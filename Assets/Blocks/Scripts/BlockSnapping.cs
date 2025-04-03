@@ -11,6 +11,10 @@ public class BlockSnapping : MonoBehaviour
     public bool hasSnapped = false; // Flag to prevent repeated snapping
     //private QueueReading? queueReading;
 
+    public int physicalPosition = 1;
+    public int targetPosition = 1;
+    public int currentColumn = 0;
+
     public AudioClip snapSound;
     private AudioSource audio;
 
@@ -75,6 +79,7 @@ public class BlockSnapping : MonoBehaviour
 
                     hasSnapped = true;
                     otherSnappedForwarding.ConnectedBlock = this.gameObject;
+                    Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
                     thisSnappedForwarding.IsRootBlock = false;
 
                     // Set other block to snapped
@@ -92,7 +97,7 @@ public class BlockSnapping : MonoBehaviour
         }
     }
 
-    private void SnapToBlock(GameObject block1, GameObject block2)
+    private void SnapToBlock(GameObject block1, GameObject block2) //block2 is top block, block1 is bottom block
     {
         Transform snapPointTop = block1.transform.Find("SnapPointTop");
         Transform snapPointBottom = block2.transform.Find("SnapPointBottom");
@@ -136,6 +141,50 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log($"{block2.name} snapped to {block1.name}.");
+
+        // Get BlockSnapping components
+        BlockSnapping block1Snapping = block1.GetComponent<BlockSnapping>();
+        BlockSnapping block2Snapping = block2.GetComponent<BlockSnapping>();
+
+        if (block1Snapping != null && block2Snapping != null)
+        {
+            // Set targetPosition values
+            block1Snapping.targetPosition = block2Snapping.targetPosition + 1;
+            Debug.Log($"{block1.name} targetPosition set to {block1Snapping.targetPosition}");
+
+            // Set targetPosition values of children (if any)
+            UpdateChildBlockPositions(block1);
+        }
+    }
+
+    private void UpdateChildBlockPositions(GameObject parentBlock)
+    {
+        if (parentBlock == null) return;
+
+        // Attempt to get the SnappedForwarding component; proceed even if null
+        SnappedForwarding parentForwarding = parentBlock.GetComponentInChildren<SnappedForwarding>();
+
+        if (parentForwarding?.ConnectedBlock == null)
+        {
+            Debug.LogWarning($"Parent block {parentBlock.name} has no connected child.");
+            return;
+        }
+
+        GameObject childBlock = parentForwarding.ConnectedBlock;
+
+        // Attempt to get BlockSnapping components, but do not force them
+        BlockSnapping parentSnapping = parentBlock.GetComponent<BlockSnapping>();
+        BlockSnapping childSnapping = childBlock.GetComponent<BlockSnapping>();
+
+        if (parentSnapping != null && childSnapping != null)
+        {
+            // Adjust child's position based on parent's position (Customize your logic as needed)
+            childSnapping.targetPosition = parentSnapping.targetPosition + 1;
+            Debug.Log($"Updated {childBlock.name} targetPosition to {childSnapping.targetPosition}");
+        }
+
+        // Continue recursively without enforcing BlockSnapping presence
+        UpdateChildBlockPositions(childBlock);
     }
 
     private void PlaySnapSound()
@@ -188,17 +237,26 @@ public class BlockSnapping : MonoBehaviour
             if (sf != null)
             {
                 sf.UpdatePhysics(otherRb);
+                ResnapBlocks(otherRb);
             }
         }
 
         // Start the coroutine and store reference for OnRelease()
         resetSnapStatusCoroutine = StartCoroutine(ResetSnapStatusAfterDelay());
 
+        // Set this block as root block (MAY BE DEPRECATED)
         SnappedForwarding snappedForwarding = gameObject.GetComponentInChildren<SnappedForwarding>();
         if (snappedForwarding != null)
         {
             snappedForwarding.IsRootBlock = true;
         }
+
+        // Set this block's targetPosition to 1 (root position)
+        this.targetPosition = 1;
+        Debug.Log($"{gameObject.name} targetPosition set to {this.targetPosition}");
+
+        // Update all child blocks recursively
+        UpdateChildBlockPositions(gameObject);
     }
 
     private void OnRelease(SelectExitEventArgs args)
@@ -235,7 +293,9 @@ public class BlockSnapping : MonoBehaviour
             return;
         }
 
-        CheckColumnSize();
+        int columnSize = CheckColumnSize();
+
+        CalculateBlockPositions(columnSize);
         blockSnapEvent.Invoke();
         //queueReading?.ReadQueue();
     }
@@ -275,35 +335,14 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log($"Snapping re-enabled on: {gameObject.name}");
     }
 
-    private GameObject? GetNthBlock(GameObject startingBlock, int n) // Function created to find blocks for CheckColumnSize()
-    {
-        int count = 1;
-        GameObject current = startingBlock;
-        while (current != null && count < n)
-        {
-            // Get the SnappedForwarding component on the current block
-            SnappedForwarding sf = current.GetComponentInChildren<SnappedForwarding>();
-            if (sf != null && sf.ConnectedBlock != null)
-            {
-                current = sf.ConnectedBlock;
-                count++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return (count == n) ? current : null;
-    }
-
-    private void CheckColumnSize()
+    private int CheckColumnSize()
     {
         // Get the SnappedForwarding component
         SnappedForwarding thisSnappedForwarding = GetComponentInChildren<SnappedForwarding>();
         if (thisSnappedForwarding == null)
         {
-            Debug.LogWarning("SnappedForwarding component not found on this block.");
-            return;
+            Debug.LogWarning("CheckColumnSize: SnappedForwarding component not found on this block.");
+            return -1;
         }
 
         GameObject startingBlock = transform.gameObject;
@@ -312,117 +351,289 @@ public class BlockSnapping : MonoBehaviour
         GameObject? rootBlock = thisSnappedForwarding.FindRootBlock(startingBlock);
         if (rootBlock == null)
         {
-            Debug.LogWarning("Root block not found.");
-            return;
+            Debug.LogWarning("CheckColumnSize: Root block not found.");
+            return -1;
         }
 
         // Count the number of blocks attached to the root block (including the root itself)
         int columnCount = thisSnappedForwarding.CountBlocks(rootBlock);
-        Debug.Log($"Column count: {columnCount}");
+        return columnCount;
+    }
 
-        // If the column count exceeds 5, reposition the 6th block and then create a new joint between block 5 and block 6.
-        if (columnCount > 5)
+    private void CalculateBlockPositions(int columnSize)
+    {
+        int blockLimit = 5; // Max size of column, can change to reference global variable at some point
+
+        GameObject startingBlock = transform.gameObject;
+        SnappedForwarding thisSnappedForwarding = startingBlock.GetComponentInChildren<SnappedForwarding>();
+
+        if (thisSnappedForwarding == null)
         {
-            // Retrieve the 6th block in the chain
-            GameObject? sixthBlock = GetNthBlock(rootBlock, 6);
-            if (sixthBlock != null)
+            Debug.LogError("SnappedForwarding component missing from the starting block.");
+            return;
+        }
+
+        GameObject currentBlock = thisSnappedForwarding.FindRootBlock(startingBlock);
+
+        if (currentBlock == null)
+        {
+            Debug.LogError("Root block not found.");
+            return;
+        }
+
+        // Capture initial root block position
+        Vector3 initialRootBlockPosition = currentBlock.transform.position;
+
+        // Debug.Log($"UpdateBlockPositions: Root block is {currentBlock}");
+        Rigidbody currentRb = currentBlock.GetComponent<Rigidbody>();
+        Rigidbody connectedRb = null;
+
+        // Check if root block has been moved
+        BlockSnapping rootBlockSnapping = currentRb.GetComponent<BlockSnapping>();
+        bool rootColumnUpdate = true;
+
+        // Adjust the rootBlockPosition based on the current and desired Y position of the root block.
+        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit)
+        {
+            rootColumnUpdate = false;
+        }
+        else
+        {
+            int positionDifference = rootBlockSnapping.physicalPosition - rootBlockSnapping.targetPosition;
+
+            float adjustAmount = (positionDifference % blockLimit) * 0.25f;
+
+            initialRootBlockPosition.y += adjustAmount;
+        }
+
+        while (currentRb != null)
+        {
+            BlockSnapping blockSnapping = currentRb.GetComponent<BlockSnapping>();
+            SnappedForwarding snappedForwarding = currentRb.GetComponentInChildren<SnappedForwarding>();
+
+            if (blockSnapping == null || snappedForwarding == null)
             {
-                // Break the joint connection on the sixth block if it exists to allow repositioning
-                FixedJoint joint = sixthBlock.GetComponent<FixedJoint>();
-                if (joint != null)
-                {
-                    Destroy(joint);
-                    Debug.Log($"FixedJoint on {sixthBlock.name} destroyed.");
-                }
+                Debug.LogError("UpdateBlockPositions: BlockSnapping or SnappedForwarding component not found on current block!");
+                break;
+            }
 
-                // Reposition the 6th block: set its position to rootBlock's position plus 1 unit along the X axis. (Will adjust to make it dynamic.)
-                Vector3 newPosition = rootBlock.transform.position + new Vector3(1f, 0f, 0f);
-                sixthBlock.transform.position = newPosition;
-                Debug.Log($"Sixth block {sixthBlock.name} repositioned to new column at {newPosition}");
-
-                Rigidbody rbSixth = sixthBlock.GetComponent<Rigidbody>();
-                if (rbSixth != null)
-                {
-                    rbSixth.useGravity = false;
-                    rbSixth.velocity = Vector3.zero;
-                    rbSixth.angularVelocity = Vector3.zero;
-                }
-                else
-                {
-                    Debug.LogWarning($"Rigidbody not found on {sixthBlock.name}");
-                }
-
-                // Mark the 6th block as a new root block.
-                SnappedForwarding sixthSF = sixthBlock.GetComponentInChildren<SnappedForwarding>();
-                if (sixthSF != null)
-                {
-                    sixthSF.IsRootBlock = true;
-                }
-
-                //Create a new joint between the 5th and 6th blocks
-                GameObject? fifthBlock = GetNthBlock(rootBlock, 5);
-                if (fifthBlock != null)
-                {
-                    Rigidbody rbFifth = fifthBlock.GetComponent<Rigidbody>();
-                    if (rbFifth != null && rbSixth != null)
-                    {
-                        FixedJoint newJoint = sixthBlock.AddComponent<FixedJoint>();
-                        newJoint.connectedBody = rbFifth;
-                        newJoint.breakForce = Mathf.Infinity;
-                        newJoint.breakTorque = Mathf.Infinity;
-                        Debug.Log($"New joint created between {sixthBlock.name} and {fifthBlock.name}.");
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Could not find Rigidbody on the 5th or 6th block for joint creation.");
-                    }
-
-                    // Spawn wire between two blocks.
-                    SpawnWire(fifthBlock, sixthBlock);
-                }
-                else
-                {
-                    Debug.LogWarning("Could not locate the fifth block in the column.");
-                }
-
+            GameObject connectedBlock = snappedForwarding.ConnectedBlock;
+            if (connectedBlock != null)
+            {
+                connectedRb = connectedBlock.GetComponent<Rigidbody>(); // Get the connected block's Rigidbody
             }
             else
             {
-                Debug.LogWarning("Could not locate the sixth block in the column.");
+                connectedRb = null; // End the loop if there's no connected block
+            }
+
+            int physicalPosition = blockSnapping.physicalPosition;
+            int targetPosition = blockSnapping.targetPosition;
+            int currentColumn = blockSnapping.currentColumn;
+            int targetColumn = (targetPosition - 1) / blockLimit;
+
+            Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' at Physical Position = {physicalPosition}, Target Position = {targetPosition}.");
+
+            if (rootColumnUpdate == false && targetPosition <= blockLimit)
+            {
+                // Position updating logic
+                physicalPosition = targetPosition;
+
+                blockSnapping.physicalPosition = targetPosition;
+
+                ResnapBlocks(currentRb);
+
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                {
+                    Debug.Log("SpawnWire called!");
+                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
+                }
+
+                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
+
+                currentRb = nextRb;
+            }
+            else
+            {
+                // Position updating logic
+                int positionDifference = 1 - targetPosition;
+                int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
+                if (positionDifference < 0) adjustPositionY = -adjustPositionY;
+
+                int adjustPositionX = targetColumn;
+
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                {
+                    //DestroyWire(currentRb, connectedRb); // Define this function later
+                }
+
+                UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
+
+                physicalPosition = targetPosition;
+                Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
+
+                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                {
+                    Debug.Log("SpawnWire called!");
+                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
+                }
+
+                blockSnapping.physicalPosition = targetPosition;
+                blockSnapping.currentColumn = targetColumn;
+
+                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
+
+                currentRb = nextRb;
             }
         }
     }
 
-    public void SpawnWire(GameObject block5, GameObject block6)
+    private void UpdateBlockPosition(Rigidbody currentRb, Vector3 initialRootBlockPosition, int adjustPositionX, int adjustPositionY)
     {
+        // Define block offsets
+        float yBlockOffset = 0.25f; // Width (Y) of block, consider changing to reference global variable
+        float xBlockOffset = 1.0f; // X Offset of columns, consider changing to reference global variable
+
+        // Find parent block through the FixedJoint and destroy the joint to allow block realignment
+        FixedJoint[] joints = currentRb.GetComponents<FixedJoint>();
+        Rigidbody parentRb = null;
+
+        //Debug.Log("UpdateBlockPosition: Initial number of joints = " + joints.Length);
+
+        // Find the parent and destroy the joint
+        foreach (FixedJoint joint in joints)
+        {
+            //Debug.Log("UpdateBlockPosition: Checking joint connected to " + joint.connectedBody?.name);
+
+            if (joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
+            {
+                parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
+                Destroy(joint); // Destroy the joint to allow repositioning
+                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                break;
+            }
+            else
+            {
+                //Debug.Log("UpdateBlockPosition: No parent found or joint connected to a wire.");
+            }
+        }
+
+        // Log the number of joints after the joint destruction
+        joints = currentRb.GetComponents<FixedJoint>();
+        //Debug.Log("UpdateBlockPosition: Number of joints after destruction = " + joints.Length);
+
+        // Capture the initial position before making changes (for debug)
+        Vector3 initialPosition = currentRb.transform.position;
+        Debug.Log("UpdateBlockPosition: Initial Position - X: " + initialPosition.x + ", Y: " + initialPosition.y + ", Z: " + initialPosition.z);
+
+        // Now calculate the new position based on initial root position and offsets
+        Vector3 adjustedPosition = new Vector3(
+            initialRootBlockPosition.x + (adjustPositionX * xBlockOffset),
+            initialRootBlockPosition.y + (adjustPositionY * yBlockOffset),
+            initialRootBlockPosition.z
+        );
+
+        Debug.Log("UpdateBlockPosition: Adjusted Position - X: " + adjustedPosition.x + ", Y: " + adjustedPosition.y + ", Z: " + adjustedPosition.z);
+
+        // Apply the new position to the block
+        currentRb.transform.position = adjustedPosition;
+        //Debug.Log("UpdateBlockPosition: Block Position Updated!");
+
+        // Reset rotation (probably unnecessary)
+        currentRb.transform.rotation = Quaternion.Euler(0, 0, 0);
+        //Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
+
+        // Recreate the joint to reattach the block to its parent
+        if (parentRb != null)
+        {
+            FixedJoint newJoint = currentRb.gameObject.AddComponent<FixedJoint>();
+            newJoint.connectedBody = parentRb;
+            newJoint.breakForce = Mathf.Infinity;
+            newJoint.breakTorque = Mathf.Infinity;
+            //Debug.Log("UpdateBlockPosition: New Joint Created and Connected to Parent.");
+        }
+        else
+        {
+            //Debug.Log("UpdateBlockPosition: No parent Rigidbody found, no joint recreated.");
+        }
+
+        // Debug to confirm position before/after update
+        Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' moved from " +
+                  $"Position X: {initialPosition.x}, Y: {initialPosition.y}, Z: {initialPosition.z} " +
+                  $"to New Position X: {currentRb.transform.position.x}, Y: {currentRb.transform.position.y}, Z: {currentRb.transform.position.z}.");
+    }
+
+    public void ResnapBlocks(Rigidbody currentRb)
+    {
+        // Find parent block through the FixedJoint and destroy the joint to allow block realignment
+        FixedJoint[] joints = currentRb.GetComponents<FixedJoint>();
+        Rigidbody parentRb = null;
+
+        //Debug.Log("UpdateBlockPosition: Initial number of joints = " + joints.Length);
+
+        // Find the parent and destroy the joint
+        foreach (FixedJoint joint in joints)
+        {
+            //Debug.Log("UpdateBlockPosition: Checking joint connected to " + joint.connectedBody?.name);
+
+            if (joint.connectedBody != null && !joint.connectedBody.name.Contains("Wire"))
+            {
+                parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
+                Destroy(joint); // Destroy the joint to allow repositioning
+                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                break;
+            }
+            else
+            {
+                //Debug.Log("UpdateBlockPosition: No parent found or joint connected to a wire.");
+            }
+        }
+        // Recreate the joint to reattach the block to its parent
+        if (parentRb != null)
+        {
+            FixedJoint newJoint = currentRb.gameObject.AddComponent<FixedJoint>();
+            newJoint.connectedBody = parentRb;
+            newJoint.breakForce = Mathf.Infinity;
+            newJoint.breakTorque = Mathf.Infinity;
+            //Debug.Log("UpdateBlockPosition: New Joint Created and Connected to Parent.");
+        }
+        else
+        {
+            //Debug.Log("UpdateBlockPosition: No parent Rigidbody found, no joint recreated.");
+        }
+    }
+
+    public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
+    {
+        Debug.Log("SpawnWire: Called!");
         GameObject wirePrefab = Resources.Load<GameObject>("Prefabs/Wire2");
 
-        if (wirePrefab == null || block5 == null || block6 == null)
+        if (wirePrefab == null || rb == null || connectedRb == null)
         {
-            Debug.LogError("Missing wirePrefab or blocks.");
+            Debug.LogError("Missing wirePrefab or Rigidbody.");
             return;
         }
 
-        // Get the snap points
-        Transform snapPointRight = block5.transform.Find("SnapPointRight");
-        Transform snapPointLeft = block6.transform.Find("SnapPointLeft");
-
+        // Find the snap points on the current block
+        Transform snapPointRight = rb.gameObject.transform.Find("SnapPointRight");
         if (snapPointRight == null)
         {
-            Debug.LogError("SnapPointRight is null.");
+            Debug.LogError("SnapPointRight not found on the current block.");
             return;
         }
 
+        // Find the snap point on the connected block
+        Transform snapPointLeft = connectedRb.transform.Find("SnapPointLeft");
         if (snapPointLeft == null)
         {
-            Debug.LogError("SnapPointLeft is null.");
+            Debug.LogError("SnapPointLeft not found on the connected block.");
             return;
         }
 
         // Spawn wire at the correct position
         GameObject newWire = Instantiate(wirePrefab, snapPointRight.position, wirePrefab.transform.rotation);
 
-        // Get the wire's snap points
+        // Find the wire's snap points
         Transform wireSnapLeft = newWire.transform.Find("SnapPointLeft");
         Transform wireSnapRight = newWire.transform.Find("SnapPointRight");
 
@@ -432,51 +643,117 @@ public class BlockSnapping : MonoBehaviour
             return;
         }
 
-        // Adjust position so wireSnapLeft aligns with snapPointRight of block5
+        // Adjust position so wireSnapLeft aligns with snapPointRight of the original block
         Vector3 wireOffset = snapPointRight.position - wireSnapLeft.position;
         newWire.transform.position += wireOffset;
 
-        // Attach the joints to keep the wire locked between blocks
-        AttachJoint(newWire, snapPointRight, snapPointLeft);
-    }
-
-    private void AttachJoint(GameObject wire, Transform snapRight, Transform snapLeft)
-    {
-        Rigidbody wireRb = wire.GetComponent<Rigidbody>();
+        Rigidbody wireRb = newWire.GetComponent<Rigidbody>();
         if (wireRb == null)
         {
-            wireRb = wire.AddComponent<Rigidbody>();
+            wireRb = newWire.AddComponent<Rigidbody>();
             wireRb.isKinematic = false;
             wireRb.useGravity = false;
             wireRb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             wireRb.interpolation = RigidbodyInterpolation.Interpolate;
         }
 
-        Rigidbody blockBottomRb = snapRight.GetComponentInParent<Rigidbody>();
-        Rigidbody blockTopRb = snapLeft.GetComponentInParent<Rigidbody>();
+        // Create joint connecting the wire to the original block (rb)
+        ConfigurableJoint jointToRb = newWire.AddComponent<ConfigurableJoint>();
+        jointToRb.connectedBody = rb;
+        jointToRb.anchor = wireSnapLeft.localPosition;
+        jointToRb.autoConfigureConnectedAnchor = false;
+        jointToRb.connectedAnchor = snapPointRight.localPosition;
+        jointToRb.xMotion = ConfigurableJointMotion.Locked;
+        jointToRb.yMotion = ConfigurableJointMotion.Locked;
+        jointToRb.zMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularXMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularYMotion = ConfigurableJointMotion.Locked;
+        jointToRb.angularZMotion = ConfigurableJointMotion.Locked;
 
-        if (blockBottomRb != null)
+        // Create joint connecting the wire to the connected block (connectedRb)
+        ConfigurableJoint jointToConnectedRb = newWire.AddComponent<ConfigurableJoint>();
+        jointToConnectedRb.connectedBody = connectedRb;
+        jointToConnectedRb.anchor = wireSnapRight.localPosition;
+        jointToConnectedRb.autoConfigureConnectedAnchor = false;
+        jointToConnectedRb.connectedAnchor = snapPointLeft.localPosition;
+        jointToConnectedRb.xMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.yMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.zMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularXMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularYMotion = ConfigurableJointMotion.Locked;
+        jointToConnectedRb.angularZMotion = ConfigurableJointMotion.Locked;
+
+        Debug.Log("Wire successfully connected between blocks.");
+    }
+
+    private void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
+    {
+        Debug.Log("DestroyWire: Called!");
+        if (rb == null || connectedRb == null)
         {
-            FixedJoint joint1 = blockBottomRb.gameObject.AddComponent<FixedJoint>();
-            joint1.connectedBody = wireRb;
-            joint1.breakForce = Mathf.Infinity;
-            joint1.breakTorque = Mathf.Infinity;
-        }
-        else
-        {
-            Debug.LogError($"No Rigidbody found in parent of {snapRight.name}");
+            Debug.LogError("DestroyWire: Provided Rigidbodies are null.");
+            return;
         }
 
-        if (blockTopRb != null)
+        rb.constraints = RigidbodyConstraints.None;
+        connectedRb.constraints = RigidbodyConstraints.None;
+
+        // Collect all FixedJoints attached to the provided Rigidbodies
+        FixedJoint[] joints = rb.GetComponents<FixedJoint>();
+        FixedJoint[] connectedJoints = connectedRb.GetComponents<FixedJoint>();
+
+        foreach (FixedJoint joint in joints)
         {
-            FixedJoint joint2 = blockTopRb.gameObject.AddComponent<FixedJoint>();
-            joint2.connectedBody = wireRb;
-            joint2.breakForce = Mathf.Infinity;
-            joint2.breakTorque = Mathf.Infinity;
+            if (joint == null) continue;
+
+            Rigidbody otherRb = joint.connectedBody;
+
+            if (otherRb != null)
+            {
+                GameObject otherObject = otherRb.gameObject;
+
+                if (otherObject.name.Contains("Wire"))
+                {
+                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
+                    if (wireDespawn != null)
+                    {
+                        wireDespawn.Despawn();
+                    }
+                    else
+                    {
+                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
+                    }
+                }
+            }
+
+            Destroy(joint); // Destroy the joint itself
         }
-        else
+
+        foreach (FixedJoint joint in connectedJoints)
         {
-            Debug.LogError($"No Rigidbody found in parent of {snapLeft.name}");
+            if (joint == null) continue;
+
+            Rigidbody otherRb = joint.connectedBody;
+
+            if (otherRb != null)
+            {
+                GameObject otherObject = otherRb.gameObject;
+
+                if (otherObject.name.Contains("Wire"))
+                {
+                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
+                    if (wireDespawn != null)
+                    {
+                        wireDespawn.Despawn();
+                    }
+                    else
+                    {
+                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
+                    }
+                }
+            }
+
+            Destroy(joint); // Destroy the joint itself
         }
     }
 }
