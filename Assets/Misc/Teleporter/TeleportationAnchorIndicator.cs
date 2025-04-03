@@ -7,6 +7,7 @@ public class TeleportationAnchorIndicator : MonoBehaviour
 {
     public GameObject arrow;
     public TeleportationAnchor teleportationAnchor;
+    public float disableArrowDistance;
 
     void Start()
     {
@@ -18,7 +19,10 @@ public class TeleportationAnchorIndicator : MonoBehaviour
 
     public void OnHoverEntered(HoverEnterEventArgs hoverEnter)
     {
-        arrow.SetActive(true);
+        if(Vector3.Distance(hoverEnter.interactorObject.transform.position, transform.position) > disableArrowDistance)
+        {
+            arrow.SetActive(true);
+        }
     }
 
     public void OnHoverExited(HoverExitEventArgs hoverExit)
