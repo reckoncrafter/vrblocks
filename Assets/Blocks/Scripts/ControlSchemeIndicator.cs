@@ -73,9 +73,11 @@ public class ControlSchemeIndicator : MonoBehaviour
     private bool interruptCountdown = false;
     IEnumerator CountdownToShowControllers()
     {
+        EnableThrobbers(true);
         yield return new WaitForSeconds(2.0f);
         if(!interruptCountdown)
         {
+            EnableThrobbers(false);
             controllerModels.EnableControllerHands(false);
         }
     }
@@ -91,6 +93,7 @@ public class ControlSchemeIndicator : MonoBehaviour
     }
 
     public void OnHoverExited(){
+        EnableThrobbers(false);
         controllerModels.TransparentHands(false);
         controllerModels.EnableControllerHands(true);
         interruptCountdown = true;
@@ -98,5 +101,11 @@ public class ControlSchemeIndicator : MonoBehaviour
         {
             r.material = submeshDefaultMaterial;
         }
+    }
+
+    private void EnableThrobbers(bool enable)
+    {
+        controllerModels.LeftHand.transform.Find("Throbber").gameObject.SetActive(enable);
+        //controllerModels.RightHand.transform.Find("Throbber").gameObject.SetActive(enable);
     }
 }
