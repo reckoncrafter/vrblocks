@@ -55,9 +55,7 @@ public class ControlSchemeIndicator : MonoBehaviour
                 Controls.Trigger_Left       =>_Find(leftControllerTransform, "Trigger"),
                 Controls.AButton_Left       =>_Find(leftControllerTransform, "XRController_LT_Thumbstick_Buttons/Button_A"),
                 Controls.BButton_Left       =>_Find(leftControllerTransform, "XRController_LT_Thumbstick_Buttons/Button_B"),
-                Controls.ThumbStick_Left    =>_Find(leftControllerTransform, "XRController_LT_Thumbstick_Buttons/ThumbStick"),
-                _ => null
-
+                Controls.ThumbStick_Left    =>_Find(leftControllerTransform, "XRController_LT_Thumbstick_Buttons/ThumbStick")
             };
         };
 
@@ -72,22 +70,33 @@ public class ControlSchemeIndicator : MonoBehaviour
         }
     }
 
-
+    private bool interruptCountdown = false;
+    IEnumerator CountdownToShowControllers()
+    {
+        yield return new WaitForSeconds(2.0f);
+        if(!interruptCountdown)
+        {
+            controllerModels.EnableControllerHands(false);
+        }
+    }
 
     public void OnHoverEntered(){
-        controllerModels.EnableControllerHands(false);
         foreach(Renderer r in submeshRenderers)
         {
             r.material = indicationMaterial;
         }
+        controllerModels.TransparentHands(true);
+        interruptCountdown = false;
+        StartCoroutine(CountdownToShowControllers());
     }
 
     public void OnHoverExited(){
+        controllerModels.TransparentHands(false);
         controllerModels.EnableControllerHands(true);
+        interruptCountdown = true;
         foreach(Renderer r in submeshRenderers)
         {
             r.material = submeshDefaultMaterial;
         }
-
     }
 }
