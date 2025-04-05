@@ -14,6 +14,7 @@ public class TurtleCommand : MonoBehaviour
         Else,
         IfEnd,
         WhileBegin,
+        WhileBreak,
         WhileEnd,
         ConditionTrue,
         ConditionFalse,

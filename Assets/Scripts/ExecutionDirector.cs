@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using MoonSharp.VsCodeDebugger.SDK;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -101,7 +104,8 @@ public class ExecutionDirector : MonoBehaviour
         Action func = afterJump switch {
             Command.MoveForward => turtleMovement.PerformWalkForward,
             Command.RotateRight => turtleMovement.PerformRotateRight,
-            Command.RotateLeft  => turtleMovement.PerformRotateLeft
+            Command.RotateLeft  => turtleMovement.PerformRotateLeft,
+            _ => () => {}
         };
         turtleMovement.shouldJump = true;
         turtleMovement.afterJumpAction = func;
@@ -161,6 +165,13 @@ public class ExecutionDirector : MonoBehaviour
             {
                 tc.SetOffendingState(true);
             }
+            GameObject failureDialog = GameObject.Find("/FailureDialog");
+            if(failureDialog)
+            {
+                TextMeshProUGUI text = failureDialog.GetComponentInChildren<TextMeshProUGUI>();
+                text.text = message;
+            }
+        
             Debug.LogError($"Syntax Error at {offendingBlock.name}");
         }
     };
@@ -273,6 +284,21 @@ public class ExecutionDirector : MonoBehaviour
                     function.scopeDict.Add(sd.BeginBlock, sd);
 
                     Debug.Log($"ExecutionDirector.Execute() [assemble scopes]: begin {sd.BeginBlock}, end {sd.EndBlock}, intermediates: {sd.IntermediateBlocks.Count}");
+                }
+                else if (instruction == Command.WhileBreak)
+                {
+                    if(scopeBuilding.Count == 0)
+                    {
+                        throw new TurtleSyntaxError("Cannot have a break outside of a while loop.", blockList[sb_index]);
+                    }
+                    else
+                    {
+                        ScopeData sd = scopeBuilding.Peek();
+                        if(sd.ScopeType == Command.IfBegin)
+                        {
+                            throw new TurtleSyntaxError("Cannot have a break inside an if statement", blockList[sb_index]);
+                        }
+                    }
                 }
                 else if (instruction == Command.WhileEnd)
                 {
@@ -532,6 +558,17 @@ public class ExecutionDirector : MonoBehaviour
                     function.scopes.Push(sd);
                 }
                 StartCoroutine(RepeatLoop(defaultWait));
+            }
+
+            else if(instruction == Command.WhileBreak)
+            {
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
+                ScopeData sd = function.scopes.Pop();
+                sd.hasExecuted = false;
+                function.scopes.Push(sd);
+                function.instructionPointer = sd.EndBlock;
+                StartCoroutine(RepeatLoop(defaultWait));
+                goto skip;
             }
 
             else if(instruction == Command.WhileEnd)
