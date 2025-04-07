@@ -10,11 +10,13 @@ public class ControllerModelsEditor : Editor
         ControllerModels controllerModels = (ControllerModels)target;
         if (GUILayout.Button("Enable Hands"))
         {
-            controllerModels.EnableControllerHands(true);
+            controllerModels.EnableControllerModel(false, true);
+            controllerModels.EnableControllerModel(false, false);
         }
         if (GUILayout.Button("Disable Hands"))
         {
-            controllerModels.EnableControllerHands(false);
+            controllerModels.EnableControllerModel(true, true);
+            controllerModels.EnableControllerModel(true, false);
         }
     }
 }
