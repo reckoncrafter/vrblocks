@@ -464,7 +464,7 @@ public class BlockSnapping : MonoBehaviour
 
                 if (physicalPosition % blockLimit == 0 && connectedRb != null)
                 {
-                    //DestroyWire(currentRb, connectedRb); // Define this function later
+                    DestroyWire(currentRb, connectedRb); // Define this function later
                 }
 
                 UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
@@ -637,5 +637,43 @@ public class BlockSnapping : MonoBehaviour
         }
 
         Debug.Log("LineRenderer wire successfully spawned.");
+    }
+
+    public void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
+    {
+        Debug.Log("DestroyWire: Called!");
+
+        // Find the correct wire by searching for the SnapPoints of the associated blocks
+        Transform snapPointRight = rb.transform.Find("SnapPointRight");
+        Transform snapPointLeft = connectedRb.transform.Find("SnapPointLeft");
+
+        if (snapPointRight == null || snapPointLeft == null)
+        {
+            Debug.LogError("Snap points not found on the rigidbodies.");
+            return;
+        }
+
+        // Try to find the wire prefab that connects these two snap points.
+        WireLine existingWire = null;
+        foreach (var wire in FindObjectsOfType<WireLine>())
+        {
+            // Check if the wire's start and end points match the snap points of the rigidbodies
+            if ((wire.startPoint == snapPointRight && wire.endPoint == snapPointLeft) ||
+                (wire.startPoint == snapPointLeft && wire.endPoint == snapPointRight))
+            {
+                existingWire = wire;
+                break;
+            }
+        }
+
+        if (existingWire != null)
+        {
+            Destroy(existingWire.gameObject);
+            Debug.Log("Wire successfully destroyed.");
+        }
+        else
+        {
+            Debug.LogError("No matching wire found between the given rigidbodies.");
+        }
     }
 }
