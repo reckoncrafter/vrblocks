@@ -37,6 +37,7 @@ public class TurtleMovement : MonoBehaviour
     public UnityEvent EndOfMovementEvent;
     public UnityEvent FailEvent = new UnityEvent();
     public UnityEvent SuccessEvent = new UnityEvent();
+    public UnityEvent ResetEvent = new UnityEvent();
 
     public Action afterJumpAction;
 
@@ -159,7 +160,6 @@ public class TurtleMovement : MonoBehaviour
         if (!aheadLevel && aheadNotEmpty)
         {
             Debug.Log("ConditionFacingStepDown: Ahead floor not level with turtle.");
-            return true;
         }
         return false;
     }
@@ -194,6 +194,8 @@ public class TurtleMovement : MonoBehaviour
         turtleCollider.material.bounciness = resetBounciness;
         transform.SetPositionAndRotation(resetPosition, resetRotation);
         rb.constraints = resetConstraints;
+
+        ResetEvent.Invoke();
     }
 
     private void EndMovement()

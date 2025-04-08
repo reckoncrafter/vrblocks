@@ -32,19 +32,20 @@ public class ExecutionDirector : MonoBehaviour
 
     // Function IDs map to separate lists of blocks under their respective Function Definition blocks.
     private Dictionary<int, List<GameObject>> functionBlockLists = new Dictionary<int, List<GameObject>>();
+
     void Start()
     {
         // The execution director must begin execution (StartButtonPressed), and maintain an internal representation of the list of blocks (OnSnapEvent)
-        startButton.GetComponent<XRSimpleInteractable>().onSelectEntered.AddListener((XRBaseInteractor xbi) => StartButtonPressed());
+        startButton.GetComponent<XRSimpleInteractable>().selectEntered.AddListener(StartButtonPressed);
         BlockSnapping.blockSnapEvent.AddListener(OnSnapEvent);
 
         GrabFunctionsInScene();
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
     }
-    public void StartButtonPressed()
+    public void StartButtonPressed(SelectEnterEventArgs selectEnter)
     {
-        //blockList = mainBlockList;
+        // initialize data structures
         executionInterrupted = false;
         CallStack.Clear();
         FunctionData mainFunction = new FunctionData();
@@ -53,13 +54,25 @@ public class ExecutionDirector : MonoBehaviour
         mainFunction.scopeDict = new Dictionary<int, ScopeData>();
         mainFunction.scopes = new Stack<ScopeData>();
 
+        // setup and begin execution
         AssembleScopes(mainFunction);
         CallStack.Push(mainFunction);
 
-        //turtleMovement.EndOfMovementEvent.AddListener(MainLoop);
         ContinueLoopEvent.AddListener(MainLoop);
-
         StartCoroutine(RepeatLoop(0.5f));
+
+        // disable start button
+        if(mainBlockList.Count > 0){
+            startButton.GetComponent<StartButton>().SetEnabled(false);
+            startButton.GetComponent<XRSimpleInteractable>().selectEntered.RemoveListener(StartButtonPressed);
+            turtleMovement.ResetEvent.AddListener(ResetStartButton);
+        }
+    }
+
+    private void ResetStartButton()
+    {
+        startButton.GetComponent<StartButton>().SetEnabled(true);
+        startButton.GetComponent<XRSimpleInteractable>().selectEntered.AddListener(StartButtonPressed);
     }
 
     private UnityEvent ContinueLoopEvent = new UnityEvent();
@@ -124,19 +137,6 @@ public class ExecutionDirector : MonoBehaviour
             _ => false
         };
         return isInverted ? !status : status;
-    }
-
-    private int FindNextBlockOfType(List<GameObject> blockList, int StartIndex, int EndIndex, Command cmd)
-    {
-        int index = StartIndex;
-        while(index <= EndIndex)
-        {
-            if(blockList[index].GetComponent<TurtleCommand>().commandEnum == cmd){
-                return index;
-            }
-            index++;
-        }
-        return -1;
     }
 
     private struct ScopeData
@@ -330,14 +330,12 @@ public class ExecutionDirector : MonoBehaviour
     public void SuccessHandler()
     {
         Debug.Log("ExecutionDirector: Success! Halting..");
-        //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
         ContinueLoopEvent.RemoveAllListeners();
         executionInterrupted = true;
     }
     public void FailHandler()
     {
         Debug.Log("ExecutionDirector: Failure! Halting..");
-        //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
         ContinueLoopEvent.RemoveAllListeners();
     }
 
@@ -348,7 +346,6 @@ public class ExecutionDirector : MonoBehaviour
     public void MainLoop()
     {
         if (executionInterrupted) return;
-
         var function = CallStack.Pop();
 
         if(function.instructionPointer >= function.blockList.Count)
@@ -361,7 +358,6 @@ public class ExecutionDirector : MonoBehaviour
             else
             {
                 // no more code
-                //turtleMovement.EndOfMovementEvent.RemoveListener(MainLoop);
                 ContinueLoopEvent.RemoveAllListeners();
                 turtleMovement.Fail();
             }

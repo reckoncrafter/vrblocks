@@ -1,23 +1,16 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class StartButton : MonoBehaviour
 {
-    public void SetGlowEffect(bool isGlow){
-        Renderer renderer = GetComponent<Renderer>();
-        if(renderer != null){
-            Material material = renderer.material;
+    public Material disabledMaterial;
+    private Material defaultMaterial;
+    private new Renderer renderer;
 
-            if(isGlow){
-                material.SetColor("_EmissionColor", Color.green);
-                material.EnableKeyword("_EMISSION");
-            }
-            else{
-                material.SetColor("_EmissionColor", Color.black);
-                material.DisableKeyword("_EMISSION");
-            }
-        }
-        else{
-            Debug.LogWarning("Renderer not found on GameObject");
-        }
+    void Start()
+    {
+        renderer = GetComponent<Renderer>();
+        defaultMaterial = renderer.material;
     }
+    public void SetEnabled(bool __enabled){ renderer.material = __enabled ? defaultMaterial : disabledMaterial; }
 }
