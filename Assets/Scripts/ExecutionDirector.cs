@@ -67,6 +67,13 @@ public class ExecutionDirector : MonoBehaviour
             startButton.GetComponent<XRSimpleInteractable>().selectEntered.RemoveListener(StartButtonPressed);
             turtleMovement.ResetEvent.AddListener(ResetStartButton);
         }
+
+        // clear old error messages
+        GameObject failureDialog = GameObject.Find("/FailureDialog");
+        if(failureDialog != null)
+        {
+            failureDialog.GetComponentInChildren<TextMeshProUGUI>().text = "";
+        }
     }
 
     private void ResetStartButton()
