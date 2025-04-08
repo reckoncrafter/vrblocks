@@ -74,6 +74,13 @@ public class ExecutionDirector : MonoBehaviour
         {
             failureDialog.GetComponentInChildren<TextMeshProUGUI>().text = "";
         }
+
+        // clear offending state material from all blocks in scene
+        TurtleCommand[] turtleCommands = FindObjectsOfType<TurtleCommand>();
+        foreach(TurtleCommand tc in turtleCommands)
+        {
+            tc.SetOffendingState(false);
+        }
     }
 
     private void ResetStartButton()
@@ -251,7 +258,7 @@ public class ExecutionDirector : MonoBehaviour
             if(isCommandOrFlowControl)
             {
                 Command instruction = blockTurtleCommand.commandEnum;
-                blockTurtleCommand.SetOffendingState(false);
+                //blockTurtleCommand.SetOffendingState(false);
                 if(instruction == Command.IfBegin)
                 {
                     ScopeData sd = new ScopeData();
