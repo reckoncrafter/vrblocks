@@ -186,6 +186,7 @@ public class TurtleMovement : MonoBehaviour
         canFail = false;
 
         SetIsWalking(false);
+        forwardArrow.SetActive(false);
         //queue.Clear();
         tween?.reset();
 
