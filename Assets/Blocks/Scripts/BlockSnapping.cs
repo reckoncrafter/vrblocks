@@ -63,36 +63,44 @@ public class BlockSnapping : MonoBehaviour
         // Check if SnapTriggerTop was entered by SnapTriggerBottom
         if (sender.gameObject.name == "SnapTriggerTop" && other.gameObject.name == "SnapTriggerBottom" && !hasSnapped)
         {
-            // Get SnappedForwarding from other.SnapTriggerBottom
             SnappedForwarding otherSnappedForwarding = other.gameObject.GetComponent<SnappedForwarding>();
             SnappedForwarding thisSnappedForwarding = GetComponentInChildren<SnappedForwarding>();
+            GameObject thisChildBlock = thisSnappedForwarding.ConnectedBlock; // Get ConnectedBlock to check for looped snapping.
 
-            // Check if the bottom trigger is already snapped
-            if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
+            // Prevent looped snapping
+            if (!thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject))
             {
-                GameObject? parentObject = other.transform.parent?.gameObject;
-                if (parentObject != null)
+                // Check if the bottom trigger is already snapped
+                if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
                 {
-                    Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
-                    PlaySnapSound();
-                    SnapToBlock(this.gameObject, parentObject);
+                    GameObject? parentObject = other.transform.parent?.gameObject;
+                    if (parentObject != null)
+                    {
+                        Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
+                        PlaySnapSound();
+                        SnapToBlock(this.gameObject, parentObject);
 
-                    hasSnapped = true;
-                    otherSnappedForwarding.ConnectedBlock = this.gameObject;
-                    Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
-                    thisSnappedForwarding.IsRootBlock = false;
+                        hasSnapped = true;
+                        otherSnappedForwarding.ConnectedBlock = this.gameObject;
+                        Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
+                        thisSnappedForwarding.IsRootBlock = false;
 
-                    // Set other block to snapped
-                    otherSnappedForwarding.SetSnapped(true);
+                        // Set other block to snapped
+                        otherSnappedForwarding.SetSnapped(true);
+                    }
+                    else
+                    {
+                        Debug.LogError("Parent object is null!");
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Parent object is null!");
+                    Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
                 }
             }
             else
             {
-                Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
+                Debug.LogError($"Looped snap prevented: {other.transform.parent?.name} is already connected to {this.name}");
             }
         }
     }
@@ -328,7 +336,7 @@ public class BlockSnapping : MonoBehaviour
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds (change as needed)
-        //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
+                                               //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
 
         blockSnapEvent.Invoke();
@@ -509,7 +517,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
                 Destroy(joint); // Destroy the joint to allow repositioning
-                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
                 break;
             }
             else
@@ -580,7 +588,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
                 Destroy(joint); // Destroy the joint to allow repositioning
-                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
                 break;
             }
             else
