@@ -100,6 +100,8 @@ public class MiniMapBlockSpawner : MonoBehaviour
 
             currentEntity.name = mapValues.blockPrefabName + i;
             currentEntity.transform.localScale = mapValues.blockScale;
+            
+            DestroyImmediate(currentEntity.GetComponent<Collider>());
         }
 
         // Goal Sphere
@@ -109,6 +111,8 @@ public class MiniMapBlockSpawner : MonoBehaviour
         generatedGoalObject.transform.localScale = mapValues.goalScale;
         generatedGoalObject.transform.position += mapValues.goalPositionOffset * miniMapScale;
         generatedGoalObject.name = mapValues.goalPrefabName;
+
+        DestroyImmediate(generatedGoalObject.GetComponent<Collider>());
 
         // Turtle
         Vector3 turtlePositionOffset = new Vector3(0, -0.2f, 0);
