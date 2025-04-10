@@ -37,7 +37,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
         XRGrabInteractable grabInteractable = GetComponent<XRGrabInteractable>();
         grabInteractable.selectEntered.AddListener(HideGrabbingHand);
         grabInteractable.selectExited.AddListener(ShowGrabbingHand);
-        
+
         startPositionOffset = (mapValues.blockScale / 2) - CalculateCenterOfMass();
     }
     void Update()
