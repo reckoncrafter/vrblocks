@@ -390,24 +390,6 @@ public class BlockSnapping : MonoBehaviour
         Rigidbody currentRb = currentBlock.GetComponent<Rigidbody>();
         Rigidbody connectedRb = null;
 
-        // Check if root block has been moved
-        BlockSnapping rootBlockSnapping = currentRb.GetComponent<BlockSnapping>();
-        bool rootColumnUpdate = true;
-
-        // Adjust the rootBlockPosition based on the current and desired Y position of the root block.
-        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit)
-        {
-            rootColumnUpdate = false;
-        }
-        else
-        {
-            int positionDifference = rootBlockSnapping.physicalPosition - rootBlockSnapping.targetPosition;
-
-            float adjustAmount = (positionDifference % blockLimit) * 0.25f;
-
-            initialRootBlockPosition.y += adjustAmount;
-        }
-
         while (currentRb != null)
         {
             BlockSnapping blockSnapping = currentRb.GetComponent<BlockSnapping>();
