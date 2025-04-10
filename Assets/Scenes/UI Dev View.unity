@@ -2038,13 +2038,24 @@ MonoBehaviour:
   turtleCollisionAudio: {fileID: 0}
   turtleFallAudio: {fileID: 0}
   turtleJumpAudio: {fileID: 0}
+  turtleSuccessAudio: {fileID: 0}
   movementDuration: 1
   animationSpeed: 4
   failBounciness: 0.3
   moveDistance: {x: 0.5, y: 0.5, z: 0.5}
+  canReset: 0
+  canFail: 0
+  shouldJump: 0
   EndOfMovementEvent:
     m_PersistentCalls:
       m_Calls: []
+  FailEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SuccessEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  forwardArrow: {fileID: 0}
 --- !u!65 &228303538
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3931,7 +3942,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.42099997, y: -0.45900005}
+  m_AnchoredPosition: {x: 0.375, y: -0.5}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &409626248
@@ -4318,7 +4329,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac091e3d1f084707adc527b6eb70e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turtleSuccessAudio: {fileID: 8300000, guid: fd2d9e198d018434095c2d9bec43ab8f, type: 3}
   mapBlock: {fileID: 2844158347067402648, guid: 040b808da240c4b54a6a4135c497a5ec, type: 3}
   goalObject: {fileID: 0}
   turtle: {fileID: 8949930570369046022, guid: 400fef76ef71943d48f3221445efd519, type: 3}
@@ -5146,7 +5156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.129, y: -0.45700017}
+  m_AnchoredPosition: {x: 1.125, y: -0.5}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &608823281
@@ -6888,7 +6898,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.129, y: 0.39099997}
+  m_AnchoredPosition: {x: 1.125, y: 0.4}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &851302067
@@ -8781,7 +8791,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.397, y: 0.39099997}
+  m_AnchoredPosition: {x: -0.375, y: 0.4}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1036209846
@@ -9881,7 +9891,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1192884591
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10574,7 +10584,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.397, y: -0.45900005}
+  m_AnchoredPosition: {x: -0.375, y: -0.5}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1264868099
@@ -14043,7 +14053,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.123, y: -0.45900005}
+  m_AnchoredPosition: {x: -1.125, y: -0.5}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1593013456
@@ -17886,7 +17896,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.123, y: 0.391}
+  m_AnchoredPosition: {x: -1.125, y: 0.4}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1936118644
@@ -18652,7 +18662,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.42099997, y: 0.39099997}
+  m_AnchoredPosition: {x: 0.375, y: 0.4}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1995467228
@@ -19159,6 +19169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waitDuration: 1
+  levelMetadataScriptables: []
 --- !u!4 &2050724769
 Transform:
   m_ObjectHideFlags: 0
