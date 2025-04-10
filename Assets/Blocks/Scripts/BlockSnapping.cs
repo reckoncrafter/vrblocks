@@ -393,7 +393,7 @@ public class BlockSnapping : MonoBehaviour
         bool rootColumnUpdate = true;
 
         // Adjust the rootBlockPosition based on the current and desired Y position of the root block.
-        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit)
+        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit - 1)
         {
             rootColumnUpdate = false;
         }
@@ -449,6 +449,12 @@ public class BlockSnapping : MonoBehaviour
                     SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
                 }
 
+                if (physicalPosition % blockLimit == 0 && connectedRb == null)
+                {
+                    Debug.Log("DestroyWire called!");
+                    DestroyWire(currentRb); // DestroyWire if new position is bottom of the column
+                }
+
                 Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
 
                 currentRb = nextRb;
@@ -462,9 +468,10 @@ public class BlockSnapping : MonoBehaviour
 
                 int adjustPositionX = targetColumn;
 
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
+                if ((physicalPosition % blockLimit == 0 && connectedRb == null) ||
+                (physicalPosition % blockLimit == 0 && physicalPosition != targetPosition))
                 {
-                    DestroyWire(currentRb, connectedRb); // Define this function later
+                    DestroyWire(currentRb); // Define this function later
                 }
 
                 UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
@@ -639,41 +646,35 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log("LineRenderer wire successfully spawned.");
     }
 
-    public void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
+    public void DestroyWire(Rigidbody rb)
     {
         Debug.Log("DestroyWire: Called!");
 
-        // Find the correct wire by searching for the SnapPoints of the associated blocks
-        Transform snapPointRight = rb.transform.Find("SnapPointRight");
-        Transform snapPointLeft = connectedRb.transform.Find("SnapPointLeft");
-
-        if (snapPointRight == null || snapPointLeft == null)
+        if (rb == null)
         {
-            Debug.LogError("Snap points not found on the rigidbodies.");
+            Debug.LogError("DestroyWire: Rigidbody is null.");
             return;
         }
 
-        // Try to find the wire prefab that connects these two snap points.
-        WireLine existingWire = null;
+        // Get the SnapPointRight of this block
+        Transform snapPointRight = rb.transform.Find("SnapPointRight");
+        if (snapPointRight == null)
+        {
+            Debug.LogError("DestroyWire: SnapPointRight not found on the Rigidbody.");
+            return;
+        }
+
+        // Find the wire connected to SnapPointRight
         foreach (var wire in FindObjectsOfType<WireLine>())
         {
-            // Check if the wire's start and end points match the snap points of the rigidbodies
-            if ((wire.startPoint == snapPointRight && wire.endPoint == snapPointLeft) ||
-                (wire.startPoint == snapPointLeft && wire.endPoint == snapPointRight))
+            if (wire.startPoint == snapPointRight || wire.endPoint == snapPointRight)
             {
-                existingWire = wire;
-                break;
+                Destroy(wire.gameObject); // Destroy the wire
+                Debug.Log("DestroyWire: Wire connected to SnapPointRight destroyed.");
+                return;
             }
         }
 
-        if (existingWire != null)
-        {
-            Destroy(existingWire.gameObject);
-            Debug.Log("Wire successfully destroyed.");
-        }
-        else
-        {
-            Debug.LogError("No matching wire found between the given rigidbodies.");
-        }
+        Debug.LogWarning("DestroyWire: No wire found connected to SnapPointRight.");
     }
 }
