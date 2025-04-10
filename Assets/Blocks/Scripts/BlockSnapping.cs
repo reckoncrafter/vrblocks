@@ -14,6 +14,7 @@ public class BlockSnapping : MonoBehaviour
     public int physicalPosition = 1;
     public int targetPosition = 1;
     public int currentColumn = 0;
+    public bool hasWire = false;
 
     public AudioClip snapSound;
     private AudioSource audio;
@@ -215,8 +216,9 @@ public class BlockSnapping : MonoBehaviour
             if (otherRb != null)
             {
                 GameObject otherObject = otherRb.gameObject;
+                DestroyWire(otherRb);
 
-                // If the connected object is a wire, despawn it
+                // Deprecated, remove me on cleanup!
                 if (otherObject.name.Contains("Wire"))
                 {
                     WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
@@ -393,7 +395,7 @@ public class BlockSnapping : MonoBehaviour
         bool rootColumnUpdate = true;
 
         // Adjust the rootBlockPosition based on the current and desired Y position of the root block.
-        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit - 1)
+        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit)
         {
             rootColumnUpdate = false;
         }
@@ -434,64 +436,39 @@ public class BlockSnapping : MonoBehaviour
 
             Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' at Physical Position = {physicalPosition}, Target Position = {targetPosition}.");
 
-            if (rootColumnUpdate == false && targetPosition <= blockLimit)
+
+            // Position updating logic
+            int positionDifference = 1 - targetPosition;
+            int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
+            if (positionDifference < 0) adjustPositionY = -adjustPositionY;
+
+            int adjustPositionX = targetColumn;
+
+            if ((blockSnapping.hasWire == true && targetPosition % blockLimit != 0) ||
+            (blockSnapping.hasWire == true && snappedForwarding.ConnectedBlock == null))
             {
-                // Position updating logic
-                physicalPosition = targetPosition;
-
-                blockSnapping.physicalPosition = targetPosition;
-
-                ResnapBlocks(currentRb);
-
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                {
-                    Debug.Log("SpawnWire called!");
-                    SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
-                }
-
-                if (physicalPosition % blockLimit == 0 && connectedRb == null)
-                {
-                    Debug.Log("DestroyWire called!");
-                    DestroyWire(currentRb); // DestroyWire if new position is bottom of the column
-                }
-
-                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
-
-                currentRb = nextRb;
+                Debug.Log("UpdateBlockPosition: DestroyWire Called!");
+                DestroyWire(currentRb);
             }
-            else
+
+            UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
+
+            physicalPosition = targetPosition;
+            Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
+
+            if (blockSnapping.hasWire == false && physicalPosition % blockLimit == 0 && connectedRb != null)
             {
-                // Position updating logic
-                int positionDifference = 1 - targetPosition;
-                int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
-                if (positionDifference < 0) adjustPositionY = -adjustPositionY;
-
-                int adjustPositionX = targetColumn;
-
-                if ((physicalPosition % blockLimit == 0 && connectedRb == null) ||
-                (physicalPosition % blockLimit == 0 && physicalPosition != targetPosition))
-                {
-                    DestroyWire(currentRb); // Define this function later
-                }
-
-                UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
-
-                physicalPosition = targetPosition;
-                Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
-
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                {
-                    Debug.Log("SpawnWire called!");
-                    SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
-                }
-
-                blockSnapping.physicalPosition = targetPosition;
-                blockSnapping.currentColumn = targetColumn;
-
-                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
-
-                currentRb = nextRb;
+                Debug.Log("UpdateBlockPosition: SpawnWire called!");
+                SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
             }
+
+            blockSnapping.physicalPosition = targetPosition;
+            blockSnapping.currentColumn = targetColumn;
+
+            Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
+
+            currentRb = nextRb;
+
         }
     }
 
@@ -637,6 +614,8 @@ public class BlockSnapping : MonoBehaviour
         {
             wireLine.startPoint = snapPointRight;
             wireLine.endPoint = snapPointLeft;
+            BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
+            blockSnapping.hasWire = true;
         }
         else
         {
@@ -671,6 +650,8 @@ public class BlockSnapping : MonoBehaviour
             {
                 Destroy(wire.gameObject); // Destroy the wire
                 Debug.Log("DestroyWire: Wire connected to SnapPointRight destroyed.");
+                BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
+                blockSnapping.hasWire = false;
                 return;
             }
         }
