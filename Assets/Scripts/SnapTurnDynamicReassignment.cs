@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -20,6 +21,8 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
     public InputActionProperty rightHandSnapTurnAction;
     public InputActionReference rightHandGrabAction;
     public InputActionReference leftHandGrabAction;
+    public PlayerUIManager playerUIManager; // for disabling menus while grabbing
+    public bool disableMenusWhileGrabbing;
     private InputActionProperty emptyInputAction = new InputActionProperty();
     private ActionBasedSnapTurnProvider snapTurnProvider;
     private ActionBasedContinuousTurnProvider continuousTurnProvider;
@@ -28,6 +31,8 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
 
     void Start()
     {
+        if(!playerUIManager){ playerUIManager = FindObjectOfType<PlayerUIManager>(); }
+
         snapTurnProvider = GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurnProvider = GetComponent<ActionBasedContinuousTurnProvider>();
         AssignTurnActions();
@@ -36,6 +41,23 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
         rightHandGrabAction.action.canceled += (ctx) => {rightIsGrabbing=false;AssignTurnActions();};
         leftHandGrabAction.action.started += (ctx) => {leftIsGrabbing=true;AssignTurnActions();};
         leftHandGrabAction.action.canceled += (ctx) => {leftIsGrabbing=false;AssignTurnActions();};
+    }
+
+    public void ToggleMenuActions()
+    {
+        if(rightIsGrabbing || leftIsGrabbing)
+        {
+            playerUIManager.pauseMenuAction.action.Disable();
+            playerUIManager.blockMenuAction.action.Disable();
+            playerUIManager.debug_EndScreenTriggerAction.action.Disable();
+        }
+        else
+        {
+            playerUIManager.pauseMenuAction.action.Enable();
+            playerUIManager.blockMenuAction.action.Enable();
+            playerUIManager.debug_EndScreenTriggerAction.action.Enable();
+        }
+
     }
     public void AssignTurnActions()
     {
@@ -55,5 +77,7 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
         snapTurnProvider.leftHandSnapTurnAction = leftIsGrabbing? emptyInputAction: leftHandSnapTurnAction;
         continuousTurnProvider.rightHandTurnAction = rightIsGrabbing? emptyInputAction: rightHandTurnAction;
         continuousTurnProvider.leftHandTurnAction = leftIsGrabbing? emptyInputAction: leftHandTurnAction;
+
+        if(disableMenusWhileGrabbing){ ToggleMenuActions(); }
     }
 }
