@@ -1,21 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection.Emit;
-using MoonSharp.VsCodeDebugger.SDK;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
 using Command = TurtleCommand.Command;
 
 /*
 Notes:
-- Blocks set to OffendingState will not be reset if they are removed from the stack.
 - Because AssembleScopes() is run upon a function call, syntax errors in functions will only be detected when they are called.
 - Jumps followed by another action do not cross control flow boundaries.
 - This is hard :(
@@ -123,20 +117,6 @@ public class ExecutionDirector : MonoBehaviour
                 turtleMovement.FixedUpdate();
                 break;
         }
-    }
-
-    private void CombinedJump(Command afterJump)
-    {
-        Debug.Log($"ExecutionDirector.CombinedJump: Jump -> {afterJump}");
-        Action func = afterJump switch {
-            Command.MoveForward => turtleMovement.PerformWalkForward,
-            Command.RotateRight => turtleMovement.PerformRotateRight,
-            Command.RotateLeft  => turtleMovement.PerformRotateLeft,
-            _ => () => {}
-        };
-        turtleMovement.shouldJump = true;
-        turtleMovement.afterJumpAction = func;
-        turtleMovement.FixedUpdate();
     }
 
     private bool EvaluateCondition(Command cmd, bool isInverted)
@@ -355,7 +335,7 @@ public class ExecutionDirector : MonoBehaviour
 
     readonly float defaultWait = 1.0f;
     readonly float moveWait = 1.8f;
-    readonly float jumpWait = 2.0f;
+    readonly float jumpWait = 2.3f;
 
     public void MainLoop()
     {
@@ -603,36 +583,13 @@ public class ExecutionDirector : MonoBehaviour
                 instruction == Command.Jump
             )
             {
-                if(instruction == Command.Jump)
-                {
-                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], jumpWait));
-                    TurtleCommand tc;
-                    if(function.instructionPointer + 1 < function.blockList.Count &&
-                        function.blockList[function.instructionPointer+1].TryGetComponent<TurtleCommand>(out tc) &&
-                        (tc.commandEnum == Command.MoveForward || tc.commandEnum == Command.RotateRight || tc.commandEnum == Command.RotateLeft)
-                        )
-                        {
-                            StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer+1], jumpWait));
-                            CombinedJump(tc.commandEnum);
-                            function.instructionPointer += 1;
-                            StartCoroutine(RepeatLoop(jumpWait));
-                        }
-                        else
-                        {
-                            InstructTurtle(instruction);
-                            StartCoroutine(RepeatLoop(jumpWait));
-                        }
-                }
-                else
-                {
-                    StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], moveWait));
-                    InstructTurtle(instruction);
-                    StartCoroutine(RepeatLoop(moveWait));
-                }
+                StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], (instruction == Command.Jump) ? jumpWait : moveWait));
+                InstructTurtle(instruction);
+                StartCoroutine(RepeatLoop((instruction == Command.Jump) ? jumpWait : moveWait));
             }
 
             else{
-                // must be a condition check
+                // must be a lone condition check (this will do nothing)
                 StartCoroutine(IlluminateBlock(function.blockList[function.instructionPointer], defaultWait));
                 InstructTurtle(instruction);
                 StartCoroutine(RepeatLoop(defaultWait));
