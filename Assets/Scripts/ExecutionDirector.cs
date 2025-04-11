@@ -114,7 +114,6 @@ public class ExecutionDirector : MonoBehaviour
                 break;
             case Command.Jump:
                 turtleMovement.shouldJump = true;
-                turtleMovement.afterJumpAction = turtleMovement.PerformWalkForward; // jump will always move forward
                 turtleMovement.FixedUpdate();
                 break;
         }

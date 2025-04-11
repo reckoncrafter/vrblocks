@@ -39,8 +39,6 @@ public class TurtleMovement : MonoBehaviour
     public UnityEvent SuccessEvent = new UnityEvent();
     public UnityEvent ResetEvent = new UnityEvent();
 
-    public Action afterJumpAction;
-
     //private EmoteBoard emoteBoard;
     public GameObject forwardArrow;
 
@@ -67,7 +65,6 @@ public class TurtleMovement : MonoBehaviour
         resetConstraints = rb.constraints;
 
         SetAnimSpeed(animationSpeed);
-        afterJumpAction = () => { };
 
         //emoteBoard = GetComponentInChildren<EmoteBoard>();
     }
@@ -274,8 +271,7 @@ public class TurtleMovement : MonoBehaviour
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
 
-        afterJumpAction();
-        afterJumpAction = () => { };
+        PerformWalkForward();
     }
 
     private void FailOnHitBack()

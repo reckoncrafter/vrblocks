@@ -34,25 +34,6 @@ public class MovementMenu : Editor
             turtleMovement.shouldJump = true;
             turtleMovement.FixedUpdate();
         }
-
-        if (GUILayout.Button("Jump + Move Forward"))
-        {
-            turtleMovement.shouldJump = true;
-            turtleMovement.afterJumpAction = turtleMovement.PerformWalkForward;
-            turtleMovement.FixedUpdate();
-        }
-        if (GUILayout.Button("Jump + Turn Left"))
-        {
-            turtleMovement.shouldJump = true;
-            turtleMovement.afterJumpAction = turtleMovement.PerformRotateLeft;
-            turtleMovement.FixedUpdate();
-        }
-        if (GUILayout.Button("Jump + Turn Right"))
-        {
-            turtleMovement.shouldJump = true;
-            turtleMovement.afterJumpAction = turtleMovement.PerformRotateRight;
-            turtleMovement.FixedUpdate();
-        }
     }
 }
 #endif
