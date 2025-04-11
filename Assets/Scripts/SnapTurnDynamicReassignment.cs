@@ -22,7 +22,7 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
     public InputActionReference rightHandGrabAction;
     public InputActionReference leftHandGrabAction;
     public PlayerUIManager playerUIManager; // for disabling menus while grabbing
-    public bool disableMenusWhileGrabbing = false;
+    public bool disableMenusWhileGrabbing;
     private InputActionProperty emptyInputAction = new InputActionProperty();
     private ActionBasedSnapTurnProvider snapTurnProvider;
     private ActionBasedContinuousTurnProvider continuousTurnProvider;
