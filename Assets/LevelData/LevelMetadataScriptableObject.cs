@@ -10,4 +10,8 @@ public class LevelMetadataScriptableObject : ScriptableObject
     public string[] levelTutorialEvents;
     public string[] levelHints;
     public Sprite levelThumbnail;
+
+    public bool enableMovementMenu;
+    public bool enableControlMenu;
+    public bool enableFunctionMenu;
 }
