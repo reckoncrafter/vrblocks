@@ -332,8 +332,6 @@ public class ExecutionDirector : MonoBehaviour
     {
         Debug.Log("ExecutionDirector: Failure! Halting..");
         ContinueLoopEvent.RemoveAllListeners();
-
-        // apparently data from previous executions is not getting cleared.
     }
 
     readonly float defaultWait = 1.0f;
