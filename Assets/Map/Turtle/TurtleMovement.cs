@@ -11,6 +11,9 @@ public class TurtleMovement : MonoBehaviour
     public AudioClip turtleJumpAudio;
     public AudioClip turtleSuccessAudio;
 
+    public GameObject miniMapTurtle;
+    public MiniMapBlockSpawner miniMapBlockSpawner;
+    private Animator miniMapTurtleAnimator;
 
     public float movementDuration = 2.0f;
     public float animationSpeed = 1.0f;
@@ -46,11 +49,13 @@ public class TurtleMovement : MonoBehaviour
     private void SetIsWalking(bool value)
     {
         animator.SetBool("isWalking", value);
+        if(miniMapTurtle){ miniMapTurtleAnimator.SetBool("isWalking", value); }
     }
 
     private void SetAnimSpeed(float value)
     {
         animator.SetFloat("animSpeed", value);
+        if(miniMapTurtle){ miniMapTurtleAnimator.SetFloat("animSpeed", value); }
     }
 
     void Start()
@@ -58,6 +63,14 @@ public class TurtleMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
+
+        if(!miniMapTurtle){ miniMapTurtle = GameObject.Find("/MiniMapSpawner/Turtle");}
+        if(!miniMapBlockSpawner) { miniMapBlockSpawner = FindObjectOfType<MiniMapBlockSpawner>();}
+        if(!miniMapTurtle.TryGetComponent<Animator>(out _))
+        {
+            miniMapTurtleAnimator = miniMapTurtle.AddComponent<Animator>();
+            miniMapTurtleAnimator.runtimeAnimatorController = animator.runtimeAnimatorController;
+        }
 
         resetPosition = transform.position;
         resetRotation = transform.rotation;
@@ -85,6 +98,12 @@ public class TurtleMovement : MonoBehaviour
             PerformJump();
             shouldJump = false;
             StartCoroutine(WaitAndCanBeGrounded());
+        }
+
+        if(miniMapTurtle)
+        {
+            miniMapTurtle.transform.localPosition = miniMapBlockSpawner.turtleUpdateOffset + miniMapBlockSpawner.startPositionOffset + this.transform.localPosition;
+            miniMapTurtle.transform.localRotation = this.transform.localRotation;
         }
     }
 
@@ -261,6 +280,7 @@ public class TurtleMovement : MonoBehaviour
     {
         //emoteBoard.Emote(EmoteBoard.Emotes.Jump);
         animator.SetTrigger("Jump");
+        if(miniMapTurtle){ miniMapTurtleAnimator.SetTrigger("Jump"); }
     }
 
     private void AddJumpForce()
