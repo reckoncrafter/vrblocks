@@ -36,7 +36,9 @@ public class ExecutionDirector : MonoBehaviour
         GrabFunctionsInScene();
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
+        turtleMovement.ResetEvent.AddListener(ResetStartButton);
     }
+
     public void StartButtonPressed(SelectEnterEventArgs selectEnter)
     {
         // initialize data structures
@@ -58,8 +60,7 @@ public class ExecutionDirector : MonoBehaviour
         // disable start button
         if(mainBlockList.Count > 0){
             startButton.GetComponent<StartButton>().SetEnabled(false);
-            startButton.GetComponent<XRSimpleInteractable>().selectEntered.RemoveListener(StartButtonPressed);
-            turtleMovement.ResetEvent.AddListener(ResetStartButton);
+            startButton.GetComponent<XRSimpleInteractable>().selectEntered.RemoveAllListeners();
         }
 
         // clear old error messages
