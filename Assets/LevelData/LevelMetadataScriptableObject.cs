@@ -4,9 +4,14 @@ using UnityEngine;
 public class LevelMetadataScriptableObject : ScriptableObject
 {
     public string levelName;
+    public string displayName;
     public int maxStarCount = 3;
     public string prerequisiteLevel;
     public string[] levelTutorialEvents;
     public string[] levelHints;
     public Sprite levelThumbnail;
+
+    public bool enableMovementMenu;
+    public bool enableControlMenu;
+    public bool enableFunctionMenu;
 }

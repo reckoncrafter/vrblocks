@@ -640,7 +640,7 @@ MonoBehaviour:
   m_SmoothScale: 0
   m_SmoothScaleAmount: 8
   m_TightenScale: 0.1
-  m_ThrowOnDetach: 0
+  m_ThrowOnDetach: 1
   m_ThrowSmoothingDuration: 0.25
   m_ThrowSmoothingCurve:
     serializedVersion: 2
@@ -678,6 +678,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasSnapped: 0
+  physicalPosition: 1
+  targetPosition: 1
+  currentColumn: 0
   snapSound: {fileID: 8300000, guid: f2216e2bc9c691543a81acc17015e4f5, type: 3}
 --- !u!114 &5405742046879034240
 MonoBehaviour:
@@ -705,10 +708,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e502c74300e26a29079fb64fb8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onMove:
-    m_PersistentCalls:
-      m_Calls: []
-  turtleMovement: {fileID: 0}
+  defaultMaterial: {fileID: 0}
+  offendingStateMaterial: {fileID: 0}
   commandEnum: 3
 --- !u!1 &8338628556024756916
 GameObject:

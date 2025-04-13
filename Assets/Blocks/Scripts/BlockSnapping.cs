@@ -14,6 +14,7 @@ public class BlockSnapping : MonoBehaviour
     public int physicalPosition = 1;
     public int targetPosition = 1;
     public int currentColumn = 0;
+    public bool hasWire = false;
 
     public AudioClip snapSound;
     private AudioSource audio;
@@ -63,36 +64,44 @@ public class BlockSnapping : MonoBehaviour
         // Check if SnapTriggerTop was entered by SnapTriggerBottom
         if (sender.gameObject.name == "SnapTriggerTop" && other.gameObject.name == "SnapTriggerBottom" && !hasSnapped)
         {
-            // Get SnappedForwarding from other.SnapTriggerBottom
             SnappedForwarding otherSnappedForwarding = other.gameObject.GetComponent<SnappedForwarding>();
             SnappedForwarding thisSnappedForwarding = GetComponentInChildren<SnappedForwarding>();
+            GameObject thisChildBlock = thisSnappedForwarding.ConnectedBlock; // Get ConnectedBlock to check for looped snapping.
 
-            // Check if the bottom trigger is already snapped
-            if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
+            // Prevent looped snapping
+            if (!thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject))
             {
-                GameObject? parentObject = other.transform.parent?.gameObject;
-                if (parentObject != null)
+                // Check if the bottom trigger is already snapped
+                if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
                 {
-                    Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
-                    PlaySnapSound();
-                    SnapToBlock(this.gameObject, parentObject);
+                    GameObject? parentObject = other.transform.parent?.gameObject;
+                    if (parentObject != null)
+                    {
+                        Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
+                        PlaySnapSound();
+                        SnapToBlock(this.gameObject, parentObject);
 
-                    hasSnapped = true;
-                    otherSnappedForwarding.ConnectedBlock = this.gameObject;
-                    Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
-                    thisSnappedForwarding.IsRootBlock = false;
+                        hasSnapped = true;
+                        otherSnappedForwarding.ConnectedBlock = this.gameObject;
+                        Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
+                        thisSnappedForwarding.IsRootBlock = false;
 
-                    // Set other block to snapped
-                    otherSnappedForwarding.SetSnapped(true);
+                        // Set other block to snapped
+                        otherSnappedForwarding.SetSnapped(true);
+                    }
+                    else
+                    {
+                        Debug.LogError("Parent object is null!");
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Parent object is null!");
+                    Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
                 }
             }
             else
             {
-                Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
+                Debug.LogError($"Looped snap prevented: {other.transform.parent?.name} is already connected to {this.name}");
             }
         }
     }
@@ -215,8 +224,9 @@ public class BlockSnapping : MonoBehaviour
             if (otherRb != null)
             {
                 GameObject otherObject = otherRb.gameObject;
+                DestroyWire(otherRb);
 
-                // If the connected object is a wire, despawn it
+                // Deprecated, remove me on cleanup!
                 if (otherObject.name.Contains("Wire"))
                 {
                     WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
@@ -328,7 +338,7 @@ public class BlockSnapping : MonoBehaviour
     private IEnumerator ResetSnapStatusAfterDelay()
     {
         yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds (change as needed)
-        //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
+                                               //queueReading?.ReadQueue(); // Update Block Queue on unsnap.
         hasSnapped = false; // Allow snapping again after a delay
 
         blockSnapEvent.Invoke();
@@ -388,24 +398,6 @@ public class BlockSnapping : MonoBehaviour
         Rigidbody currentRb = currentBlock.GetComponent<Rigidbody>();
         Rigidbody connectedRb = null;
 
-        // Check if root block has been moved
-        BlockSnapping rootBlockSnapping = currentRb.GetComponent<BlockSnapping>();
-        bool rootColumnUpdate = true;
-
-        // Adjust the rootBlockPosition based on the current and desired Y position of the root block.
-        if (rootBlockSnapping.physicalPosition == rootBlockSnapping.targetPosition || columnSize <= blockLimit)
-        {
-            rootColumnUpdate = false;
-        }
-        else
-        {
-            int positionDifference = rootBlockSnapping.physicalPosition - rootBlockSnapping.targetPosition;
-
-            float adjustAmount = (positionDifference % blockLimit) * 0.25f;
-
-            initialRootBlockPosition.y += adjustAmount;
-        }
-
         while (currentRb != null)
         {
             BlockSnapping blockSnapping = currentRb.GetComponent<BlockSnapping>();
@@ -434,57 +426,39 @@ public class BlockSnapping : MonoBehaviour
 
             Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' at Physical Position = {physicalPosition}, Target Position = {targetPosition}.");
 
-            if (rootColumnUpdate == false && targetPosition <= blockLimit)
+
+            // Position updating logic
+            int positionDifference = 1 - targetPosition;
+            int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
+            if (positionDifference < 0) adjustPositionY = -adjustPositionY;
+
+            int adjustPositionX = targetColumn;
+
+            if ((blockSnapping.hasWire == true && targetPosition % blockLimit != 0) ||
+            (blockSnapping.hasWire == true && snappedForwarding.ConnectedBlock == null))
             {
-                // Position updating logic
-                physicalPosition = targetPosition;
-
-                blockSnapping.physicalPosition = targetPosition;
-
-                ResnapBlocks(currentRb);
-
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                {
-                    Debug.Log("SpawnWire called!");
-                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
-                }
-
-                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
-
-                currentRb = nextRb;
+                Debug.Log("UpdateBlockPosition: DestroyWire Called!");
+                DestroyWire(currentRb);
             }
-            else
+
+            UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
+
+            physicalPosition = targetPosition;
+            Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
+
+            if (blockSnapping.hasWire == false && physicalPosition % blockLimit == 0 && connectedRb != null)
             {
-                // Position updating logic
-                int positionDifference = 1 - targetPosition;
-                int adjustPositionY = Mathf.Abs(positionDifference) % blockLimit;
-                if (positionDifference < 0) adjustPositionY = -adjustPositionY;
-
-                int adjustPositionX = targetColumn;
-
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                {
-                    //DestroyWire(currentRb, connectedRb); // Define this function later
-                }
-
-                UpdateBlockPosition(currentRb, initialRootBlockPosition, adjustPositionX, adjustPositionY);
-
-                physicalPosition = targetPosition;
-                Debug.Log($"SpawnWire: Physical position = {physicalPosition}, Evaluation = {physicalPosition % blockLimit}");
-
-                if (physicalPosition % blockLimit == 0 && connectedRb != null)
-                {
-                    Debug.Log("SpawnWire called!");
-                    //SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
-                }
-
-                blockSnapping.physicalPosition = targetPosition;
-                blockSnapping.currentColumn = targetColumn;
-
-                Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
-
-                currentRb = nextRb;
+                Debug.Log("UpdateBlockPosition: SpawnWire called!");
+                SpawnWire(currentRb, connectedRb); // SpawnWire if new position is bottom of the column
             }
+
+            blockSnapping.physicalPosition = targetPosition;
+            blockSnapping.currentColumn = targetColumn;
+
+            Rigidbody nextRb = connectedRb;  // The next block in the chain is the connected block.
+
+            currentRb = nextRb;
+
         }
     }
 
@@ -509,7 +483,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
                 Destroy(joint); // Destroy the joint to allow repositioning
-                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
                 break;
             }
             else
@@ -580,7 +554,7 @@ public class BlockSnapping : MonoBehaviour
             {
                 parentRb = joint.connectedBody;  // Store the parent Rigidbody for later joint
                 Destroy(joint); // Destroy the joint to allow repositioning
-                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
+                                //Debug.Log("UpdateBlockPosition: Joint Destroyed!");
                 break;
             }
             else
@@ -606,7 +580,7 @@ public class BlockSnapping : MonoBehaviour
     public void SpawnWire(Rigidbody rb, Rigidbody connectedRb)
     {
         Debug.Log("SpawnWire: Called!");
-        GameObject wirePrefab = Resources.Load<GameObject>("Prefabs/Wire2");
+        GameObject wirePrefab = Resources.Load<GameObject>("Prefabs/WireLine");
 
         if (wirePrefab == null || rb == null || connectedRb == null)
         {
@@ -614,146 +588,64 @@ public class BlockSnapping : MonoBehaviour
             return;
         }
 
-        // Find the snap points on the current block
-        Transform snapPointRight = rb.gameObject.transform.Find("SnapPointRight");
-        if (snapPointRight == null)
-        {
-            Debug.LogError("SnapPointRight not found on the current block.");
-            return;
-        }
-
-        // Find the snap point on the connected block
+        Transform snapPointRight = rb.transform.Find("SnapPointRight");
         Transform snapPointLeft = connectedRb.transform.Find("SnapPointLeft");
-        if (snapPointLeft == null)
+
+        if (snapPointRight == null || snapPointLeft == null)
         {
-            Debug.LogError("SnapPointLeft not found on the connected block.");
+            Debug.LogError("Snap points not found.");
             return;
         }
 
-        // Spawn wire at the correct position
-        GameObject newWire = Instantiate(wirePrefab, snapPointRight.position, wirePrefab.transform.rotation);
+        GameObject newWire = Instantiate(wirePrefab);
+        WireLine wireLine = newWire.GetComponent<WireLine>();
 
-        // Find the wire's snap points
-        Transform wireSnapLeft = newWire.transform.Find("SnapPointLeft");
-        Transform wireSnapRight = newWire.transform.Find("SnapPointRight");
-
-        if (wireSnapLeft == null || wireSnapRight == null)
+        if (wireLine != null)
         {
-            Debug.LogError("Wire prefab is missing snap points.");
-            return;
+            wireLine.startPoint = snapPointRight;
+            wireLine.endPoint = snapPointLeft;
+            BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
+            blockSnapping.hasWire = true;
+        }
+        else
+        {
+            Debug.LogError("WireLine script missing from prefab!");
         }
 
-        // Adjust position so wireSnapLeft aligns with snapPointRight of the original block
-        Vector3 wireOffset = snapPointRight.position - wireSnapLeft.position;
-        newWire.transform.position += wireOffset;
-
-        Rigidbody wireRb = newWire.GetComponent<Rigidbody>();
-        if (wireRb == null)
-        {
-            wireRb = newWire.AddComponent<Rigidbody>();
-            wireRb.isKinematic = false;
-            wireRb.useGravity = false;
-            wireRb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            wireRb.interpolation = RigidbodyInterpolation.Interpolate;
-        }
-
-        // Create joint connecting the wire to the original block (rb)
-        ConfigurableJoint jointToRb = newWire.AddComponent<ConfigurableJoint>();
-        jointToRb.connectedBody = rb;
-        jointToRb.anchor = wireSnapLeft.localPosition;
-        jointToRb.autoConfigureConnectedAnchor = false;
-        jointToRb.connectedAnchor = snapPointRight.localPosition;
-        jointToRb.xMotion = ConfigurableJointMotion.Locked;
-        jointToRb.yMotion = ConfigurableJointMotion.Locked;
-        jointToRb.zMotion = ConfigurableJointMotion.Locked;
-        jointToRb.angularXMotion = ConfigurableJointMotion.Locked;
-        jointToRb.angularYMotion = ConfigurableJointMotion.Locked;
-        jointToRb.angularZMotion = ConfigurableJointMotion.Locked;
-
-        // Create joint connecting the wire to the connected block (connectedRb)
-        ConfigurableJoint jointToConnectedRb = newWire.AddComponent<ConfigurableJoint>();
-        jointToConnectedRb.connectedBody = connectedRb;
-        jointToConnectedRb.anchor = wireSnapRight.localPosition;
-        jointToConnectedRb.autoConfigureConnectedAnchor = false;
-        jointToConnectedRb.connectedAnchor = snapPointLeft.localPosition;
-        jointToConnectedRb.xMotion = ConfigurableJointMotion.Locked;
-        jointToConnectedRb.yMotion = ConfigurableJointMotion.Locked;
-        jointToConnectedRb.zMotion = ConfigurableJointMotion.Locked;
-        jointToConnectedRb.angularXMotion = ConfigurableJointMotion.Locked;
-        jointToConnectedRb.angularYMotion = ConfigurableJointMotion.Locked;
-        jointToConnectedRb.angularZMotion = ConfigurableJointMotion.Locked;
-
-        Debug.Log("Wire successfully connected between blocks.");
+        Debug.Log("LineRenderer wire successfully spawned.");
     }
 
-    private void DestroyWire(Rigidbody rb, Rigidbody connectedRb)
+    public void DestroyWire(Rigidbody rb)
     {
         Debug.Log("DestroyWire: Called!");
-        if (rb == null || connectedRb == null)
+
+        if (rb == null)
         {
-            Debug.LogError("DestroyWire: Provided Rigidbodies are null.");
+            Debug.LogError("DestroyWire: Rigidbody is null.");
             return;
         }
 
-        rb.constraints = RigidbodyConstraints.None;
-        connectedRb.constraints = RigidbodyConstraints.None;
-
-        // Collect all FixedJoints attached to the provided Rigidbodies
-        FixedJoint[] joints = rb.GetComponents<FixedJoint>();
-        FixedJoint[] connectedJoints = connectedRb.GetComponents<FixedJoint>();
-
-        foreach (FixedJoint joint in joints)
+        // Get the SnapPointRight of this block
+        Transform snapPointRight = rb.transform.Find("SnapPointRight");
+        if (snapPointRight == null)
         {
-            if (joint == null) continue;
-
-            Rigidbody otherRb = joint.connectedBody;
-
-            if (otherRb != null)
-            {
-                GameObject otherObject = otherRb.gameObject;
-
-                if (otherObject.name.Contains("Wire"))
-                {
-                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
-                    if (wireDespawn != null)
-                    {
-                        wireDespawn.Despawn();
-                    }
-                    else
-                    {
-                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
-                    }
-                }
-            }
-
-            Destroy(joint); // Destroy the joint itself
+            Debug.LogError("DestroyWire: SnapPointRight not found on the Rigidbody.");
+            return;
         }
 
-        foreach (FixedJoint joint in connectedJoints)
+        // Find the wire connected to SnapPointRight
+        foreach (var wire in FindObjectsOfType<WireLine>())
         {
-            if (joint == null) continue;
-
-            Rigidbody otherRb = joint.connectedBody;
-
-            if (otherRb != null)
+            if (wire.startPoint == snapPointRight || wire.endPoint == snapPointRight)
             {
-                GameObject otherObject = otherRb.gameObject;
-
-                if (otherObject.name.Contains("Wire"))
-                {
-                    WireDespawn wireDespawn = otherObject.GetComponent<WireDespawn>();
-                    if (wireDespawn != null)
-                    {
-                        wireDespawn.Despawn();
-                    }
-                    else
-                    {
-                        Destroy(otherObject); // Destroy the wire object if no WireDespawn script
-                    }
-                }
+                Destroy(wire.gameObject); // Destroy the wire
+                Debug.Log("DestroyWire: Wire connected to SnapPointRight destroyed.");
+                BlockSnapping blockSnapping = rb.GetComponent<BlockSnapping>();
+                blockSnapping.hasWire = false;
+                return;
             }
-
-            Destroy(joint); // Destroy the joint itself
         }
+
+        Debug.LogWarning("DestroyWire: No wire found connected to SnapPointRight.");
     }
 }

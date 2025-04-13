@@ -72,6 +72,38 @@ public class SnappedForwarding : MonoBehaviour
         }
     }
 
+    public bool IsLoopedBlock(GameObject thisBlock, GameObject otherBlock)
+    {
+        Debug.Log($"IsLoopedBlock called: thisBlock.connectedBody = {thisBlock?.name ?? "null"}, otherBlock = {otherBlock?.name ?? "null"}");
+
+        if (thisBlock == null)
+        {
+            return false;
+        }
+
+        GameObject currentBlock = otherBlock;
+
+        while (currentBlock != null)
+        {
+            if (currentBlock == thisBlock)
+            {
+                return true;
+            }
+
+            SnappedForwarding snappedForwarding = currentBlock.GetComponentInChildren<SnappedForwarding>();
+            if (snappedForwarding != null && snappedForwarding.ConnectedBlock != null)
+            {
+                currentBlock = snappedForwarding.ConnectedBlock;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return false;
+    }
+
     public GameObject? FindRootBlock(GameObject startingBlock)
     {
         // Null check for starting block
