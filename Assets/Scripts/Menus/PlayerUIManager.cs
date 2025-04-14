@@ -49,7 +49,8 @@ public class PlayerUIManager : MonoBehaviour
     public Button nextLevelButton;
     public Button endScreenReturnToMenu;
     public Button endScreenReturnToMenuAlt;
-    
+
+    private UISFXManager? uiSFXManager;
     private bool toggleBlockMenu = false;
     private Transform xrRig;
 
@@ -86,6 +87,8 @@ public class PlayerUIManager : MonoBehaviour
         
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
+
+        uiSFXManager = FindObjectOfType<UISFXManager>();
     }
 
     public float movementStrength = 2.0f;
@@ -120,6 +123,7 @@ public class PlayerUIManager : MonoBehaviour
     {
         pauseMenu.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
         optionsMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+        uiSFXManager?.PlayUISFX(MenuUISFX.PlayerInputActionOpen);
     }
 
     public void ClosePauseMenu()
@@ -179,11 +183,14 @@ public class PlayerUIManager : MonoBehaviour
         if (toggleBlockMenu)
         {
             blockMenu.LeanScale(Vector3.one, animationSpeed).setEaseInOutCubic();
+            uiSFXManager?.PlayUISFX(MenuUISFX.PlayerInputActionOpen);
         }
         else
         {
             blockMenu.LeanScale(Vector3.zero, animationSpeed).setEaseInOutCubic();
+            uiSFXManager?.PlayUISFX(MenuUISFX.PlayerInputActionClose);
         }
+        
     }
 
     void ShowBlockMenuCategory(GameObject category)
