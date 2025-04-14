@@ -19,7 +19,7 @@ public class ExecutionDirector : MonoBehaviour
     public TurtleMovement turtleMovement;
     public GameObject startBlock;
     public GameObject startButton;
-    public BlockCount blockCount;
+    public HandBoundUIHandler handBoundUI;
 
     // maintains a list of the blocks under Block (StartQueue)
     private List<GameObject> mainBlockList = new List<GameObject>();
@@ -37,6 +37,8 @@ public class ExecutionDirector : MonoBehaviour
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
         turtleMovement.ResetEvent.AddListener(ResetStartButton);
+
+        if(handBoundUI == null){ handBoundUI = FindObjectOfType<HandBoundUIHandler>(); }
     }
 
     public void StartButtonPressed(SelectEnterEventArgs selectEnter)
@@ -78,7 +80,6 @@ public class ExecutionDirector : MonoBehaviour
         }
 
         // clear error dialog
-        HandBoundUIHandler handBoundUI = FindObjectOfType<HandBoundUIHandler>();
         if(handBoundUI != null){ handBoundUI.SetErrorDialog(""); }
     }
 
@@ -639,7 +640,7 @@ public class ExecutionDirector : MonoBehaviour
         {
             blocksAllQueues += fbl.Value.Count;
         }
-        blockCount.SetBlockCount(blocksAllQueues);
+        handBoundUI.SetBlockCount(blocksAllQueues);
     }
 
     void GrabFunctionsInScene(){

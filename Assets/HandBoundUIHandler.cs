@@ -7,10 +7,13 @@ public class HandBoundUIHandler : MonoBehaviour
 {
     public Transform errorDialog;
     private TextMeshProUGUI errorDialogTextMesh;
+    public Transform blockCount;
+    private TextMeshProUGUI blockCountTextMesh;
 
     void Awake()
     {
         errorDialogTextMesh = errorDialog.Find("Canvas/Text").GetComponent<TextMeshProUGUI>();
+        blockCountTextMesh = blockCount.Find("Text").GetComponent<TextMeshProUGUI>();
     }
 
     public void SetErrorDialog(string content)
@@ -25,5 +28,10 @@ public class HandBoundUIHandler : MonoBehaviour
             errorDialog.gameObject.SetActive(false);
             errorDialogTextMesh.text = "";
         }
+    }
+
+    public void SetBlockCount(int count)
+    {
+        blockCountTextMesh.text = count.ToString();
     }
 }
