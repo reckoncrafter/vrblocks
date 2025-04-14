@@ -20,7 +20,7 @@ public class PlayerUIManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject returnToMenuConfirmWindow;
     public GameObject optionsMenu;
-    public GameObject blockMenu; 
+    public GameObject blockMenu;
     public GameObject endScreen;
     public float animationSpeed = .3f;
 
@@ -51,7 +51,6 @@ public class PlayerUIManager : MonoBehaviour
     public Button endScreenReturnToMenuAlt;
     
     private bool toggleBlockMenu = false;
-
     private Transform xrRig;
 
     void Start()
@@ -62,13 +61,13 @@ public class PlayerUIManager : MonoBehaviour
         returnToMenuConfirmWindow.LeanScale(Vector3.zero, 0f);
         optionsMenu.SetActive(true);
         optionsMenu.LeanScale(Vector3.zero, 0f);
-        blockMenu.SetActive(true); 
+        blockMenu.SetActive(true);
         blockMenu.LeanScale(Vector3.zero, 0f);
         endScreen.SetActive(true);
-        endScreen.LeanScale(Vector3.zero, 0f); 
+        endScreen.LeanScale(Vector3.zero, 0f);
 
         pauseMenuAction.action.started += context => { EnablePauseMenu(); };
-        blockMenuAction.action.started += context => { ToggleBlockMenu(); }; 
+        blockMenuAction.action.started += context => { ToggleBlockMenu(); };
         debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
         resetTurtleButton.onClick.AddListener(ResetTurtle);
@@ -76,14 +75,17 @@ public class PlayerUIManager : MonoBehaviour
         controlTab.onClick.AddListener(() => ShowBlockMenuCategory(controlPanel));
         functionTab.onClick.AddListener(() => ShowBlockMenuCategory(functionPanel));
 
-        foreach (var b in openPauseMenuButtons){ b.onClick.AddListener(EnablePauseMenu); }
-        foreach (var b in returnToMenuWithConfirmationButtons){ b.onClick.AddListener(OpenConfirmationWindow); }
-        foreach (var b in openOptionsMenuButtons){ b.onClick.AddListener(EnableOptionsMenu); }
+        foreach (var b in openPauseMenuButtons) { b.onClick.AddListener(EnablePauseMenu); }
+        foreach (var b in returnToMenuWithConfirmationButtons) { b.onClick.AddListener(OpenConfirmationWindow); }
+        foreach (var b in openOptionsMenuButtons) { b.onClick.AddListener(EnableOptionsMenu); }
         returnToMenuDenyButton.onClick.AddListener(CloseConfirmationWindow);
         returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
 
         xrRig = FindObjectOfType<XROrigin>().transform;
+        
+        // Open Movement Panel on Block Menu at start
+        ShowBlockMenuCategory(movementPanel);
     }
 
     public float movementStrength = 2.0f;
@@ -105,7 +107,7 @@ public class PlayerUIManager : MonoBehaviour
     void OnEnable()
     {
         pauseMenuAction.action.Enable();
-        blockMenuAction.action.Enable(); 
+        blockMenuAction.action.Enable();
     }
 
     void OnDisable()
@@ -130,7 +132,7 @@ public class PlayerUIManager : MonoBehaviour
     public void ResetTurtle()
     {
         TurtleMovement turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
-        if(turtleMovement != null)
+        if (turtleMovement != null)
         {
             turtleMovement.Reset();
         }
@@ -205,7 +207,8 @@ public class PlayerUIManager : MonoBehaviour
         // DirectoryInfo thumbnailDir = new DirectoryInfo(Application.dataPath + "/LevelData/Thumbnails");
         LevelMetadataScriptableObject[] levelMetadataScriptables = GameObject.Find("/LevelStatesManager").GetComponent<LevelStatesManager>().levelMetadataScriptables;
         // FileInfo[] fin = thumbnailDir.GetFiles("*.png");
-        if(SceneTransitionStates.GetSelectedLevel() + 1 >= levelMetadataScriptables.Length){
+        if (SceneTransitionStates.GetSelectedLevel() + 1 >= levelMetadataScriptables.Length)
+        {
             nextLevelButton.GameObject().LeanScale(Vector3.zero, 0f);
             endScreenReturnToMenu.GameObject().LeanScale(Vector3.zero, 0f);
         }

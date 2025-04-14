@@ -68,40 +68,43 @@ public class BlockSnapping : MonoBehaviour
             SnappedForwarding thisSnappedForwarding = GetComponentInChildren<SnappedForwarding>();
             GameObject thisChildBlock = thisSnappedForwarding.ConnectedBlock; // Get ConnectedBlock to check for looped snapping.
 
-            // Prevent looped snapping
-            if (!thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject))
+            if (thisSnappedForwarding.snappingEnabled == true && otherSnappedForwarding.snappingEnabled == true)
             {
-                // Check if the bottom trigger is already snapped
-                if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
+                // Prevent looped snapping
+                if (!thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject))
                 {
-                    GameObject? parentObject = other.transform.parent?.gameObject;
-                    if (parentObject != null)
+                    // Check if the bottom trigger is already snapped
+                    if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
                     {
-                        Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
-                        PlaySnapSound();
-                        SnapToBlock(this.gameObject, parentObject);
+                        GameObject? parentObject = other.transform.parent?.gameObject;
+                        if (parentObject != null)
+                        {
+                            Debug.Log($"{sender.name} collided with {other.name}. Attempting to snap.");
+                            PlaySnapSound();
+                            SnapToBlock(this.gameObject, parentObject);
 
-                        hasSnapped = true;
-                        otherSnappedForwarding.ConnectedBlock = this.gameObject;
-                        Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
-                        thisSnappedForwarding.IsRootBlock = false;
+                            hasSnapped = true;
+                            otherSnappedForwarding.ConnectedBlock = this.gameObject;
+                            Debug.Log($"SnapToBlock: {other.name} connected block set to {otherSnappedForwarding.ConnectedBlock.name}.");
+                            thisSnappedForwarding.IsRootBlock = false;
 
-                        // Set other block to snapped
-                        otherSnappedForwarding.SetSnapped(true);
+                            // Set other block to snapped
+                            otherSnappedForwarding.SetSnapped(true);
+                        }
+                        else
+                        {
+                            Debug.LogError("Parent object is null!");
+                        }
                     }
                     else
                     {
-                        Debug.LogError("Parent object is null!");
+                        Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
                     }
                 }
                 else
                 {
-                    Debug.Log($"Cannot snap to {other.name} as it is already snapped.");
+                    Debug.LogError($"Looped snap prevented: {other.transform.parent?.name} is already connected to {this.name}");
                 }
-            }
-            else
-            {
-                Debug.LogError($"Looped snap prevented: {other.transform.parent?.name} is already connected to {this.name}");
             }
         }
     }
@@ -209,6 +212,7 @@ public class BlockSnapping : MonoBehaviour
     }
 
     private Coroutine? resetSnapStatusCoroutine;
+    private Coroutine? disableSnapOnGrab;
 
     private void OnGrab(SelectEnterEventArgs args)
     {
@@ -267,6 +271,20 @@ public class BlockSnapping : MonoBehaviour
 
         // Update all child blocks recursively
         UpdateChildBlockPositions(gameObject);
+
+        // Disable snapping for a moment to prevent snapping during teleportation.
+        disableSnapOnGrab = StartCoroutine(DisableSnapOnGrab());
+    }
+
+    private IEnumerator DisableSnapOnGrab()
+    {
+        SnappedForwarding snappedForwarding = GetComponentInChildren<SnappedForwarding>();
+        if (snappedForwarding != null)
+        {
+            snappedForwarding.snappingEnabled = false;
+            yield return new WaitForSeconds(0.1f);
+            snappedForwarding.snappingEnabled = true;
+        }
     }
 
     private void OnRelease(SelectExitEventArgs args)
