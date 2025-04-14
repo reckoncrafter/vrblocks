@@ -4,6 +4,7 @@ public class SnappedForwarding : MonoBehaviour
 {
     public bool IsRootBlock { get; set; } = true;
     public bool IsSnapped { get; private set; } = false;  // Flag to prevent further snapping
+    public bool snappingEnabled { get; set; } = true;
     public GameObject? ConnectedBlock { get; set; }
 
     // Get snapped status
