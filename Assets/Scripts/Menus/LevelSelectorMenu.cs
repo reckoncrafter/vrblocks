@@ -2,6 +2,7 @@
  Level Selector + animations
 */
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ public class LevelSelectorMenu : MonoBehaviour
 
     private int selectedLevelIndex = SceneTransitionStates.GetSelectedLevel();
     private Sprite[] levelThumbnails;
+    private string[] levelTitles;
 
     // Animations
     private readonly float levelNavAnimationSpeed = 0.1f;
@@ -65,9 +67,14 @@ public class LevelSelectorMenu : MonoBehaviour
         // }
         LevelMetadataScriptableObject[] levelMetadataScriptables = GameObject.Find("/LevelStatesManager").GetComponent<LevelStatesManager>().levelMetadataScriptables;
         levelThumbnails = new Sprite[levelMetadataScriptables.Length];
+        levelTitles = new string[levelMetadataScriptables.Length];
         for(int i = 0; i < levelMetadataScriptables.Length; i++)
         {
             levelThumbnails[i] = levelMetadataScriptables[i].levelThumbnail;
+        }
+        for(int i = 0; i < levelMetadataScriptables.Length; i++)
+        {
+            levelTitles[i] = levelMetadataScriptables[i].displayName;
         }
 
         playLevelButton.onClick.AddListener(GoToLevel);
@@ -145,6 +152,8 @@ public class LevelSelectorMenu : MonoBehaviour
             middleLevelView.SetActive(true);
             Image mThumbnail = middleLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             mThumbnail.sprite = levelThumbnails[selectedLevelIndex];
+            TextMeshProUGUI mTextMesh = middleLevelView.transform.Find("LevelTitleText").GetComponent<TextMeshProUGUI>();
+            mTextMesh.text = levelTitles[selectedLevelIndex];
         }
         else
         {
@@ -157,6 +166,8 @@ public class LevelSelectorMenu : MonoBehaviour
             leftNavigateButton.gameObject.SetActive(true);
             Image lThumbnail = leftLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             lThumbnail.sprite = levelThumbnails[selectedLevelIndex - 1];
+            TextMeshProUGUI lTextMesh = leftLevelView.transform.Find("LevelTitleText").GetComponent<TextMeshProUGUI>();
+            lTextMesh.text = levelTitles[selectedLevelIndex - 1];
         }
         else
         {
@@ -170,6 +181,8 @@ public class LevelSelectorMenu : MonoBehaviour
             rightNavigateButton.gameObject.SetActive(true);
             Image rThumbnail = rightLevelView.transform.Find("LevelThumbnail").GetComponent<Image>();
             rThumbnail.sprite = levelThumbnails[selectedLevelIndex + 1];
+            TextMeshProUGUI rTextMesh = rightLevelView.transform.Find("LevelTitleText").GetComponent<TextMeshProUGUI>();
+            rTextMesh.text = levelTitles[selectedLevelIndex + 1];  
         }
         else
         {
