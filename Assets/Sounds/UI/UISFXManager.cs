@@ -25,6 +25,7 @@ public class UISFXManager : MonoBehaviour
         uiSFXAudioSource = GetComponent<AudioSource>();
 
         Button[] foundUIInteractables = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        Toggle[] foundUIToggles = FindObjectsByType<Toggle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach(Button uiInteractable in foundUIInteractables)
         {
             if(uiInteractable.gameObject.CompareTag("MenuUIButton"))
@@ -42,6 +43,13 @@ public class UISFXManager : MonoBehaviour
             else if(uiInteractable.gameObject.CompareTag("MenuUIButtonError"))
             {
                 uiInteractable.onClick.AddListener(() => { PlayUISFX(MenuUISFX.MenuUIButtonError); });
+            }
+        }
+        foreach(Toggle uiToggle in foundUIToggles)
+        {
+            if(uiToggle.gameObject.CompareTag("MenuUIToggle"))
+            {
+                uiToggle.onValueChanged.AddListener((bool val) => {if (val){ PlayUISFX(MenuUISFX.MenuUIButton); } else { PlayUISFX(MenuUISFX.MenuUIButtonReturn); }});
             }
         }
     }
