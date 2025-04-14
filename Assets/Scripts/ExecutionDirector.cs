@@ -20,7 +20,6 @@ public class ExecutionDirector : MonoBehaviour
     public GameObject startBlock;
     public GameObject startButton;
     public BlockCount blockCount;
-    public TextMeshProUGUI failureDialog;
 
     // maintains a list of the blocks under Block (StartQueue)
     private List<GameObject> mainBlockList = new List<GameObject>();
@@ -77,6 +76,10 @@ public class ExecutionDirector : MonoBehaviour
         {
             tc.SetOffendingState(false);
         }
+
+        // clear error dialog
+        HandBoundUIHandler handBoundUI = FindObjectOfType<HandBoundUIHandler>();
+        if(handBoundUI != null){ handBoundUI.SetErrorDialog(""); }
     }
 
     private void ResetStartButton()
@@ -157,14 +160,14 @@ public class ExecutionDirector : MonoBehaviour
         public TurtleSyntaxError(string message, GameObject offendingBlock) : base(message)
         {
             TurtleCommand tc;
-            ExecutionDirector ed = FindObjectOfType<ExecutionDirector>();
             if(offendingBlock.TryGetComponent<TurtleCommand>(out tc))
             {
                 tc.SetOffendingState(true);
             }
-            if(ed.failureDialog)
+            HandBoundUIHandler handBoundUI = FindObjectOfType<HandBoundUIHandler>();
+            if(handBoundUI != null)
             {
-                ed.failureDialog.text = message;
+                handBoundUI.SetErrorDialog(message);
             }
         
             Debug.LogError($"Syntax Error at {offendingBlock.name}");
