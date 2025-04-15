@@ -119,9 +119,9 @@ public class MiniMapBlockSpawner : MonoBehaviour
             }
         }
 
-        SphereCollider sCollider = transform.gameObject.AddComponent<SphereCollider>();
-        sCollider.center = Vector3.zero;
-        sCollider.radius = 1.0f;
+        // SphereCollider sCollider = transform.gameObject.AddComponent<SphereCollider>();
+        // sCollider.center = Vector3.zero;
+        // sCollider.radius = 1.0f;
     }
     public void HideGrabbingHand(SelectEnterEventArgs args)
     {
@@ -154,9 +154,9 @@ public class MiniMapBlockSpawner : MonoBehaviour
             DestroyImmediate(child.gameObject);
         }
 
-        foreach (SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
-        {
-            DestroyImmediate(sCollider);
-        }
+        // foreach (SphereCollider sCollider in transform.gameObject.GetComponents<SphereCollider>().ToList())
+        // {
+        //     DestroyImmediate(sCollider);
+        // }
     }
 }
