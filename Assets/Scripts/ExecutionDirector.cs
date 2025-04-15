@@ -78,9 +78,6 @@ public class ExecutionDirector : MonoBehaviour
         {
             tc.SetOffendingState(false);
         }
-
-        // clear error dialog
-        if(handBoundUI != null){ handBoundUI.SetErrorDialog(""); }
     }
 
     private void ResetStartButton()
