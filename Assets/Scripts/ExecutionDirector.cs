@@ -19,7 +19,7 @@ public class ExecutionDirector : MonoBehaviour
     public TurtleMovement turtleMovement;
     public GameObject startBlock;
     public GameObject startButton;
-    public BlockCount blockCount;
+    public HandBoundUIHandler handBoundUI;
 
     // maintains a list of the blocks under Block (StartQueue)
     private List<GameObject> mainBlockList = new List<GameObject>();
@@ -37,6 +37,8 @@ public class ExecutionDirector : MonoBehaviour
         turtleMovement.FailEvent.AddListener(FailHandler);
         turtleMovement.SuccessEvent.AddListener(SuccessHandler);
         turtleMovement.ResetEvent.AddListener(ResetStartButton);
+
+        if(handBoundUI == null){ handBoundUI = FindObjectOfType<HandBoundUIHandler>(); }
     }
 
     public void StartButtonPressed(SelectEnterEventArgs selectEnter)
@@ -76,6 +78,9 @@ public class ExecutionDirector : MonoBehaviour
         {
             tc.SetOffendingState(false);
         }
+
+        // clear error dialog
+        if(handBoundUI != null){ handBoundUI.SetErrorDialog(""); }
     }
 
     private void ResetStartButton()
@@ -160,11 +165,10 @@ public class ExecutionDirector : MonoBehaviour
             {
                 tc.SetOffendingState(true);
             }
-            GameObject failureDialog = GameObject.Find("/FailureDialog");
-            if(failureDialog)
+            HandBoundUIHandler handBoundUI = FindObjectOfType<HandBoundUIHandler>();
+            if(handBoundUI != null)
             {
-                TextMeshProUGUI text = failureDialog.GetComponentInChildren<TextMeshProUGUI>();
-                text.text = message;
+                handBoundUI.SetErrorDialog(message);
             }
         
             Debug.LogError($"Syntax Error at {offendingBlock.name}");
@@ -636,7 +640,7 @@ public class ExecutionDirector : MonoBehaviour
         {
             blocksAllQueues += fbl.Value.Count;
         }
-        blockCount.SetBlockCount(blocksAllQueues);
+        handBoundUI.SetBlockCount(blocksAllQueues);
     }
 
     void GrabFunctionsInScene(){
