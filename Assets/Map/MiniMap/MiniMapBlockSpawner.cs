@@ -86,7 +86,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
             GameObject currentEntity = Instantiate(mapBlock, coords, Quaternion.identity);
 
             currentEntity.transform.SetParent(gameObject.transform, false);
-
+            currentEntity.tag = "MiniMap";
             currentEntity.name = mapValues.blockPrefabName + i;
             currentEntity.transform.localScale = mapValues.blockScale;
             
@@ -100,6 +100,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
         generatedGoalObject.transform.localScale = mapValues.goalScale;
         generatedGoalObject.transform.position += mapValues.goalPositionOffset * miniMapScale;
         generatedGoalObject.name = mapValues.goalPrefabName;
+        generatedGoalObject.tag = "MiniMap";
 
         DestroyImmediate(generatedGoalObject.GetComponent<Collider>());
 
@@ -109,6 +110,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
         TurtleMovement turtleEntity = Instantiate(turtle, turtleCoords, Quaternion.Euler(0, mapValues.turtleRotation, 0));
         turtleEntity.transform.SetParent(gameObject.transform, false);
         turtleEntity.name = mapValues.turtlePrefabName;
+        turtleEntity.tag = "MiniMap";
         foreach (Component c in turtleEntity.GetComponents<Component>().ToList())
         {
             if (!typeof(Transform).IsAssignableFrom(c.GetType()))

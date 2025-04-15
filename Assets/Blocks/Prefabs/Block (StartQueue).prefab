@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7534286884896320513}
   m_Layer: 0
   m_Name: SnapTriggerBottom
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 2630119995073688266}
   m_Layer: 0
   m_Name: SnapPointLeft
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 2407286013370795328}
   m_Layer: 0
   m_Name: LabelText
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 6895860544129634337}
   m_Layer: 0
   m_Name: BlockLabel
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -350,10 +350,9 @@ GameObject:
   - component: {fileID: 704375314700345918}
   - component: {fileID: 4180480759335816501}
   - component: {fileID: 6630869357201564972}
-  - component: {fileID: 5354081781134567555}
   m_Layer: 0
   m_Name: Block (StartQueue)
-  m_TagString: Block
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -642,6 +641,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasSnapped: 0
+  physicalPosition: 1
+  targetPosition: 1
+  currentColumn: 0
+  hasWire: 0
   snapSound: {fileID: 8300000, guid: f2216e2bc9c691543a81acc17015e4f5, type: 3}
 --- !u!114 &6630869357201564972
 MonoBehaviour:
@@ -657,18 +660,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorLevel: 0
   padding: 0.1
---- !u!114 &5354081781134567555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122732868338158301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cf55196b48accc4bb66553c47f1fa70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6675633817676241122
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,7 +673,7 @@ GameObject:
   - component: {fileID: 4085908278527706045}
   m_Layer: 0
   m_Name: LabelPanel
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -755,7 +746,7 @@ GameObject:
   - component: {fileID: 616791098846811607}
   m_Layer: 0
   m_Name: SnapPointBottom
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -786,7 +777,7 @@ GameObject:
   - component: {fileID: 3215908060182401400}
   m_Layer: 0
   m_Name: SnapPointRight
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -817,7 +808,7 @@ GameObject:
   - component: {fileID: 1692367171048213189}
   m_Layer: 0
   m_Name: AttachPoint
-  m_TagString: Untagged
+  m_TagString: StartBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

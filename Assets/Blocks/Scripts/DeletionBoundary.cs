@@ -11,8 +11,8 @@ public class DeletionBoundary : MonoBehaviour
         // something similar might be needed for start queue
         // turtle cannot be destroyed
         if (other.gameObject.CompareTag("Player") ||
-            other.gameObject.name == "Block (StartQueue)" ||
-            other.gameObject.TryGetComponent<MiniMapBlockSpawner>(out _))
+            other.gameObject.CompareTag("MiniMap") ||
+            other.gameObject.CompareTag("StartBlock"))
         {
             //other.gameObject.GetComponent<TurtleMovement>().Reset();
             return;
