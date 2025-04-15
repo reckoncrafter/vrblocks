@@ -64,14 +64,16 @@ public class TurtleMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
 
-        if(!miniMapTurtle){ miniMapTurtle = GameObject.Find("/MiniMapSpawner/Turtle");}
         if(!miniMapBlockSpawner) { miniMapBlockSpawner = FindObjectOfType<MiniMapBlockSpawner>();}
-        if(!miniMapTurtle.TryGetComponent<Animator>(out _))
+        if(miniMapBlockSpawner)
         {
-            miniMapTurtleAnimator = miniMapTurtle.AddComponent<Animator>();
-            miniMapTurtleAnimator.runtimeAnimatorController = animator.runtimeAnimatorController;
+            if(!miniMapTurtle){ miniMapTurtle = GameObject.Find("/MiniMapSpawner/Turtle");}
+            if(!miniMapTurtle.TryGetComponent<Animator>(out _))
+            {
+                miniMapTurtleAnimator = miniMapTurtle.AddComponent<Animator>();
+                miniMapTurtleAnimator.runtimeAnimatorController = animator.runtimeAnimatorController;
+            }
         }
-
         resetPosition = transform.position;
         resetRotation = transform.rotation;
         resetBounciness = turtleCollider.material.bounciness;

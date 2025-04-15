@@ -3,6 +3,7 @@
 */
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -51,6 +52,7 @@ public class PlayerUIManager : MonoBehaviour
 
     private UISFXManager? uiSFXManager;
     private bool toggleBlockMenu = false;
+    private Transform xrRig;
 
     void Start()
     {
@@ -81,10 +83,28 @@ public class PlayerUIManager : MonoBehaviour
         returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
 
+        xrRig = FindObjectOfType<XROrigin>().transform;
+        
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
 
         uiSFXManager = FindObjectOfType<UISFXManager>();
+    }
+
+    public float movementStrength = 2.0f;
+
+    void Update()
+    {
+        foreach(Transform child in this.transform)
+        {
+            // https://www.reddit.com/r/Unity3D/comments/cj7niq/comment/evbnl0k/
+            Vector3 look = child.transform.position - xrRig.transform.position;
+            float radians = Mathf.Atan2(look.x, look.z);
+            float degrees = radians * Mathf.Rad2Deg;
+            float str = Mathf.Min(movementStrength * Time.deltaTime, 1);
+            Quaternion targetRotation = Quaternion.Euler(0, degrees, 0);
+            child.transform.rotation = Quaternion.Slerp(child.transform.rotation, targetRotation, str);
+        }
     }
 
     void OnEnable()
