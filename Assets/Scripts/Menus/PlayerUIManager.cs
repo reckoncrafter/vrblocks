@@ -95,6 +95,8 @@ public class PlayerUIManager : MonoBehaviour
 
     void Update()
     {
+        // KNOWN BUG: When menus have rotated past 90 degrees, menus supposed to appear on top of other menus,
+        // like the confirmation window, will appear below the other menu.
         foreach(Transform child in this.transform)
         {
             // https://www.reddit.com/r/Unity3D/comments/cj7niq/comment/evbnl0k/
