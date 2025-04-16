@@ -4,6 +4,23 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+#if UNITY_EDITOR
+using UnityEditor;
+[CustomEditor(typeof(ControlTutorialHandler))]
+public class ControlTutorialHandlerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        ControlTutorialHandler controlTutorialHandler = (ControlTutorialHandler)target;
+        if(GUILayout.Button("Toggle Control Labels"))
+        {
+            controlTutorialHandler.toggleTutorial();
+        }
+    }
+}
+
+#endif
+
 public class ControlTutorialHandler : MonoBehaviour
 {
     public GameObject rightTutorial;
@@ -23,14 +40,14 @@ public class ControlTutorialHandler : MonoBehaviour
         }
         StartCoroutine(delay());
 
-        disableControlLabels.action.started += (ctx) => {toggleTutorial(!isActive);};
+        disableControlLabels.action.started += (ctx) => {toggleTutorial();};
     }
-    void toggleTutorial(bool enabled)
+    public void toggleTutorial()
     {
-        isActive = enabled;
-        rightTutorial.SetActive(enabled);
-        leftTutorial.SetActive(enabled);
-        cm.EnableControllerModel(enabled, true);
-        cm.EnableControllerModel(enabled, false);
+        isActive = !isActive;
+        rightTutorial.SetActive(isActive);
+        leftTutorial.SetActive(isActive);
+        cm.EnableControllerModel(isActive, true);
+        cm.EnableControllerModel(isActive, false);
     }
 }
