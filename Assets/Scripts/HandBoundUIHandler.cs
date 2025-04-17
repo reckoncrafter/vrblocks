@@ -9,6 +9,8 @@ public class HandBoundUIHandler : MonoBehaviour
     private TextMeshProUGUI errorDialogTextMesh;
     public Transform blockCount;
     private TextMeshProUGUI blockCountTextMesh;
+    
+    public float dialogTimeout = 4.0f;
 
     void Awake()
     {
@@ -18,16 +20,15 @@ public class HandBoundUIHandler : MonoBehaviour
 
     public void SetErrorDialog(string content)
     {
-        if(content != "")
+        IEnumerator reset()
         {
-            errorDialog.gameObject.SetActive(true);
-            errorDialogTextMesh.text = content;
-        }
-        else
-        {
+            yield return new WaitForSeconds(dialogTimeout);
             errorDialog.gameObject.SetActive(false);
             errorDialogTextMesh.text = "";
         }
+        errorDialog.gameObject.SetActive(true);
+        errorDialogTextMesh.text = content;
+        StartCoroutine(reset());
     }
 
     public void SetBlockCount(int count)

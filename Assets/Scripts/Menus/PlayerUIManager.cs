@@ -53,6 +53,7 @@ public class PlayerUIManager : MonoBehaviour
     private UISFXManager? uiSFXManager;
     private bool toggleBlockMenu = false;
     private Transform xrRig;
+    private Transform pivot;
 
     void Start()
     {
@@ -84,6 +85,7 @@ public class PlayerUIManager : MonoBehaviour
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
 
         xrRig = FindObjectOfType<XROrigin>().transform;
+        pivot = transform.Find("Pivot");
         
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
@@ -92,19 +94,16 @@ public class PlayerUIManager : MonoBehaviour
     }
 
     public float movementStrength = 2.0f;
-
+    
     void Update()
     {
-        foreach(Transform child in this.transform)
-        {
-            // https://www.reddit.com/r/Unity3D/comments/cj7niq/comment/evbnl0k/
-            Vector3 look = child.transform.position - xrRig.transform.position;
-            float radians = Mathf.Atan2(look.x, look.z);
-            float degrees = radians * Mathf.Rad2Deg;
-            float str = Mathf.Min(movementStrength * Time.deltaTime, 1);
-            Quaternion targetRotation = Quaternion.Euler(0, degrees, 0);
-            child.transform.rotation = Quaternion.Slerp(child.transform.rotation, targetRotation, str);
-        }
+        // https://www.reddit.com/r/Unity3D/comments/cj7niq/comment/evbnl0k/
+        Vector3 look = pivot.position - xrRig.transform.position;
+        float radians = Mathf.Atan2(look.x, look.z);
+        float degrees = radians * Mathf.Rad2Deg;
+        float str = Mathf.Min(movementStrength * Time.deltaTime, 1);
+        Quaternion targetRotation = Quaternion.Euler(0, degrees, 0);
+        pivot.rotation = Quaternion.Slerp(pivot.rotation, targetRotation, str);
     }
 
     void OnEnable()
