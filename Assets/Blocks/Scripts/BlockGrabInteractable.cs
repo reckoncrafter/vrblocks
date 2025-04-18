@@ -63,7 +63,6 @@ public class BlockGrabInteractable : XRGrabInteractable
         base.OnSelectExited(args);
         if(isWaiting && waitForPullInput && args.interactorObject is XRRayInteractor)
         {
-            transform.SetParent(null);
             isWaiting = false;
             trackPosition = true;
             trackRotation = true;
@@ -76,6 +75,7 @@ public class BlockGrabInteractable : XRGrabInteractable
         if(isWaiting && ( (isRightHand && interactorName == "RRayInteractor") || (!isRightHand && interactorName == "LRayInteractor")))
         {
             detachTriggered.Invoke(detachMode);
+            transform.SetParent(null);
             isWaiting = false;
             trackPosition = true;
             trackRotation = true;
