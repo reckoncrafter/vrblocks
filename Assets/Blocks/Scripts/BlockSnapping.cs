@@ -17,7 +17,7 @@ public class BlockSnapping : MonoBehaviour
     public bool hasWire = false;
 
     public AudioClip snapSound;
-    private AudioSource audio;
+    private AudioSource audioSource;
 
 
 
@@ -35,10 +35,10 @@ public class BlockSnapping : MonoBehaviour
             grabInteractable.selectExited.AddListener(OnRelease);
         }
 
-        audio = GetComponent<AudioSource>();
-        if (audio == null)
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
         {
-            audio = gameObject.AddComponent<AudioSource>(); // Add if not found
+            audioSource = gameObject.AddComponent<AudioSource>(); // Add if not found
         }
     }
 
@@ -201,9 +201,9 @@ public class BlockSnapping : MonoBehaviour
 
     private void PlaySnapSound()
     {
-        if (audio != null && snapSound != null)
+        if (audioSource != null && snapSound != null)
         {
-            audio.PlayOneShot(snapSound);
+            audioSource.PlayOneShot(snapSound);
         }
         else
         {

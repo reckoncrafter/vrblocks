@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 public class TurtleMovement : MonoBehaviour
 {
+    private AudioSource audioSource;
     public AudioClip turtleCollisionAudio;
     public AudioClip turtleFallAudio;
     public AudioClip turtleJumpAudio;
@@ -60,6 +61,7 @@ public class TurtleMovement : MonoBehaviour
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         turtleCollider = GetComponent<BoxCollider>();
@@ -91,7 +93,7 @@ public class TurtleMovement : MonoBehaviour
         {
             Fail(() =>
             {
-                AudioSource.PlayClipAtPoint(turtleFallAudio, transform.position);
+                audioSource.PlayOneShot(turtleFallAudio);
             });
         }
 
@@ -287,7 +289,7 @@ public class TurtleMovement : MonoBehaviour
 
     private void AddJumpForce()
     { // to be called by the jump animation
-        AudioSource.PlayClipAtPoint(turtleJumpAudio, transform.position);
+        audioSource.PlayOneShot(turtleJumpAudio);
 
         float jumpForce = Mathf.Sqrt(moveDistance.y * 1.5f * 2 * Mathf.Abs(Physics.gravity.y)); // h = (µsin(θ))^2 / 2g with 50% more height
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
@@ -300,7 +302,7 @@ public class TurtleMovement : MonoBehaviour
     {
         Fail(() =>
         {
-            AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
+            audioSource.PlayOneShot(turtleCollisionAudio);
             rb.AddTorque(new Vector3(UnityEngine.Random.Range(-10f, 10f), 0, UnityEngine.Random.Range(-10f, 10f)), ForceMode.Impulse);
         });
     }
@@ -309,7 +311,7 @@ public class TurtleMovement : MonoBehaviour
     {
         Fail(() =>
         {
-            AudioSource.PlayClipAtPoint(turtleCollisionAudio, transform.position);
+            audioSource.PlayOneShot(turtleCollisionAudio);
             rb.AddForce((-transform.forward + transform.up) * Mathf.Sqrt(moveDistance.y * 0.3f * 2 * Mathf.Abs(Physics.gravity.y)), ForceMode.Impulse);
             rb.AddTorque(-transform.right * 5, ForceMode.Impulse);
         });
@@ -350,7 +352,7 @@ public class TurtleMovement : MonoBehaviour
         canReset = false;
         tween?.reset();
         SetIsWalking(false);
-        AudioSource.PlayClipAtPoint(turtleSuccessAudio, transform.position);
+        audioSource.PlayOneShot(turtleSuccessAudio);
         SuccessEvent.Invoke();
     }
 }
