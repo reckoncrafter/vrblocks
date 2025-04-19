@@ -22,21 +22,24 @@ public class BlockGrabInteractable : XRGrabInteractable
     private Transform OriginalSceneParent;
     private BlockSnapping blockSnapping;
 
+
     public UnityEvent<DetachMode> detachTriggered;
+    public UnityEvent<bool> onGrabChanged; // true = grabbed, false = released
+
 
     private void Start()
     {
-        rPrimaryDetachAction.action.started += (ctx) => {Detach(ctx, true, DetachMode.Primary);};
-        lPrimaryDetachAction.action.started += (ctx) => {Detach(ctx, false, DetachMode.Primary);};
-        rSecondaryDetachAction.action.started += (ctx) => {Detach(ctx, true, DetachMode.Secondary);};
-        lSecondaryDetachAction.action.started += (ctx) => {Detach(ctx, false, DetachMode.Secondary);};
+        rPrimaryDetachAction.action.started += (ctx) => { Detach(ctx, true, DetachMode.Primary); };
+        lPrimaryDetachAction.action.started += (ctx) => { Detach(ctx, false, DetachMode.Primary); };
+        rSecondaryDetachAction.action.started += (ctx) => { Detach(ctx, true, DetachMode.Secondary); };
+        lSecondaryDetachAction.action.started += (ctx) => { Detach(ctx, false, DetachMode.Secondary); };
         // add more detach actions here
 
         OriginalSceneParent = transform.parent;
         blockSnapping = GetComponent<BlockSnapping>();
 
         Transform attachPoint = transform.Find("AttachPoint");
-        if(attachPoint != null)
+        if (attachPoint != null)
         {
             attachTransform = attachPoint;
         }
@@ -45,7 +48,8 @@ public class BlockGrabInteractable : XRGrabInteractable
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
         base.OnSelectEntered(args);
-        if(blockSnapping && blockSnapping.hasSnapped)
+        onGrabChanged?.Invoke(true);
+        if (blockSnapping && blockSnapping.hasSnapped)
         {
             transform.SetParent(OriginalSceneParent);
             if (waitForPullInput && args.interactorObject is XRRayInteractor)
@@ -61,7 +65,8 @@ public class BlockGrabInteractable : XRGrabInteractable
     protected override void OnSelectExited(SelectExitEventArgs args)
     {
         base.OnSelectExited(args);
-        if(isWaiting && waitForPullInput && args.interactorObject is XRRayInteractor)
+        onGrabChanged?.Invoke(false);
+        if (isWaiting && waitForPullInput && args.interactorObject is XRRayInteractor)
         {
             isWaiting = false;
             trackPosition = true;
@@ -72,7 +77,7 @@ public class BlockGrabInteractable : XRGrabInteractable
 
     private void Detach(InputAction.CallbackContext ctx, bool isRightHand, DetachMode detachMode)
     {
-        if(isWaiting && ( (isRightHand && interactorName == "RRayInteractor") || (!isRightHand && interactorName == "LRayInteractor")))
+        if (isWaiting && ((isRightHand && interactorName == "RRayInteractor") || (!isRightHand && interactorName == "LRayInteractor")))
         {
             detachTriggered.Invoke(detachMode);
             transform.SetParent(null);
@@ -81,5 +86,4 @@ public class BlockGrabInteractable : XRGrabInteractable
             trackRotation = true;
         }
     }
-    
 }

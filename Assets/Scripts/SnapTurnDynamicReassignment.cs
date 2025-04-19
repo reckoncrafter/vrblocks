@@ -12,7 +12,7 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
     {
         SnapTurn,
         ContinuousTurn
-    }    
+    }
 
     public TurningMode turningMode = TurningMode.SnapTurn;
     public InputActionProperty leftHandTurnAction;
@@ -28,24 +28,36 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
     private ActionBasedContinuousTurnProvider continuousTurnProvider;
     private bool rightIsGrabbing = false;
     private bool leftIsGrabbing = false;
+    public List<BlockGrabInteractable> grabSources;
+
 
     void Start()
     {
-        if(!playerUIManager){ playerUIManager = FindObjectOfType<PlayerUIManager>(); }
+        if (!playerUIManager) { playerUIManager = FindObjectOfType<PlayerUIManager>(); }
 
         snapTurnProvider = GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurnProvider = GetComponent<ActionBasedContinuousTurnProvider>();
         AssignTurnActions();
 
-        rightHandGrabAction.action.started += (ctx) => {rightIsGrabbing=true;AssignTurnActions();};
-        rightHandGrabAction.action.canceled += (ctx) => {rightIsGrabbing=false;AssignTurnActions();};
-        leftHandGrabAction.action.started += (ctx) => {leftIsGrabbing=true;AssignTurnActions();};
-        leftHandGrabAction.action.canceled += (ctx) => {leftIsGrabbing=false;AssignTurnActions();};
+        rightHandGrabAction.action.started += (ctx) => { rightIsGrabbing = true; AssignTurnActions(); };
+        rightHandGrabAction.action.canceled += (ctx) => { rightIsGrabbing = false; AssignTurnActions(); };
+        leftHandGrabAction.action.started += (ctx) => { leftIsGrabbing = true; AssignTurnActions(); };
+        leftHandGrabAction.action.canceled += (ctx) => { leftIsGrabbing = false; AssignTurnActions(); };
+
+        foreach (var grab in grabSources)
+        {
+            grab.onGrabChanged.AddListener((isGrabbing) =>
+            {
+                rightIsGrabbing = isGrabbing;
+                leftIsGrabbing = isGrabbing;
+                AssignTurnActions();
+            });
+        }
     }
 
     public void ToggleMenuActions()
     {
-        if(rightIsGrabbing || leftIsGrabbing)
+        if (rightIsGrabbing || leftIsGrabbing)
         {
             playerUIManager.pauseMenuAction.action.Disable();
             playerUIManager.blockMenuAction.action.Disable();
@@ -61,23 +73,23 @@ public class SnapTurnDynamicReassignment : MonoBehaviour
     }
     public void AssignTurnActions()
     {
-        if(turningMode == TurningMode.SnapTurn)
+        if (turningMode == TurningMode.SnapTurn)
         {
             snapTurnProvider.enabled = true;
             continuousTurnProvider.enabled = false;
 
         }
-        else if(turningMode == TurningMode.ContinuousTurn)
+        else if (turningMode == TurningMode.ContinuousTurn)
         {
             snapTurnProvider.enabled = false;
             continuousTurnProvider.enabled = true;
         }
 
-        snapTurnProvider.rightHandSnapTurnAction = rightIsGrabbing? emptyInputAction: rightHandSnapTurnAction;
-        snapTurnProvider.leftHandSnapTurnAction = leftIsGrabbing? emptyInputAction: leftHandSnapTurnAction;
-        continuousTurnProvider.rightHandTurnAction = rightIsGrabbing? emptyInputAction: rightHandTurnAction;
-        continuousTurnProvider.leftHandTurnAction = leftIsGrabbing? emptyInputAction: leftHandTurnAction;
+        snapTurnProvider.rightHandSnapTurnAction = rightIsGrabbing ? emptyInputAction : rightHandSnapTurnAction;
+        snapTurnProvider.leftHandSnapTurnAction = leftIsGrabbing ? emptyInputAction : leftHandSnapTurnAction;
+        continuousTurnProvider.rightHandTurnAction = rightIsGrabbing ? emptyInputAction : rightHandTurnAction;
+        continuousTurnProvider.leftHandTurnAction = leftIsGrabbing ? emptyInputAction : leftHandTurnAction;
 
-        if(disableMenusWhileGrabbing){ ToggleMenuActions(); }
+        if (disableMenusWhileGrabbing) { ToggleMenuActions(); }
     }
 }

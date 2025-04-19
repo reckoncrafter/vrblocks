@@ -29,7 +29,7 @@ public class BlockSnapping : MonoBehaviour
 
         // XR Grab Interactable listeners
         var grabInteractable = GetComponent<XRGrabInteractable>();
-        if(grabInteractable != null)
+        if (grabInteractable != null)
         {
             if (grabInteractable is BlockGrabInteractable)
             {
@@ -224,11 +224,14 @@ public class BlockSnapping : MonoBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+        // Disable snapping for a moment to prevent snapping during teleportation (Moved up to ensure it's called before anything else)
+        disableSnapOnGrab = StartCoroutine(DisableSnapOnGrab());
         OnGrab(BlockGrabInteractable.DetachMode.Primary);
     }
     private void OnGrab(BlockGrabInteractable.DetachMode detachMode)
     {
         SnappedForwarding snappedForwarding = gameObject.GetComponentInChildren<SnappedForwarding>();
+
         if (detachMode == BlockGrabInteractable.DetachMode.Primary) // Primary grab logic
         {
             Debug.Log($"Block grabbed (primary): {gameObject.name}");
@@ -368,7 +371,7 @@ public class BlockSnapping : MonoBehaviour
         // Start the coroutine and store reference for OnRelease()
         resetSnapStatusCoroutine = StartCoroutine(ResetSnapStatusAfterDelay());
 
-        // Set this block as root block (MAY BE DEPRECATED)
+        // Set this block as root block
         if (snappedForwarding != null)
         {
             snappedForwarding.IsRootBlock = true;
@@ -380,9 +383,6 @@ public class BlockSnapping : MonoBehaviour
 
         // Update all child blocks recursively
         UpdateChildBlockPositions(gameObject);
-
-        // Disable snapping for a moment to prevent snapping during teleportation.
-        disableSnapOnGrab = StartCoroutine(DisableSnapOnGrab());
     }
 
     private IEnumerator DisableSnapOnGrab()
@@ -391,7 +391,7 @@ public class BlockSnapping : MonoBehaviour
         if (snappedForwarding != null)
         {
             snappedForwarding.snappingEnabled = false;
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
             snappedForwarding.snappingEnabled = true;
         }
     }
