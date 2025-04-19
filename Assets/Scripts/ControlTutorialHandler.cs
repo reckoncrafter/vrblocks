@@ -11,6 +11,7 @@ public class ControlTutorialHandlerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
         ControlTutorialHandler controlTutorialHandler = (ControlTutorialHandler)target;
         if(GUILayout.Button("Toggle Control Labels"))
         {
@@ -25,25 +26,30 @@ public class ControlTutorialHandler : MonoBehaviour
 {
     public GameObject rightTutorial;
     public GameObject leftTutorial;
+    public GameObject controlLabelPopup;
     public InputActionReference disableControlLabels;
+    public float popupTimeout;
     ControllerModels cm;
     bool isActive = true;
 
     void Start()
     {
-        cm = GetComponent<ControllerModels>();
-        IEnumerator delay()
+        IEnumerator close_popup()
         {
-            yield return new WaitForSeconds(0.5f);
-            cm.EnableControllerModel(true, true);
-            cm.EnableControllerModel(true, false);
+            yield return new WaitForSeconds(popupTimeout);
+            controlLabelPopup.SetActive(false);
         }
-        StartCoroutine(delay());
-
+        controlLabelPopup.SetActive(true);
+        StartCoroutine(close_popup());
+        cm = GetComponent<ControllerModels>();
         disableControlLabels.action.started += (ctx) => {toggleTutorial();};
     }
     public void toggleTutorial()
     {
+        if(controlLabelPopup.activeInHierarchy)
+        {
+            controlLabelPopup.SetActive(false);
+        }
         isActive = !isActive;
         rightTutorial.SetActive(isActive);
         leftTutorial.SetActive(isActive);
