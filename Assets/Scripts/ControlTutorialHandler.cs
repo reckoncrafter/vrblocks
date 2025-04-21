@@ -30,7 +30,7 @@ public class ControlTutorialHandler : MonoBehaviour
     public InputActionReference disableControlLabels;
     public float popupTimeout;
     ControllerModels cm;
-    bool isActive = true;
+    bool isActive = false;
 
     void Start()
     {

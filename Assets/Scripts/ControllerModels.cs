@@ -28,6 +28,7 @@ public class ControllerModels : MonoBehaviour
     private GameObject XRControllerRight;
     private Dictionary<Controls, Renderer> LeftSubmeshRenderers;
     private Dictionary<Controls, Renderer> RightSubmeshRenderers;
+    private ControlTutorialHandler controlTutorialHandler;
 
     void Start(){
         RightController = transform.Find("Camera Offset/Right Controller").gameObject;
@@ -40,6 +41,8 @@ public class ControllerModels : MonoBehaviour
 
         DefaultHandMaterial = LeftHand.GetComponentInChildren<Renderer>().material;
         DefaultControllerMaterial = XRControllerLeft.GetComponentInChildren<Renderer>().material;
+
+        controlTutorialHandler = GetComponent<ControlTutorialHandler>();
 
         RightSubmeshRenderers = new Dictionary<Controls, Renderer>()
         {
@@ -86,6 +89,14 @@ public class ControllerModels : MonoBehaviour
         {
             XRControllerLeft.SetActive(enabled);
             LeftHand.SetActive(!enabled);
+        }
+
+        if(controlTutorialHandler is not null && controlTutorialHandler.leftTutorial.activeInHierarchy)
+        {
+            XRControllerLeft.SetActive(true);
+            XRControllerRight.SetActive(true);
+            RightHand.SetActive(false);
+            LeftHand.SetActive(false);
         }
     }
 
