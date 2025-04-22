@@ -175,6 +175,25 @@ public class BlockSnapping : MonoBehaviour
             // Set targetPosition values of children (if any)
             UpdateChildBlockPositions(block1);
         }
+
+        ReleaseRootBlock(block1);
+    }
+
+    private void ReleaseRootBlock(GameObject block)
+    {
+        if (block == null) return;
+
+        SnappedForwarding snappedForwarding = block.GetComponentInChildren<SnappedForwarding>();
+        if (snappedForwarding == null) return;
+
+        GameObject rootBlock = snappedForwarding.FindRootBlock(block);
+        if (rootBlock == null) return;
+
+        Rigidbody rootRb = rootBlock.GetComponent<Rigidbody>();
+        if (rootRb != null)
+        {
+            rootRb.constraints = RigidbodyConstraints.None;
+        }
     }
 
     private void UpdateChildBlockPositions(GameObject parentBlock)
