@@ -186,6 +186,7 @@ public class BlockSnapping : MonoBehaviour
         SnappedForwarding snappedForwarding = block.GetComponentInChildren<SnappedForwarding>();
         if (snappedForwarding == null) return;
 
+        snappedForwarding.IsRootBlock = false; // prevents FindRootBlock from returning this block.
         GameObject rootBlock = snappedForwarding.FindRootBlock(block);
         if (rootBlock == null) return;
 
