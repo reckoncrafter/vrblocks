@@ -137,6 +137,8 @@ public class PlayerUIManager : MonoBehaviour
         TurtleMovement turtleMovement = GameObject.Find("/MapSpawner/Turtle").GetComponent<TurtleMovement>();
         if (turtleMovement != null)
         {
+            turtleMovement.canFail = true;
+            turtleMovement.canReset = true;
             turtleMovement.Fail();
         }
         else
