@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 public class PlayerUIManager : MonoBehaviour
 {
+    public XROrigin xrRig;
+    public GameObject pivot;
+
+    [Header("XR Rig Actions")]
     public InputActionProperty pauseMenuAction = new InputActionProperty(new InputAction("Pause Menu Input", expectedControlType: "bool"));
     public InputActionProperty blockMenuAction = new InputActionProperty(new InputAction("Block Menu Input", expectedControlType: "bool"));
 
@@ -46,14 +50,13 @@ public class PlayerUIManager : MonoBehaviour
     public Button functionTab;
 
     [Header("End Screen Menu")]
+    public Button debug_EndscreenTriggerButton;
     public Button nextLevelButton;
     public Button endScreenReturnToMenu;
     public Button endScreenReturnToMenuAlt;
 
     private UISFXManager? uiSFXManager;
     private bool toggleBlockMenu = false;
-    private Transform xrRig;
-    private Transform pivot;
 
     void Start()
     {
@@ -70,7 +73,8 @@ public class PlayerUIManager : MonoBehaviour
 
         pauseMenuAction.action.started += context => { EnablePauseMenu(); };
         blockMenuAction.action.started += context => { ToggleBlockMenu(); };
-        debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
+        // debug_EndScreenTriggerAction.action.started += context => { EnableEndScreen(); };
+        debug_EndscreenTriggerButton.onClick.AddListener(EnableEndScreen);
         resumeGameButton.onClick.AddListener(ClosePauseMenu);
         resetTurtleButton.onClick.AddListener(ResetTurtle);
         movementTab.onClick.AddListener(() => ShowBlockMenuCategory(movementPanel));
@@ -83,9 +87,6 @@ public class PlayerUIManager : MonoBehaviour
         returnToMenuDenyButton.onClick.AddListener(CloseConfirmationWindow);
         returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
-
-        xrRig = FindObjectOfType<XROrigin>().transform;
-        pivot = transform.Find("Pivot");
         
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
@@ -98,12 +99,12 @@ public class PlayerUIManager : MonoBehaviour
     void Update()
     {
         // https://www.reddit.com/r/Unity3D/comments/cj7niq/comment/evbnl0k/
-        Vector3 look = pivot.position - xrRig.transform.position;
+        Vector3 look = pivot.transform.position - xrRig.transform.position;
         float radians = Mathf.Atan2(look.x, look.z);
         float degrees = radians * Mathf.Rad2Deg;
         float str = Mathf.Min(movementStrength * Time.deltaTime, 1);
         Quaternion targetRotation = Quaternion.Euler(0, degrees, 0);
-        pivot.rotation = Quaternion.Slerp(pivot.rotation, targetRotation, str);
+        pivot.transform.rotation = Quaternion.Slerp(pivot.transform.rotation, targetRotation, str);
     }
 
     void OnEnable()
