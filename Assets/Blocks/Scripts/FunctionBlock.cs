@@ -36,12 +36,14 @@ public class FunctionBlock : MonoBehaviour
 
     public void OnHoverEntered(HoverEnterEventArgs hoverEnter){
       isHovered = true;
+      playerUIManager.blockMenuAction.action.Disable();
       //controllerModels.EnableControllerHands(false);
       //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
     public void OnHoverExited(HoverExitEventArgs hoverExit){
       isHovered = false;
+      playerUIManager.blockMenuAction.action.Enable();
       //controllerModels.EnableControllerHands(true);
       //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
