@@ -60,9 +60,11 @@ public class PlayerUIManager : MonoBehaviour
     private bool toggleBlockMenu = false;
 
     [Header("Function Call Spawning")]
+    public Button functionDefinitionButton;
     public Button callFunctionButton;
     public FunctionBlock? selectedFunctionBlock;
     public GameObject functionCallPrefab;
+    public GameObject functionDefPrefab;
 
     void Start()
     {
@@ -94,6 +96,7 @@ public class PlayerUIManager : MonoBehaviour
         returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
         callFunctionButton.onClick.AddListener(SpawnFunctionCall);
+        functionDefinitionButton.onClick.AddListener(SpawnFuctionDefinition);
         
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
@@ -172,6 +175,21 @@ public class PlayerUIManager : MonoBehaviour
       var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
       FCLabel.text = "Call " + selectedFunctionBlock.FunctionID.ToString();
       fcb.GetComponent<FunctionCallBlock>().FunctionID = selectedFunctionBlock.FunctionID;
+    }
+
+    void SpawnFuctionDefinition()
+    {
+        Vector3 spawnOffset = new (0, 0.5f, 0);
+        var blockEntity = GameObject.Find("MoveableEntities/BlockEntity").GetComponent<Transform>();
+        GameObject newFunction = Instantiate(functionDefPrefab, functionDefinitionButton.transform.position + spawnOffset, functionDefinitionButton.transform.rotation, blockEntity);
+        FunctionBlock functionBlock = newFunction.GetComponent<FunctionBlock>();
+        if(selectedFunctionBlock != null)
+        {
+            selectedFunctionBlock.SetSelectedVisual(false);
+        }
+        functionBlock.SetSelectedVisual(true);
+        SetFunctionCallButtonStatus(true);
+        selectedFunctionBlock = functionBlock;
     }
 
     public void OpenConfirmationWindow()

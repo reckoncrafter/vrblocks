@@ -149,7 +149,6 @@ GameObject:
   - component: {fileID: 4950276849472520537}
   - component: {fileID: 5636777924410968202}
   - component: {fileID: 1545302782675530703}
-  - component: {fileID: 551792133008361378}
   m_Layer: 5
   m_Name: FunctionButton
   m_TagString: MenuUIButton
@@ -259,21 +258,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &551792133008361378
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 196384321620982669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 449357cc7bf292742ab21bb2065a516e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blockPrefab: {fileID: 6713015538121544575, guid: 819c1545583934bb7a1f0e275d024dc7, type: 3}
-  spawnParent: {fileID: 0}
-  spawnOffset: {x: 0, y: 0.5, z: 0}
 --- !u!1 &198650159233208111
 GameObject:
   m_ObjectHideFlags: 0
@@ -4855,9 +4839,11 @@ MonoBehaviour:
   nextLevelButton: {fileID: 114004908926766871}
   endScreenReturnToMenu: {fileID: 7059557852561757490}
   endScreenReturnToMenuAlt: {fileID: 7649715759853756646}
+  functionDefinitionButton: {fileID: 1545302782675530703}
   callFunctionButton: {fileID: 8322343230500934033}
   selectedFunctionBlock: {fileID: 0}
   functionCallPrefab: {fileID: 6713015538121544575, guid: 6624236ae1e177e2cb847d4bf721f9ca, type: 3}
+  functionDefPrefab: {fileID: 6713015538121544575, guid: 819c1545583934bb7a1f0e275d024dc7, type: 3}
   movementStrength: 2
 --- !u!1 &4104392604732612235
 GameObject:

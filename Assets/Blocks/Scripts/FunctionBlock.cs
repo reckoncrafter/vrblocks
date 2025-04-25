@@ -14,18 +14,19 @@ public class FunctionBlock : MonoBehaviour
     public Vector3 spawnOffset;
     public int FunctionID;
     public Material selectedForSpawnMaterial;
-    private Material defaultMaterial;
+    public Material defaultMaterial;
     private PlayerUIManager playerUIManager;
     private bool isHovered = false;
     // Start is called before the first frame update
     void Start()
     {
-      defaultMaterial = GetComponent<Renderer>().material;
       primaryButtonRight.action.started += OnPrimaryButton;
       primaryButtonLeft.action.started += OnPrimaryButton;
       GetComponent<XRGrabInteractable>().hoverEntered.AddListener(OnHoverEntered);
       GetComponent<XRGrabInteractable>().hoverExited.AddListener(OnHoverExited);
       FunctionID = gameObject.GetInstanceID();
+      var FCLabel = transform.Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
+      FCLabel.text = "Function " + FunctionID.ToString();
       playerUIManager = FindObjectOfType<PlayerUIManager>();
     }
 
@@ -36,13 +37,13 @@ public class FunctionBlock : MonoBehaviour
     public void OnHoverEntered(HoverEnterEventArgs hoverEnter){
       isHovered = true;
       //controllerModels.EnableControllerHands(false);
-      Debug.Log("FunctionDefinintionBlock: Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
     public void OnHoverExited(HoverExitEventArgs hoverExit){
       isHovered = false;
       //controllerModels.EnableControllerHands(true);
-      Debug.Log("FunctionDefinintionBlock: Not Hovered");
+      //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
 
     public void OnPrimaryButton(InputAction.CallbackContext ctx)
