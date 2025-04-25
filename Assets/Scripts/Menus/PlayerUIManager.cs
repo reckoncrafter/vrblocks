@@ -2,6 +2,7 @@
  Handle level-to-level Player UI + animations
 */
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
 using UnityEngine;
@@ -58,6 +59,11 @@ public class PlayerUIManager : MonoBehaviour
     private UISFXManager? uiSFXManager;
     private bool toggleBlockMenu = false;
 
+    [Header("Function Call Spawning")]
+    public Button callFunctionButton;
+    public FunctionBlock? selectedFunctionBlock;
+    public GameObject functionCallPrefab;
+
     void Start()
     {
         pauseMenu.SetActive(true);
@@ -87,11 +93,13 @@ public class PlayerUIManager : MonoBehaviour
         returnToMenuDenyButton.onClick.AddListener(CloseConfirmationWindow);
         returnToMenuConfirmButton.onClick.AddListener(ReturnToLevelSelector);
         nextLevelButton.onClick.AddListener(ContinueToNextLevel);
+        callFunctionButton.onClick.AddListener(SpawnFunctionCall);
         
         // Open Movement Panel on Block Menu at start
         ShowBlockMenuCategory(movementPanel);
 
         uiSFXManager = FindObjectOfType<UISFXManager>();
+        if(xrRig == null){ xrRig = FindObjectOfType<XROrigin>(); }
     }
 
     public float movementStrength = 2.0f;
@@ -146,6 +154,24 @@ public class PlayerUIManager : MonoBehaviour
         {
             Debug.Log("ResetTurtleButton: Can't find Turtle!");
         }
+    }
+
+    public void SetFunctionCallButtonStatus(bool status)
+    {
+        callFunctionButton.interactable = status;
+    }
+
+    void SpawnFunctionCall()
+    {
+      Vector3 spawnOffset = new (0, 0.5f, 0);
+      var blockEntity = GameObject.Find("MoveableEntities/BlockEntity").GetComponent<Transform>();
+      GameObject newFunctionCall = Instantiate(functionCallPrefab, callFunctionButton.transform.position + spawnOffset, callFunctionButton.transform.rotation, blockEntity);
+      newFunctionCall.name = "Block (FunctionCall)";
+      FunctionCallBlock fcb = newFunctionCall.AddComponent<FunctionCallBlock>();
+      fcb.functionDefinition = selectedFunctionBlock;
+      var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
+      FCLabel.text = "Call " + selectedFunctionBlock.FunctionID.ToString();
+      fcb.GetComponent<FunctionCallBlock>().FunctionID = selectedFunctionBlock.FunctionID;
     }
 
     public void OpenConfirmationWindow()
