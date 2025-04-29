@@ -4,61 +4,77 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class FunctionBlock : MonoBehaviour
 {
-    //public ControllerModels controllerModels;
     public InputActionReference primaryButtonRight;
     public InputActionReference primaryButtonLeft;
     public GameObject functionCallPrefab;
     public Vector3 spawnOffset;
     public int FunctionID;
-
-    //private QueueReading queueReading;
+    public Material selectedForSpawnMaterial;
+    public Material defaultMaterial;
+    private PlayerUIManager playerUIManager;
     private bool isHovered = false;
     // Start is called before the first frame update
     void Start()
     {
-      //controllerModels = GameObject.Find("XR Origin (XR Rig)").GetComponent<ControllerModels>();
-      primaryButtonRight.action.started += onPrimaryButton;
-      primaryButtonLeft.action.started += onPrimaryButton;
-      //queueReading = gameObject.GetComponent<QueueReading>();
+      primaryButtonRight.action.started += OnPrimaryButton;
+      primaryButtonLeft.action.started += OnPrimaryButton;
+      GetComponent<XRGrabInteractable>().hoverEntered.AddListener(OnHoverEntered);
+      GetComponent<XRGrabInteractable>().hoverExited.AddListener(OnHoverExited);
       FunctionID = gameObject.GetInstanceID();
+      var FCLabel = transform.Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
+      FCLabel.text = "Function " + FunctionID.ToString();
+      playerUIManager = FindObjectOfType<PlayerUIManager>();
     }
 
     // void onActivation(){
     //     Queue<UnityEvent> blockQueue = queueReading.GetBlockQueueOfUnityEvents();
     // }
 
-    public void OnHoverEntered(){
+    public void OnHoverEntered(HoverEnterEventArgs hoverEnter){
       isHovered = true;
+      playerUIManager.blockMenuAction.action.Disable();
       //controllerModels.EnableControllerHands(false);
       //Debug.Log("FunctionDefinintionBlock: Hovered");
     }
 
-    public void OnHoverExited(){
+    public void OnHoverExited(HoverExitEventArgs hoverExit){
       isHovered = false;
+      playerUIManager.blockMenuAction.action.Enable();
       //controllerModels.EnableControllerHands(true);
       //Debug.Log("FunctionDefinintionBlock: Not Hovered");
     }
 
-    void onPrimaryButton(InputAction.CallbackContext context){
-      if(isHovered){
-        spawnCallBlock();
+    public void OnPrimaryButton(InputAction.CallbackContext ctx)
+    {
+      if(isHovered && playerUIManager != null)
+      {
+        if(playerUIManager.selectedFunctionBlock != this && playerUIManager.selectedFunctionBlock != null) // other function selected
+        {
+          playerUIManager.selectedFunctionBlock.SetSelectedVisual(false);
+          playerUIManager.selectedFunctionBlock = this;
+          playerUIManager.SetFunctionCallButtonStatus(true);
+          SetSelectedVisual(true);
+        }
+        else if(playerUIManager.selectedFunctionBlock == null) // no function selected
+        {
+          playerUIManager.selectedFunctionBlock = this;
+          playerUIManager.SetFunctionCallButtonStatus(true);
+          SetSelectedVisual(true);
+        }
+        else // this function selected
+        {
+          playerUIManager.selectedFunctionBlock = null;
+          playerUIManager.SetFunctionCallButtonStatus(false);
+          SetSelectedVisual(false);
+        }
       }
     }
 
-    void spawnCallBlock(){
-      var transform = GetComponent<Transform>();
-      var blockEntity = GameObject.Find("MoveableEntities/BlockEntity").GetComponent<Transform>();
-      GameObject newFunctionCall = Instantiate(functionCallPrefab, transform.position + spawnOffset, transform.rotation, blockEntity);
-      newFunctionCall.name = "Block (FunctionCall)";
-      FunctionCallBlock fcb = newFunctionCall.AddComponent<FunctionCallBlock>();
-      fcb.functionDefinition = gameObject;
-      var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
-      FCLabel.text = "Call " + FunctionID.ToString();
-      fcb.GetComponent<FunctionCallBlock>().FunctionID = FunctionID;
-    }
+    public void SetSelectedVisual(bool status){ GetComponent<Renderer>().material = status ? selectedForSpawnMaterial : defaultMaterial; }
 }
 
 /*

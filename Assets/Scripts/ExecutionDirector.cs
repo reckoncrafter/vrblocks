@@ -600,7 +600,7 @@ public class ExecutionDirector : MonoBehaviour
 
         else if (isFunctionCall)
         {
-            GameObject fd = functionCallBlock.functionDefinition;
+            GameObject fd = functionCallBlock.functionDefinition.gameObject;
             FunctionData nextFunctionData = new FunctionData();
             nextFunctionData.blockList = functionBlockLists[functionCallBlock.FunctionID];
             nextFunctionData.instructionPointer = 0;

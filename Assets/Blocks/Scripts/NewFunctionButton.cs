@@ -34,7 +34,7 @@ public class NewFunctionButton : MonoBehaviour
 
         //newFunctionDefinitionInstance.AddComponent(typeof(QueueReading));
         FunctionCallBlock fcb = newFunctionCallInstance.AddComponent<FunctionCallBlock>();
-        fcb.functionDefinition = newFunctionDefinitionInstance;
+        fcb.functionDefinition = newFunctionDefinitionInstance.GetComponent<FunctionBlock>();
 
         // BROKEN
         var FCLabel = newFunctionCallInstance.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();

@@ -5,12 +5,12 @@ using UnityEngine.Events;
 
 public class FunctionCallBlock : MonoBehaviour
 {
-    public GameObject functionDefinition;
+    public FunctionBlock functionDefinition;
     public int FunctionID;
 
     void Start(){
         //FunctionID = functionDefinition.GetComponent<FunctionBlock>().FunctionID;
-        FunctionID = functionDefinition.GetInstanceID();
+        FunctionID = functionDefinition.gameObject.GetInstanceID();
     }
 
     // public Queue<UnityEvent> getFunction(){
