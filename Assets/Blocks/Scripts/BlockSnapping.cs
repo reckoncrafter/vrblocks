@@ -79,7 +79,7 @@ public class BlockSnapping : MonoBehaviour
             if (thisSnappedForwarding.snappingEnabled == true && otherSnappedForwarding.snappingEnabled == true)
             {
                 // Prevent looped snapping
-                if (!thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject))
+                if (thisChildBlock is null || !thisSnappedForwarding.IsLoopedBlock(thisChildBlock, other.transform.parent?.gameObject)) // thisChildBlock is sometimes null.
                 {
                     // Check if the bottom trigger is already snapped
                     if (otherSnappedForwarding != null && otherSnappedForwarding.CanSnap())
