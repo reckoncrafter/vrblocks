@@ -5,11 +5,15 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.UI;
 
 public class FunctionBlock : MonoBehaviour
 {
     public InputActionReference primaryButtonRight;
     public InputActionReference primaryButtonLeft;
+
+    public InputActionReference secondaryButtonRight;
+    public InputActionReference secondaryButtonLeft;
     public GameObject functionCallPrefab;
     public Vector3 spawnOffset;
     public int FunctionID;
@@ -17,11 +21,20 @@ public class FunctionBlock : MonoBehaviour
     public Material defaultMaterial;
     private PlayerUIManager playerUIManager;
     private bool isHovered = false;
-    // Start is called before the first frame update
+
+    [Space (10)]
+    public string functionName = "";
+    private TextMeshProUGUI textMesh;
+    public UnityEvent<string> OnNameChanged = new UnityEvent<string>();
     void Start()
     {
       primaryButtonRight.action.started += OnPrimaryButton;
       primaryButtonLeft.action.started += OnPrimaryButton;
+      secondaryButtonRight.action.started += OnSecondaryButton;
+      secondaryButtonLeft.action.started += OnSecondaryButton;
+
+      textMesh = GetComponentInChildren<TextMeshProUGUI>();
+
       GetComponent<XRGrabInteractable>().hoverEntered.AddListener(OnHoverEntered);
       GetComponent<XRGrabInteractable>().hoverExited.AddListener(OnHoverExited);
       FunctionID = gameObject.GetInstanceID();
@@ -71,6 +84,28 @@ public class FunctionBlock : MonoBehaviour
           playerUIManager.SetFunctionCallButtonStatus(false);
           SetSelectedVisual(false);
         }
+      }
+    }
+
+    public void OnSecondaryButton(InputAction.CallbackContext ctx)
+    {
+      if(isHovered)
+      {
+        VRKeys.Keyboard keyboard = FindObjectOfType<VRKeys.Keyboard>();
+        keyboard.Enable();
+        keyboard.OnCancel.AddListener( () => {
+          keyboard.Disable();
+          keyboard.OnCancel.RemoveAllListeners();
+          keyboard.OnSubmit.RemoveAllListeners();
+        } );
+        keyboard.OnSubmit.AddListener( (submitText) => {
+          functionName = submitText;
+          textMesh.text = functionName;
+          OnNameChanged.Invoke(submitText);
+          keyboard.Disable();
+          keyboard.OnCancel.RemoveAllListeners();
+          keyboard.OnSubmit.RemoveAllListeners();          
+        } );
       }
     }
 

@@ -90,6 +90,11 @@ namespace VRKeys {
 
 		public bool disabled = true;
 
+		[Space (15)]
+		public GameObject XRControllerLeft;
+
+		public GameObject XRControllerRight;
+
 		[Serializable]
 		public class KeyboardUpdateEvent : UnityEvent<string> { }
 
@@ -135,8 +140,10 @@ namespace VRKeys {
 			//playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
 			//playerSpace.transform.localRotation = InputTracking.GetLocalRotation (XRNode.TrackingReference);
 
-			leftHand = new GameObject ("Left Hand");
-			rightHand = new GameObject ("Right Hand");
+			// leftHand = new GameObject ("Left Hand");
+			// rightHand = new GameObject ("Right Hand");
+			leftHand = XRControllerLeft;
+			rightHand = XRControllerRight;
 
 			yield return StartCoroutine (DoSetLanguage (keyboardLayout));
 
@@ -154,11 +161,17 @@ namespace VRKeys {
 			//playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
 			//playerSpace.transform.localRotation = InputTracking.GetLocalRotation (XRNode.TrackingReference);
 
-			leftHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.LeftHand);
-			leftHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.LeftHand);
+			// leftHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.LeftHand);
+			// leftHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.LeftHand);
 
-			rightHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.RightHand);
-			rightHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.RightHand);
+			// rightHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.RightHand);
+			// rightHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.RightHand);
+
+			leftHand.transform.localPosition = XRControllerLeft.transform.localPosition;
+			leftHand.transform.localRotation = XRControllerLeft.transform.localRotation;
+
+			rightHand.transform.localPosition = XRControllerRight.transform.localPosition;
+			rightHand.transform.localRotation = XRControllerRight.transform.localRotation;
 		}
 
 		private void PositionAndAttachMallets () {
