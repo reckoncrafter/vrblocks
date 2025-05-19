@@ -93,18 +93,27 @@ public class FunctionBlock : MonoBehaviour
       {
         VRKeys.Keyboard keyboard = FindObjectOfType<VRKeys.Keyboard>();
         keyboard.Enable();
-        keyboard.OnCancel.AddListener( () => {
+        ControllerModels cm = FindObjectOfType<ControllerModels>();
+        cm.EnableControllerModel(true, true);
+        cm.EnableControllerModel(true, false);
+
+        void disable_keyboard(){
+          cm.EnableControllerModel(false, true);
+          cm.EnableControllerModel(false, false);
           keyboard.Disable();
           keyboard.OnCancel.RemoveAllListeners();
-          keyboard.OnSubmit.RemoveAllListeners();
+          keyboard.OnSubmit.RemoveAllListeners(); 
+        };
+
+        keyboard.OnCancel.AddListener( () => {
+          disable_keyboard();
         } );
+        
         keyboard.OnSubmit.AddListener( (submitText) => {
           functionName = submitText;
           textMesh.text = functionName;
           OnNameChanged.Invoke(submitText);
-          keyboard.Disable();
-          keyboard.OnCancel.RemoveAllListeners();
-          keyboard.OnSubmit.RemoveAllListeners();          
+          disable_keyboard();
         } );
       }
     }
