@@ -9,8 +9,7 @@ public class MiniMapBlockSpawner : MonoBehaviour
     public GameObject goalObject;
     public TurtleMovement turtle;
     public MapBlockScriptableObject mapValues;
-    public GameObject disableLeftHandModelOnGrab;
-    public GameObject disableRightHandModelOnGrab;
+    public ControllerModels controllerModels;
     public Vector3 startPositionOffset;
     public Vector3 turtleUpdateOffset = new Vector3(-0.25f, -0.25f, -0.25f);
     public float miniMapScale = 0.1f;
@@ -39,9 +38,11 @@ public class MiniMapBlockSpawner : MonoBehaviour
         grabInteractable.selectExited.AddListener(ShowGrabbingHand);
 
         startPositionOffset = (mapValues.blockScale / 2) - CalculateCenterOfMass();
+        controllerModels = FindObjectOfType<ControllerModels>();
     }
     void Update()
     {
+        if(minimapRB == null){ return;  }
         // Return minimap to original position
         if ((initPos - transform.position).magnitude >= 0.08)
         {
@@ -125,24 +126,27 @@ public class MiniMapBlockSpawner : MonoBehaviour
     }
     public void HideGrabbingHand(SelectEnterEventArgs args)
     {
+        if(controllerModels == null){ return; }
+
         if (args.interactorObject.transform.CompareTag("Left Hand"))
         {
-            disableLeftHandModelOnGrab.SetActive(false);
+            controllerModels.EnableControllerModel(true, false);
         }
         else if (args.interactorObject.transform.CompareTag("Right Hand"))
         {
-            disableRightHandModelOnGrab.SetActive(false);
+            controllerModels.EnableControllerModel(true, true);
         }
     }
     public void ShowGrabbingHand(SelectExitEventArgs args)
     {
+        if(controllerModels == null){ return; }
         if (args.interactorObject.transform.CompareTag("Left Hand"))
         {
-            disableLeftHandModelOnGrab.SetActive(true);
+            controllerModels.EnableControllerModel(false, false);
         }
         else if (args.interactorObject.transform.CompareTag("Right Hand"))
         {
-            disableRightHandModelOnGrab.SetActive(true);
+            controllerModels.EnableControllerModel(false, true);
         }
     }
     public void ClearMap()
