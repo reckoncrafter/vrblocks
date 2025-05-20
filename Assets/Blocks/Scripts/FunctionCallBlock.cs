@@ -14,8 +14,9 @@ public class FunctionCallBlock : MonoBehaviour
         textMesh = GetComponentInChildren<TextMeshProUGUI>();
         //FunctionID = functionDefinition.GetComponent<FunctionBlock>().FunctionID;
         FunctionID = functionDefinition.gameObject.GetInstanceID();
-        functionDefinition.OnNameChanged.AddListener( (newName) => {
-            textMesh.text = $"Call: {newName}";
+        functionDefinition.OnNameChanged.AddListener( (newName) =>
+        {
+            textMesh.text = $"Call: {(newName == "" ? FunctionID : newName)}";
         });
     }
 
