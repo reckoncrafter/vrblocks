@@ -173,7 +173,9 @@ public class PlayerUIManager : MonoBehaviour
       FunctionCallBlock fcb = newFunctionCall.AddComponent<FunctionCallBlock>();
       fcb.functionDefinition = selectedFunctionBlock;
       var FCLabel = newFunctionCall.GetComponent<Transform>().Find("BlockLabel/LabelText").gameObject.GetComponent<TextMeshProUGUI>();
-      FCLabel.text = "Call " + selectedFunctionBlock.FunctionID.ToString();
+
+
+      FCLabel.text = "Call: " + (selectedFunctionBlock.functionName == "" ? selectedFunctionBlock.FunctionID.ToString() : selectedFunctionBlock.functionName);
       fcb.GetComponent<FunctionCallBlock>().FunctionID = selectedFunctionBlock.FunctionID;
     }
 
