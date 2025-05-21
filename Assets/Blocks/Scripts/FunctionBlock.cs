@@ -93,6 +93,7 @@ public class FunctionBlock : MonoBehaviour
       {
         VRKeys.Keyboard keyboard = FindObjectOfType<VRKeys.Keyboard>();
         keyboard.Enable();
+        keyboard.SetText(functionName);
         ControllerModels cm = FindObjectOfType<ControllerModels>();
         cm.EnableControllerModel(true, true);
         cm.EnableControllerModel(true, false);
@@ -112,6 +113,7 @@ public class FunctionBlock : MonoBehaviour
         keyboard.OnSubmit.AddListener( (submitText) => {
           functionName = submitText;
           textMesh.text = functionName;
+          if (functionName == ""){ textMesh.text = FunctionID.ToString(); }
           OnNameChanged.Invoke(submitText);
           disable_keyboard();
         } );

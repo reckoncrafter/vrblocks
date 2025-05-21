@@ -535,7 +535,10 @@ MonoBehaviour:
   FunctionID: 0
   selectedForSpawnMaterial: {fileID: 2100000, guid: ed9ac05816b571a719251b9937f35ffe, type: 2}
   defaultMaterial: {fileID: 2100000, guid: 8bc8f266815144b96b5c0882ef7dda74, type: 2}
-  text: {fileID: 1018436606756444959}
+  functionName: 
+  OnNameChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3681838429516486516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -935,9 +938,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.08
+  m_fontSizeMax: 0.2
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -950,7 +953,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
