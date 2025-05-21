@@ -457,7 +457,7 @@ public class BlockSnapping : MonoBehaviour
         //queueReading?.ReadQueue();
     }
 
-    private void ResetSnapStatusOnOtherBlock(GameObject otherBlock)
+    public void ResetSnapStatusOnOtherBlock(GameObject otherBlock)
     {
         // Find the SnapTriggerBottom on the other block
         Transform otherSnapTriggerBottom = otherBlock.transform.Find("SnapTriggerBottom");
