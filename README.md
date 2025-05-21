@@ -39,6 +39,8 @@ This project is currently built for Oculus/Meta Quest headsets, and tested on Oc
 
 The project is not available on the Meta Quest store, and must be sideloaded.
 
+To allow sideloading on Meta headsets, Developer Mode must be enabled. Instructions for enabling developer mode can be found [here](https://developers.meta.com/horizon/documentation/native/android/mobile-device-setup/)
+
 ### Android Debug Bridge
 
 If you don't already have Android SDK Platform Tools installed, they can be downloaded [here](https://developer.android.com/tools/releases/platform-tools)
