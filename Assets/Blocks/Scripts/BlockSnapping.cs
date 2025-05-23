@@ -664,8 +664,8 @@ public class BlockSnapping : MonoBehaviour
         currentRb.transform.position = adjustedPosition;
         //Debug.Log("UpdateBlockPosition: Block Position Updated!");
 
-        // Reset rotation (probably unnecessary)
-        currentRb.transform.rotation = Quaternion.Euler(0, 0, 0);
+        // Face the player on update. 
+        currentRb.transform.rotation = Quaternion.Euler(0, 0, 0); //Quaternion.LookRotation(playerLocation)
         //Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
 
         // Recreate the joint to reattach the block to its parent
