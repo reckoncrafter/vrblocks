@@ -651,7 +651,7 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log("UpdateBlockPosition: Initial Position - X: " + initialPosition.x + ", Y: " + initialPosition.y + ", Z: " + initialPosition.z);
 
         // Calculate circular offset of block to reposition additional columns along a circular area
-        Transform playerTransform = GameObject.Find("XR Origin (XR Rig)").transform;
+        Transform playerTransform = GameObject.Find("XR Origin (XR Rig)").transform; // The player's current position
         Vector3 playerPosition = playerTransform.position;
         Vector3 parentPosition = initialRootBlockPosition;
 
@@ -659,16 +659,15 @@ public class BlockSnapping : MonoBehaviour
         Vector3 parentToPlayer = (playerPosition - parentPosition).normalized;
         parentToPlayer.y = 0;
 
-        // Radius of circular area
+        // Radius of circular arc (distance from root to player)
         float radius = Vector3.Distance(playerPosition, parentPosition);
 
-        // Calculate the new circular position based on root position following circular shape of radius = distance from root block.
+        // Calculate new position on circular arc for this block
         Vector3 adjustedPosition = GetCircularOffset(playerPosition, parentToPlayer, radius, adjustPositionX, 10f); // Adjust the float number to modify distance between columns!!!
 
-        // Maintain y position from offset
+        // Apply y-offset to maintain block stack
         adjustedPosition.y = initialRootBlockPosition.y + (adjustPositionY * yBlockOffset);
 
-        currentRb.transform.position = adjustedPosition;
         Debug.Log("UpdateBlockPosition: Adjusted Position - X: " + adjustedPosition.x + ", Y: " + adjustedPosition.y + ", Z: " + adjustedPosition.z);
 
         // Apply the new position to the block
@@ -707,7 +706,7 @@ public class BlockSnapping : MonoBehaviour
         // Determine base angle
         float baseAngle = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
 
-        // Calculate the angle for this column
+        // Calculate the angle for this column (+180f because it was behind the player)
         float angle = baseAngle + 180f + (xOffset * angleStepDegrees);
 
         // Convert angle back to radians
