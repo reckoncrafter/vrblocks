@@ -18,6 +18,22 @@ public class DeletionBoundary : MonoBehaviour
             return;
         }
 
+        if (other.gameObject.CompareTag("Block"))
+        {
+            Joint joint = other.GetComponent<Joint>();
+            if (joint != null && joint.connectedBody != null)
+            {
+                GameObject parentBlock = joint.connectedBody.gameObject;
+                BlockSnapping parentSnapping = parentBlock.GetComponent<BlockSnapping>();
+                if (parentSnapping != null)
+                {
+                    parentSnapping.ResetSnapStatusOnOtherBlock(parentBlock);
+                    Rigidbody parentRb = parentBlock.GetComponent<Rigidbody>();
+                    parentSnapping.DestroyWire(parentRb);
+                }
+            }
+        }
+
         Destroy(other.gameObject);
         objectDestroyedEvent.Invoke();
     }
