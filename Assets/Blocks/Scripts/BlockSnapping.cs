@@ -20,7 +20,6 @@ public class BlockSnapping : MonoBehaviour
     private AudioSource audioSource;
 
 
-
     private void Awake()
     {
         // Collision Forwarding active
@@ -651,12 +650,23 @@ public class BlockSnapping : MonoBehaviour
         Vector3 initialPosition = currentRb.transform.position;
         Debug.Log("UpdateBlockPosition: Initial Position - X: " + initialPosition.x + ", Y: " + initialPosition.y + ", Z: " + initialPosition.z);
 
-        // Now calculate the new position based on initial root position and offsets
-        Vector3 adjustedPosition = new Vector3(
-            initialRootBlockPosition.x + (adjustPositionX * xBlockOffset),
-            initialRootBlockPosition.y + (adjustPositionY * yBlockOffset),
-            initialRootBlockPosition.z
-        );
+        // Calculate circular offset of block to reposition additional columns along a circular area
+        Transform playerTransform = GameObject.Find("XR Origin (XR Rig)").transform; // The player's current position
+        Vector3 playerPosition = playerTransform.position;
+        Vector3 parentPosition = initialRootBlockPosition;
+
+        // Direction from root block to player
+        Vector3 parentToPlayer = (playerPosition - parentPosition).normalized;
+        parentToPlayer.y = 0;
+
+        // Radius of circular arc (distance from root to player)
+        float radius = Vector3.Distance(playerPosition, parentPosition);
+
+        // Calculate new position on circular arc for this block
+        Vector3 adjustedPosition = GetCircularOffset(playerPosition, parentToPlayer, radius, adjustPositionX, 10f); // Adjust the float number to modify distance between columns!!!
+
+        // Apply y-offset to maintain block stack
+        adjustedPosition.y = initialRootBlockPosition.y + (adjustPositionY * yBlockOffset);
 
         Debug.Log("UpdateBlockPosition: Adjusted Position - X: " + adjustedPosition.x + ", Y: " + adjustedPosition.y + ", Z: " + adjustedPosition.z);
 
@@ -664,8 +674,11 @@ public class BlockSnapping : MonoBehaviour
         currentRb.transform.position = adjustedPosition;
         //Debug.Log("UpdateBlockPosition: Block Position Updated!");
 
-        // Reset rotation (probably unnecessary)
-        currentRb.transform.rotation = Quaternion.Euler(0, 0, 0);
+        // Face the player on update. 
+        Vector3 directionToPlayer = playerTransform.position - currentRb.transform.position;
+        directionToPlayer.y = 0; // Ignore Y direction to keep blocks straight.
+
+        currentRb.transform.rotation = Quaternion.LookRotation(-directionToPlayer); //Quaternion.LookRotation(playerLocation)
         //Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
 
         // Recreate the joint to reattach the block to its parent
@@ -686,6 +699,25 @@ public class BlockSnapping : MonoBehaviour
         Debug.Log($"UpdateBlockPosition: Block '{currentRb.name}' moved from " +
                   $"Position X: {initialPosition.x}, Y: {initialPosition.y}, Z: {initialPosition.z} " +
                   $"to New Position X: {currentRb.transform.position.x}, Y: {currentRb.transform.position.y}, Z: {currentRb.transform.position.z}.");
+    }
+
+    public Vector3 GetCircularOffset(Vector3 center, Vector3 forward, float radius, int xOffset, float angleStepDegrees)
+    {
+        // Determine base angle
+        float baseAngle = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+
+        // Calculate the angle for this column (+180f because it was behind the player)
+        float angle = baseAngle + 180f + (xOffset * angleStepDegrees);
+
+        // Convert angle back to radians
+        float rad = angle * Mathf.Deg2Rad;
+
+        // Return position offset on the circle
+        return new Vector3(
+            center.x + radius * Mathf.Sin(rad),
+            center.y,
+            center.z + radius * Mathf.Cos(rad)
+        );
     }
 
     public void ResnapBlocks(Rigidbody currentRb)
