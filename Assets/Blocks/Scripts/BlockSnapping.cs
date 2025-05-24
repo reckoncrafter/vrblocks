@@ -20,7 +20,6 @@ public class BlockSnapping : MonoBehaviour
     private AudioSource audioSource;
 
 
-
     private void Awake()
     {
         // Collision Forwarding active
@@ -665,7 +664,11 @@ public class BlockSnapping : MonoBehaviour
         //Debug.Log("UpdateBlockPosition: Block Position Updated!");
 
         // Face the player on update. 
-        currentRb.transform.rotation = Quaternion.Euler(0, 0, 0); //Quaternion.LookRotation(playerLocation)
+        Transform playerPosition = GameObject.Find("XR Origin (XR Rig)").transform;
+        Vector3 directionToPlayer = playerPosition.position - currentRb.transform.position;
+        directionToPlayer.y = 0; // Ignore Y direction to keep blocks straight.
+
+        currentRb.transform.rotation = Quaternion.LookRotation(-directionToPlayer); //Quaternion.LookRotation(playerLocation)
         //Debug.Log("UpdateBlockPosition: Block Rotation Reset!");
 
         // Recreate the joint to reattach the block to its parent
